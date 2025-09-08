@@ -5,7 +5,6 @@
 
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useVirtual } from '@tanstack/react-virtual';
 import { 
   ChevronDown,
   ChevronUp,
@@ -184,13 +183,8 @@ export function ModernDataTable<T = any>({
 
   const totalPages = Math.ceil(processedData.length / pageSize);
 
-  // Virtual scrolling setup
+  // Virtual scrolling setup (disabled for now)
   const parentRef = React.useRef<HTMLDivElement>(null);
-  const rowVirtualizer = useVirtual({
-    size: virtualScrolling ? paginatedData.length : 0,
-    parentRef,
-    estimateSize: () => 60,
-  });
 
   // Gestion du tri
   const handleSort = (columnId: string) => {
@@ -439,17 +433,6 @@ export function ModernDataTable<T = any>({
                     {emptyMessage}
                   </td>
                 </tr>
-              ) : virtualScrolling ? (
-                rowVirtualizer.virtualItems.map(virtualRow => {
-                  const row = paginatedData[virtualRow.index];
-                  return (
-                    <TableRow
-                      key={virtualRow.index}
-                      row={row}
-                      index={virtualRow.index}
-                    />
-                  );
-                })
               ) : (
                 paginatedData.map((row, index) => (
                   <TableRow key={index} row={row} index={index} />
