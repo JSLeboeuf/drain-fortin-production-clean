@@ -35,7 +35,7 @@ export default function Dashboard() {
   
   const { data: enhancedMetrics, isLoading: enhancedLoading } = useEnhancedMetrics();
   const { activeCalls } = useWebSocket();
-  const alerts = useAllAlerts();
+  const { data: alerts, isLoading: alertsLoading, error: alertsError } = useAllAlerts();
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
   
@@ -70,7 +70,7 @@ export default function Dashboard() {
     localStorage.setItem('guillaume_onboarding_seen', 'true');
   };
 
-  if (isLoading || enhancedLoading) {
+  if (isLoading || enhancedLoading || alertsLoading) {
     return (
       <div className="flex h-screen bg-gray-50 dark:bg-background">
         <Sidebar />

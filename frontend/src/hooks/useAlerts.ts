@@ -179,17 +179,32 @@ function mapPriorityToSeverity(priority: string): 'critical' | 'high' | 'medium'
 }
 
 export function useAllAlerts() {
-  const { data: slaAlerts } = useSLAAlerts();
-  const { data: constraintAlerts } = useConstraintAlerts();
-  
+  const { data: slaAlerts, isLoading: slaLoading, error: slaError } = useSLAAlerts();
+  const { data: constraintAlerts, isLoading: constraintLoading, error: constraintError } = useConstraintAlerts();
+
+  // Gestion des états de chargement
+  const isLoading = slaLoading || constraintLoading;
+  const error = slaError || constraintError;
+
   // S'assurer que les données sont des tableaux valides
+  const safeSlaAlerts = Array.isArray(slaAlerts) ? slaAlerts : [];
+  const safeConstraintAlerts = Array.isArray(constraintAlerts) ? constraintAlerts : [];
+
   const allAlerts = [
-    ...(slaAlerts || []),
-    ...(constraintAlerts || [])
+    ...safeSlaAlerts,
+    ...safeConstraintAlerts
   ];
-  
-  return allAlerts.sort((a, b) => {
+
+  // Trier par sévérité
+  const sortedAlerts = allAlerts.sort((a, b) => {
     const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
     return severityOrder[a.severity] - severityOrder[b.severity];
   });
+
+  return {
+    data: sortedAlerts,
+    isLoading,
+    error,
+    count: sortedAlerts.length,
+  };
 }

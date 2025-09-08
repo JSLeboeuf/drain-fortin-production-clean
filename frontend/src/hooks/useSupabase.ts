@@ -158,8 +158,8 @@ export function useDashboardData() {
   useRealtimeCalls();
   
   return {
-    calls: calls.data || [],
-    leads: leads.data || [],
+    calls: Array.isArray(calls.data) ? calls.data : [],
+    leads: Array.isArray(leads.data) ? leads.data : [],
     metrics: metrics.data || {
       totalCalls: 0,
       totalLeads: 0,
