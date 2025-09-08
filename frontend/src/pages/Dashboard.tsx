@@ -15,6 +15,7 @@ import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
 import PaulROITracker from "@/components/dashboard/PaulROITracker";
 import SmartInsights from "@/components/dashboard/SmartInsights";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { PageErrorBoundary } from "@/components/ErrorBoundary";
 import { useDashboardData, useRealtimeCalls } from "@/hooks/useSupabase";
 import { useWebSocket } from "@/hooks/useWebSocket";
@@ -42,8 +43,8 @@ export default function Dashboard() {
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
   
-  // Afficher le dashboard moderne par défaut
-  const [useModernUI, setUseModernUI] = useState(true);
+  // Afficher le dashboard moderne par défaut (désactivé temporairement pour debug)
+  const [useModernUI, setUseModernUI] = useState(false);
   
   // Notifications P1 - désactivées temporairement pour éviter les erreurs
   const hasP1Active = activeCalls?.some(c => c.priority === 'P1') || false;
@@ -107,6 +108,18 @@ export default function Dashboard() {
           title="Dashboard" 
           subtitle="Surveillance en temps réel de Paul, votre assistant vocal" 
         />
+        
+        {/* Toggle pour basculer entre les UI */}
+        <div className="px-4 md:px-6 mb-2">
+          <Button
+            onClick={() => setUseModernUI(!useModernUI)}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            {useModernUI ? "Interface Classique" : "Interface Moderne"}
+          </Button>
+        </div>
         
         <div className="px-4 md:px-6 mb-4">
           <QuickActions />
