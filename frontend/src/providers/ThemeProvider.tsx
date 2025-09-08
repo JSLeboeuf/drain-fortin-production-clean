@@ -4,7 +4,6 @@
  */
 
 import React, { createContext, useContext, useEffect } from 'react';
-import { useAppStore, useTheme } from '@/stores/useAppStore';
 import type { ThemeMode } from '@/styles/theme';
 
 interface ThemeContextType {
@@ -31,45 +30,47 @@ export function ThemeProvider({
   enableSystem = true,
   ...props
 }: ThemeProviderProps) {
-  const theme = useTheme();
-  const { setTheme } = useAppStore();
+  // Use local state instead of store to avoid circular dependencies
+  const [localTheme, setLocalTheme] = React.useState<ThemeMode>(() => {
+    // Get initial theme from localStorage or system
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(storageKey);
+      if (stored === 'light' || stored === 'dark') {
+        return stored as ThemeMode;
+      }
+      if (enableSystem) {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+    }
+    return defaultTheme;
+  });
 
-  // Detect system theme preference
-  const getSystemTheme = (): ThemeMode => {
-    if (typeof window === 'undefined') return defaultTheme;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  };
-
-  // Initialize theme
+  // Initialize and update theme
   useEffect(() => {
     const root = window.document.documentElement;
     
     // Remove existing theme classes
     root.classList.remove('light', 'dark');
     
-    let finalTheme = theme;
-    
-    // If no theme is set and system detection is enabled
-    if (!theme && enableSystem) {
-      finalTheme = getSystemTheme();
-      setTheme(finalTheme);
-    }
-    
     // Apply theme class to document
-    root.classList.add(finalTheme);
+    root.classList.add(localTheme);
     
     // Set CSS custom properties for smooth transitions
-    root.style.setProperty('color-scheme', finalTheme);
+    root.style.setProperty('color-scheme', localTheme);
+    
+    // Save to localStorage
+    localStorage.setItem(storageKey, localTheme);
     
     // Add transition class for smooth theme switching
     root.classList.add('theme-transition');
     
     // Remove transition class after animation completes
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       root.classList.remove('theme-transition');
     }, 300);
     
-  }, [theme, setTheme, enableSystem]);
+    return () => clearTimeout(timer);
+  }, [localTheme, storageKey]);
 
   // Listen to system theme changes
   useEffect(() => {
@@ -78,26 +79,26 @@ export function ThemeProvider({
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
     const handleChange = (e: MediaQueryListEvent) => {
-      if (theme === 'system' || !theme) {
-        const systemTheme = e.matches ? 'dark' : 'light';
-        setTheme(systemTheme);
-      }
+      // Only update if explicitly set to follow system
+      const systemTheme = e.matches ? 'dark' : 'light';
+      setLocalTheme(systemTheme);
     };
 
+    // Only add listener if system detection is enabled
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme, setTheme, enableSystem]);
+  }, [enableSystem]);
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    setLocalTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
   const value: ThemeContextType = {
-    theme,
-    setTheme,
+    theme: localTheme,
+    setTheme: setLocalTheme,
     toggleTheme,
-    isDark: theme === 'dark',
-    isLight: theme === 'light',
+    isDark: localTheme === 'dark',
+    isLight: localTheme === 'light',
   };
 
   return (
