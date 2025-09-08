@@ -38,39 +38,40 @@ vi.mock('./ConstraintItem', () => ({
 
 // Mock the constraint service
 vi.mock('@/services/constraintService', () => ({
-  transformConstraintsData: vi.fn(() => [
-    {
-      id: 'C001',
-      name: 'Test Constraint 1',
-      condition: 'test condition',
-      category: 'service',
-      priority: 'P1',
-      description: 'Test description',
-      violationCount: 0,
-      active: true
-    },
-    {
-      id: 'C002', 
-      name: 'Test Constraint 2',
-      condition: 'another condition',
-      category: 'pricing',
-      priority: 'P2',
-      description: 'Another test description',
-      violationCount: 1,
-      active: false
-    }
-  ]),
+  fetchConstraints: vi.fn(async () => ({
+    items: [
+      {
+        id: 'C001',
+        name: 'Test Constraint 1',
+        condition: 'test condition',
+        category: 'service',
+        priority: 'P1',
+        description: 'Test description',
+        violationCount: 0,
+        active: true,
+        action: 'validate'
+      },
+      {
+        id: 'C002', 
+        name: 'Test Constraint 2',
+        condition: 'another condition',
+        category: 'pricing',
+        priority: 'P2',
+        description: 'Another test description',
+        violationCount: 1,
+        active: false,
+        action: 'validate'
+      }
+    ]
+  })),
   getConstraintsByCategory: vi.fn(() => ({})),
   getConstraintStats: vi.fn(() => ({
     total: 2,
     active: 1,
     inactive: 1,
-    p1Count: 1,
-    p2Count: 1,
-    p3Count: 0,
-    p4Count: 0,
-    violationsTotal: 1,
-    categories: {}
+    activationRate: 50,
+    byCategory: [],
+    byPriority: { P1: 1, P2: 1, P3: 0, P4: 0 }
   }))
 }));
 

@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import React from "react";
 import { logger } from "@/lib/logger";
 // Session Safety: no-outbound mocks (DEV only)
 import "./mocks/no-outbound";
@@ -56,4 +57,8 @@ if (import.meta.env.DEV) {
   } catch {}
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);

@@ -10,23 +10,9 @@ export interface LiveCall {
   metadata?: Record<string, any>;
 }
 
-// Import shared types from backend for consistency
-export type {
-  Call as BackendCall,
-  AnalyticsSummary,
-  DashboardData,
-  Alert,
-  AppSettings,
-  CompanyProfile,
-  APIResponse,
-  PaginatedResponse,
-  CallsQueryParams,
-  AnalyticsQueryParams,
-  CallStatus as BackendCallStatus,
-  CallPriority,
-  AlertType,
-  AlertSeverity
-} from '../../../src/types/shared.js';
+// Remarque: pour éviter les dépendances croisées fragiles, les types backend
+// ne sont plus ré-exportés depuis le dossier racine. Définissez ici les
+// interfaces strictement nécessaires au frontend.
 
 // Frontend-specific Call interface (extends backend)
 export interface Call {

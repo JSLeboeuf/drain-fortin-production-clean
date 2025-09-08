@@ -21,6 +21,11 @@ VITE_WS_URL=ws://localhost:3001
 
 # Logging Level
 VITE_LOG_LEVEL=debug
+ 
+# API Backend (compat Next.js/Vite)
+# Utilisez de préférence NEXT_PUBLIC_API_BASE_URL; VITE_API_BASE_URL reste supporté
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+# VITE_API_BASE_URL=http://localhost:8080
 ```
 
 ## Instructions
