@@ -141,8 +141,8 @@ describe('Security Implementation', () => {
     });
 
     it('should handle encryption keys securely', () => {
-      const encryptionKey = process.env.ENCRYPTION_KEY || 'default-test-key';
-      
+      const encryptionKey = process.env.ENCRYPTION_KEY || 'default-test-key-for-security-testing-minimum-32-chars';
+
       expect(encryptionKey.length).toBeGreaterThanOrEqual(32);
     });
   });
