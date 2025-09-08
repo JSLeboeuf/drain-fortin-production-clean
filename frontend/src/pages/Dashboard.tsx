@@ -21,9 +21,9 @@ import { useWebSocket } from "@/hooks/useWebSocket";
 import { useAllAlerts, useEnhancedMetrics } from "@/hooks/useAlerts";
 import { useState, useEffect } from "react";
 
+import { ModernDashboard } from '@/components/dashboard/ModernDashboard';
+
 export default function Dashboard() {
-  // Import du nouveau dashboard moderne
-  const { ModernDashboard } = require('@/components/dashboard/ModernDashboard');
   
   // Utiliser les hooks synchronisés avec Supabase
   const { 
