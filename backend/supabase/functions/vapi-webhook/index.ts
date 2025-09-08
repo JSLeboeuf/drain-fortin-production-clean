@@ -1,6 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
-import { corsHeaders } from "../_shared/cors.ts";
+import { 
+  getCorsHeaders, 
+  isOriginAllowed, 
+  validateContentType,
+  sanitizeHeaders,
+  getRateLimitConfig
+} from "../_shared/cors.ts";
 
 // Environment variables
 // Supabase injects SUPABASE_URL automatically. Service key must be provided via secret
@@ -11,9 +17,13 @@ const VAPI_WEBHOOK_SECRET = Deno.env.get('VAPI_WEBHOOK_SECRET');
 const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID') || '';
 const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN') || '';
 const TWILIO_FROM = Deno.env.get('TWILIO_FROM') || Deno.env.get('TWILIO_PHONE_NUMBER') || '';
+const ENVIRONMENT = Deno.env.get('ENVIRONMENT') || 'development';
 
 // Initialize Supabase client
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+// Rate limiting storage (in-memory for this example)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
 interface VAPIWebhookPayload {
   type: string;
@@ -49,13 +59,38 @@ interface VAPIWebhookPayload {
   };
 }
 
-// Helper function to verify HMAC signature
+// Enhanced security: Rate limiting
+function checkRateLimit(ip: string): boolean {
+  const config = getRateLimitConfig();
+  const now = Date.now();
+  const key = `rate_limit_${ip}`;
+  
+  const existing = rateLimitStore.get(key);
+  if (!existing || now > existing.resetTime) {
+    rateLimitStore.set(key, { count: 1, resetTime: now + config.windowMs });
+    return true;
+  }
+  
+  if (existing.count >= config.maxRequests) {
+    return false;
+  }
+  
+  existing.count++;
+  return true;
+}
+
+// Enhanced security: HMAC signature verification
 async function verifySignature(payload: string, signature: string, secret: string): Promise<boolean> {
-  if (!secret || !signature) return false;
+  if (!secret || !signature) {
+    console.warn('Missing webhook secret or signature');
+    return false;
+  }
+  
   try {
     const encoder = new TextEncoder();
     const keyData = encoder.encode(secret);
     const payloadData = encoder.encode(payload);
+    
     const key = await crypto.subtle.importKey(
       'raw',
       keyData,
@@ -63,16 +98,49 @@ async function verifySignature(payload: string, signature: string, secret: strin
       false,
       ['sign', 'verify']
     );
+    
     const sigBuf = await crypto.subtle.sign('HMAC', key, payloadData);
-    // hex-encode to compare to common hex signature
-    const hex = Array.from(new Uint8Array(sigBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
-    const expected = signature.replace(/^hmac-sha256=/, '').toLowerCase();
-    if (hex.length !== expected.length) return false;
+    const hex = Array.from(new Uint8Array(sigBuf))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    const expected = signature.replace(/^(sha256=|hmac-sha256=)/, '').toLowerCase();
+    
+    if (hex.length !== expected.length) {
+      console.warn('Signature length mismatch');
+      return false;
+    }
+    
+    // Timing-safe comparison
     let diff = 0;
-    for (let i = 0; i < hex.length; i++) diff |= hex.charCodeAt(i) ^ expected.charCodeAt(i);
-    return diff === 0;
-  } catch {
+    for (let i = 0; i < hex.length; i++) {
+      diff |= hex.charCodeAt(i) ^ expected.charCodeAt(i);
+    }
+    
+    const isValid = diff === 0;
+    if (!isValid) {
+      console.warn('Invalid webhook signature');
+    }
+    
+    return isValid;
+  } catch (error) {
+    console.error('Signature verification error:', error);
     return false;
+  }
+}
+
+// Security logging function
+async function logSecurityEvent(eventType: string, details: any, ip?: string) {
+  try {
+    await supabase.from('security_events').insert({
+      event_type: eventType,
+      details,
+      ip_address: ip,
+      timestamp: new Date().toISOString(),
+      environment: ENVIRONMENT
+    });
+  } catch (error) {
+    console.error('Failed to log security event:', error);
   }
 }
 
@@ -89,7 +157,7 @@ function classifyPriority(description: string, value?: number): {
   return { priority: 'P4', reason: 'standard', sla_seconds: 1800 };
 }
 
-// Process function calls from VAPI
+// Process function calls from VAPI (unchanged from original - functionality preserved)
 async function processFunction(name: string, args: any): Promise<any> {
   switch (name) {
     case 'validateServiceRequest': {
@@ -305,14 +373,70 @@ async function processFunction(name: string, args: any): Promise<any> {
   }
 }
 
-// Main webhook handler
+// Enhanced main webhook handler with security
 serve(async (req) => {
+  const clientIp = req.headers.get('x-forwarded-for') || 
+                   req.headers.get('x-real-ip') || 
+                   'unknown';
+  const origin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
+
   try {
+    // Security: Rate limiting
+    if (!checkRateLimit(clientIp)) {
+      await logSecurityEvent('rate_limit_exceeded', { ip: clientIp }, clientIp);
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Security: Validate request method
+    if (req.method !== 'POST') {
+      await logSecurityEvent('invalid_method', { method: req.method, ip: clientIp }, clientIp);
+      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+        status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Security: Validate content type
+    const contentType = req.headers.get('content-type');
+    if (!validateContentType(contentType)) {
+      await logSecurityEvent('invalid_content_type', { contentType, ip: clientIp }, clientIp);
+      return new Response(JSON.stringify({ error: 'Invalid content type' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Security: Validate origin in production
+    if (ENVIRONMENT === 'production' && !isOriginAllowed(origin)) {
+      await logSecurityEvent('cors_violation', { origin, ip: clientIp }, clientIp);
+      return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     const raw = await req.text();
-    const payload: VAPIWebhookPayload = JSON.parse(raw || '{}');
+    
+    // Security: Validate JSON payload
+    let payload: VAPIWebhookPayload;
+    try {
+      payload = JSON.parse(raw || '{}');
+    } catch (error) {
+      await logSecurityEvent('invalid_json', { error: error.message, ip: clientIp }, clientIp);
+      return new Response(JSON.stringify({ error: 'Invalid JSON payload' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
 
     // Health-check: answer fast without HMAC requirement
     if (payload.type === 'health-check') {
@@ -321,10 +445,15 @@ serve(async (req) => {
       });
     }
 
-    // Verify signature in production
-    if (Deno.env.get('ENVIRONMENT') === 'production') {
+    // Security: Verify signature in production
+    if (ENVIRONMENT === 'production') {
       const signature = req.headers.get('x-vapi-signature') || '';
       if (!(await verifySignature(raw, signature, VAPI_WEBHOOK_SECRET || ''))) {
+        await logSecurityEvent('invalid_signature', { 
+          hasSignature: !!signature,
+          hasSecret: !!VAPI_WEBHOOK_SECRET,
+          ip: clientIp 
+        }, clientIp);
         return new Response(JSON.stringify({ error: 'Invalid signature' }), {
           status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -332,6 +461,7 @@ serve(async (req) => {
       }
     }
 
+    // Process webhook events (unchanged from original - functionality preserved)
     switch (payload.type) {
       case 'call-started': {
         if (payload.call) {
@@ -402,7 +532,9 @@ serve(async (req) => {
             const result = await processFunction(toolCall.function.name, toolCall.function.arguments);
             results.push({ toolCallId: toolCall.toolCallId, result });
           }
-          return new Response(JSON.stringify({ results }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+          return new Response(JSON.stringify({ results }), { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          });
         }
         break;
       }
@@ -413,6 +545,11 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Webhook error', error);
+    await logSecurityEvent('webhook_error', { 
+      error: error.message,
+      ip: clientIp 
+    }, clientIp);
+    
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

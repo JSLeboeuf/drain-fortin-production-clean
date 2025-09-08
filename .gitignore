@@ -10,22 +10,46 @@ out/
 */dist/
 */build/
 
-# Environment variables
+# Environment variables - SECURITY CRITICAL
 .env
 .env.local
 .env.production
 .env.development
+.env.staging
+.env.test
 *.env
+*.env.*
 !.env.example
 !config/.env.example
+!frontend/.env.example
 
-# IDE
+# Secrets and Keys - NEVER COMMIT
+*secret*
+*key*
+*token*
+*password*
+*credential*
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+*.keystore
+*.jks
+auth.json
+service-account.json
+google-services.json
+GoogleService-Info.plist
+
+# IDE and Editor files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+*.sublime-project
+*.sublime-workspace
 
 # Logs
 logs/
@@ -35,11 +59,15 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+debug.log
+error.log
 
 # Testing
 coverage/
 .nyc_output/
 *.lcov
+test-results/
+playwright-report/
 
 # Cache
 .npm/
@@ -47,28 +75,34 @@ coverage/
 .pnp.*
 .cache/
 .parcel-cache/
+.eslintcache
+.stylelintcache
+.rts2_cache_cjs/
+.rts2_cache_es/
 
 # Temporary files
 tmp/
 temp/
 *.tmp
 *.temp
+*.bak
+*.backup
+*~
 
 # Supabase
 **/supabase/.branches
 **/supabase/.temp
 .supabase/
 
-# Security - NEVER commit these
-*.pem
-*.key
-*.cert
-*.p12
-*.pfx
+# Cloud platforms
+.vercel
+.netlify
 
 # OS files
 Thumbs.db
 Desktop.ini
+.DS_Store
+*.DS_Store
 
 # Debug
 debug/
@@ -76,17 +110,16 @@ debug/
 *.seed
 *.pid.lock
 
+# Runtime data
+pids
+*.pid.lock
+lib-cov
+
 # TypeScript
 *.tsbuildinfo
 
 # Optional npm cache
 .npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional stylelint cache
-.stylelintcache
 
 # Output of 'npm pack'
 *.tgz
@@ -94,29 +127,20 @@ debug/
 # Yarn
 yarn-integrity
 .yarn-integrity
-
-# dotenv environment variable files
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Vercel
-.vercel
-
-# Netlify
-.netlify
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
 
 # Local development
 *.local
-
-# Backup files
-*.backup
-*.bak
 
 # Database
 *.db
 *.sqlite
 *.sqlite3
+*.db-journal
 
 # Archives
 *.zip
@@ -124,3 +148,37 @@ yarn-integrity
 *.gz
 *.rar
 *.7z
+
+# Deployment scripts with secrets
+deploy-to-*.ps1
+deploy-*.sh
+*deploy*secret*
+
+# Config files that might contain secrets
+config.json
+settings.json
+app-settings.json
+local-settings.json
+
+# Security scan results
+security-report.*
+vulnerability-report.*
+audit-report.*
+
+# Generated documentation
+docs/generated/
+api-docs/
+
+# Monitoring and analytics
+.sentry/
+.datadog/
+
+# IMPORTANT: Files that were accidentally committed with secrets
+# These should be in git history but ignored going forward
+config/.env.production
+frontend/.env
+deploy-to-supabase.ps1
+test-sms-internal.js
+
+# Add any domain-specific ignore patterns here
+# Example: *-production-config.json

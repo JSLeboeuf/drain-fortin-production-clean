@@ -1,255 +1,204 @@
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+// SMS Testing Script - Secure Version
+// This script tests SMS functionality without exposing secrets
 
-// Configuration Twilio
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || 'YOUR_TWILIO_ACCOUNT_SID';
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || 'YOUR_TWILIO_AUTH_TOKEN';
-const TWILIO_FROM = '+14389004385'; // Drain Fortin - Test Direct
+const TWILIO_FROM = process.env.TWILIO_FROM || process.env.TWILIO_PHONE_NUMBER || '+1xxxxxxxxxx';
 
-// Numéro de test (votre numéro pour recevoir le SMS)
-const INTERNAL_TEAM_NUMBER = '+14502803222';
+// Test phone numbers (replace with real numbers)
+const TEST_TEAM_NUMBERS = [
+    process.env.TEST_PHONE_NUMBER || '+14502803222'
+];
 
-// Test direct avec Twilio - P1 Urgence
-async function testP1Urgency() {
-  console.log('🚨 Test SMS Urgence P1 - Équipe Interne...\n');
-  
-  const message = `🚨 URGENCE IMMÉDIATE - Drain Fortin
+console.log('🧪 SMS Testing Script - Secure Version');
+console.log('=====================================');
 
-CLIENT: Jean Tremblay
-TÉL: 514-555-1234
-ADRESSE: 123 rue Principale, Brossard
-PROBLÈME: Refoulement d'égout dans le sous-sol
-PRIORITÉ: P1
-
-Rappeler le client rapidement.`;
-
-  try {
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
-    const auth = 'Basic ' + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64');
+// Validate environment
+function validateEnvironment() {
+    console.log('🔍 Validating environment variables...');
     
-    const body = new URLSearchParams();
-    body.set('From', TWILIO_FROM);
-    body.set('To', INTERNAL_TEAM_NUMBER);
-    body.set('Body', message);
+    const required = ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_FROM'];
+    const missing = required.filter(var_name => !process.env[var_name]);
     
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': auth,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: body.toString()
-    });
-    
-    const result = await response.json();
-    
-    if (response.ok && result.sid) {
-      console.log('✅ SMS P1 envoyé avec succès!');
-      console.log('   SID:', result.sid);
-      console.log('   To:', result.to);
-      console.log('   Status:', result.status);
-    } else {
-      console.error('❌ Erreur:', result);
+    if (missing.length > 0) {
+        console.error('❌ Missing required environment variables:');
+        missing.forEach(var_name => console.error(`   - ${var_name}`));
+        console.error('\nPlease set these variables before running tests.');
+        process.exit(1);
     }
-  } catch (error) {
-    console.error('❌ Erreur:', error);
-  }
+    
+    console.log('✅ Environment validation passed');
+    return true;
 }
 
-// Test P2 - Priorité Municipale
-async function testP2Municipal() {
-  console.log('\n⚠️ Test SMS P2 - Municipal...\n');
-  
-  const message = `⚠️ PRIORITÉ MUNICIPALE - Drain Fortin
+// Test SMS sending function
+async function sendTestSMS(to, priority = 'P4', urgency = 'TEST') {
+    const urgencyEmoji = {
+        'P1': '🚨',
+        'P2': '⚠️', 
+        'P3': '🔧',
+        'P4': '📋',
+        'TEST': '🧪'
+    };
+    
+    const message = `${urgencyEmoji[priority]} ${urgency} - Drain Fortin CRM
 
-CLIENT: Ville de Longueuil
-TÉL: 450-555-6789
-ADRESSE: 456 boul. Saint-Laurent, Longueuil
-PROBLÈME: Égout municipal bloqué
-PRIORITÉ: P2
+CLIENT: Test Client
+TÉL: +15145551234
+ADRESSE: 123 Test Street, Montreal QC
+PROBLÈME: Test message - SMS functionality verification
+PRIORITÉ: ${priority}
 
-Rappeler le client rapidement.`;
+This is a test message - please ignore.
+System functioning correctly.`;
 
-  try {
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
-    const auth = 'Basic ' + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64');
+    console.log(`📤 Sending test SMS to ${to}...`);
     
-    const body = new URLSearchParams();
-    body.set('From', TWILIO_FROM);
-    body.set('To', INTERNAL_TEAM_NUMBER);
-    body.set('Body', message);
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': auth,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: body.toString()
-    });
-    
-    const result = await response.json();
-    
-    if (response.ok && result.sid) {
-      console.log('✅ SMS P2 envoyé avec succès!');
-      console.log('   SID:', result.sid);
-      console.log('   Status:', result.status);
-    } else {
-      console.error('❌ Erreur:', result);
+    try {
+        const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
+        const body = new URLSearchParams({
+            From: TWILIO_FROM,
+            To: to,
+            Body: message
+        });
+        
+        const auth = 'Basic ' + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64');
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': auth,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log(`✅ SMS sent successfully to ${to}`);
+        console.log(`   SID: ${result.sid}`);
+        console.log(`   Status: ${result.status}`);
+        
+        return { success: true, sid: result.sid, to, message };
+        
+    } catch (error) {
+        console.error(`❌ Failed to send SMS to ${to}:`, error.message);
+        return { success: false, error: error.message, to };
     }
-  } catch (error) {
-    console.error('❌ Erreur:', error);
-  }
 }
 
-// Test P3 - Service Majeur
-async function testP3ServiceMajeur() {
-  console.log('\n🔧 Test SMS P3 - Service Majeur...\n');
-  
-  const message = `🔧 SERVICE MAJEUR - Drain Fortin
-
-CLIENT: Marie Dubois
-TÉL: 438-555-9876
-ADRESSE: 789 avenue des Érables, Saint-Hubert
-PROBLÈME: Installation de gainage complet
-PRIORITÉ: P3
-
-Rappeler le client rapidement.`;
-
-  try {
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
-    const auth = 'Basic ' + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64');
+// Test different priority levels
+async function runPriorityTests() {
+    console.log('\n📊 Testing different priority levels...');
     
-    const body = new URLSearchParams();
-    body.set('From', TWILIO_FROM);
-    body.set('To', INTERNAL_TEAM_NUMBER);
-    body.set('Body', message);
+    const priorities = [
+        { level: 'P1', description: 'URGENCE IMMÉDIATE' },
+        { level: 'P2', description: 'PRIORITÉ MUNICIPALE' },
+        { level: 'P3', description: 'SERVICE MAJEUR' },
+        { level: 'P4', description: 'SERVICE STANDARD' }
+    ];
     
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': auth,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: body.toString()
-    });
+    const results = [];
     
-    const result = await response.json();
-    
-    if (response.ok && result.sid) {
-      console.log('✅ SMS P3 envoyé avec succès!');
-      console.log('   SID:', result.sid);
-      console.log('   Status:', result.status);
-    } else {
-      console.error('❌ Erreur:', result);
+    for (const priority of priorities) {
+        console.log(`\n🔄 Testing priority ${priority.level} (${priority.description})`);
+        
+        for (const phoneNumber of TEST_TEAM_NUMBERS) {
+            const result = await sendTestSMS(phoneNumber, priority.level, priority.description);
+            results.push(result);
+            
+            // Wait between sends to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
     }
-  } catch (error) {
-    console.error('❌ Erreur:', error);
-  }
+    
+    return results;
 }
 
-// Test P4 - Service Standard
-async function testP4Standard() {
-  console.log('\n📋 Test SMS P4 - Service Standard...\n');
-  
-  const message = `📋 SERVICE STANDARD - Drain Fortin
-
-CLIENT: Robert Gagnon
-TÉL: 514-555-3456
-ADRESSE: 321 rue des Pins, Montréal
-PROBLÈME: Inspection caméra préventive
-PRIORITÉ: P4
-
-Rappeler le client rapidement.`;
-
-  try {
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
-    const auth = 'Basic ' + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64');
+// Generate test report
+function generateReport(results) {
+    console.log('\n📋 TEST REPORT');
+    console.log('==============');
     
-    const body = new URLSearchParams();
-    body.set('From', TWILIO_FROM);
-    body.set('To', INTERNAL_TEAM_NUMBER);
-    body.set('Body', message);
+    const successful = results.filter(r => r.success);
+    const failed = results.filter(r => !r.success);
     
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': auth,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: body.toString()
-    });
+    console.log(`📊 Total tests: ${results.length}`);
+    console.log(`✅ Successful: ${successful.length}`);
+    console.log(`❌ Failed: ${failed.length}`);
+    console.log(`📈 Success rate: ${((successful.length / results.length) * 100).toFixed(1)}%`);
     
-    const result = await response.json();
-    
-    if (response.ok && result.sid) {
-      console.log('✅ SMS P4 envoyé avec succès!');
-      console.log('   SID:', result.sid);
-      console.log('   Status:', result.status);
-    } else {
-      console.error('❌ Erreur:', result);
+    if (failed.length > 0) {
+        console.log('\n❌ Failed tests:');
+        failed.forEach(result => {
+            console.log(`   ${result.to}: ${result.error}`);
+        });
     }
-  } catch (error) {
-    console.error('❌ Erreur:', error);
-  }
+    
+    if (successful.length > 0) {
+        console.log('\n✅ Successful sends:');
+        successful.forEach(result => {
+            console.log(`   ${result.to}: ${result.sid}`);
+        });
+    }
+    
+    console.log('\n💡 Next steps:');
+    if (failed.length > 0) {
+        console.log('   • Check Twilio console for delivery status');
+        console.log('   • Verify phone numbers are valid');
+        console.log('   • Check account balance and permissions');
+    }
+    console.log('   • Test webhook integration with VAPI');
+    console.log('   • Verify SMS routing in production');
 }
 
-// Menu de sélection
+// Main execution
 async function main() {
-  console.log('========================================');
-  console.log('  TEST SMS ÉQUIPE INTERNE DRAIN FORTIN');
-  console.log('========================================');
-  console.log(`📱 Envoi vers: ${INTERNAL_TEAM_NUMBER}`);
-  console.log('');
-  console.log('Choisir le niveau d\'urgence à tester:');
-  console.log('1. P1 - URGENCE IMMÉDIATE (Inondation)');
-  console.log('2. P2 - PRIORITÉ MUNICIPALE');
-  console.log('3. P3 - SERVICE MAJEUR (Gainage)');
-  console.log('4. P4 - SERVICE STANDARD');
-  console.log('5. Tous les niveaux (4 SMS)');
-  console.log('');
-  
-  // Par défaut, on teste P1
-  const choice = process.argv[2] || '1';
-  
-  switch(choice) {
-    case '1':
-      await testP1Urgency();
-      break;
-    case '2':
-      await testP2Municipal();
-      break;
-    case '3':
-      await testP3ServiceMajeur();
-      break;
-    case '4':
-      await testP4Standard();
-      break;
-    case '5':
-      await testP1Urgency();
-      await new Promise(r => setTimeout(r, 2000));
-      await testP2Municipal();
-      await new Promise(r => setTimeout(r, 2000));
-      await testP3ServiceMajeur();
-      await new Promise(r => setTimeout(r, 2000));
-      await testP4Standard();
-      break;
-    default:
-      console.log('Choix invalide. Utilisation: node test-sms-internal.js [1-5]');
-  }
-  
-  console.log('\n========================================');
-  console.log('Test terminé!');
-  console.log('');
-  console.log('📌 Note: Les SMS sont maintenant envoyés à l\'équipe');
-  console.log('interne avec les infos du client pour rappel.');
+    try {
+        console.log('Starting SMS tests...\n');
+        
+        // Validate environment
+        validateEnvironment();
+        
+        // Show configuration (without secrets)
+        console.log('🔧 Configuration:');
+        console.log(`   Account SID: ${TWILIO_ACCOUNT_SID.substring(0, 6)}...`);
+        console.log(`   From number: ${TWILIO_FROM}`);
+        console.log(`   Test recipients: ${TEST_TEAM_NUMBERS.length}`);
+        console.log('');
+        
+        // Run tests
+        const results = await runPriorityTests();
+        
+        // Generate report
+        generateReport(results);
+        
+        console.log('\n🎉 SMS testing completed!');
+        
+    } catch (error) {
+        console.error('💥 Test execution failed:', error);
+        process.exit(1);
+    }
 }
 
-// Check if node-fetch is installed
-try {
-  require.resolve('node-fetch');
-  main();
-} catch(e) {
-  console.log('Installation de node-fetch...');
-  require('child_process').execSync('npm install node-fetch', {stdio: 'inherit'});
-  console.log('Relancez le script: node test-sms-internal.js');
+// Handle unhandled errors
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    process.exit(1);
+});
+
+// Run if called directly
+if (require.main === module) {
+    main();
 }
+
+module.exports = { sendTestSMS, runPriorityTests, validateEnvironment };
