@@ -1,0 +1,280 @@
+# 📊 MONITORING CONFIGURATION - DRAIN FORTIN v1.0.0
+# Production Monitoring Setup
+
+# ============================================
+# PROMETHEUS CONFIGURATION
+# ============================================
+prometheus:
+  global:
+    scrape_interval: 15s
+    evaluation_interval: 15s
+    external_labels:
+      app: 'drain-fortin'
+      env: 'production'
+      version: '1.0.0'
+  
+  scrape_configs:
+    - job_name: 'frontend'
+      static_configs:
+        - targets: ['localhost:3000']
+      metrics_path: '/metrics'
+    
+    - job_name: 'backend'
+      static_configs:
+        - targets: ['localhost:3001']
+      metrics_path: '/api/metrics'
+    
+    - job_name: 'supabase'
+      static_configs:
+        - targets: ['phiduqxcufdmgjvdipyu.supabase.co']
+
+# ============================================
+# ALERTING RULES
+# ============================================
+alerts:
+  groups:
+    - name: availability
+      interval: 30s
+      rules:
+        - alert: ServiceDown
+          expr: up == 0
+          for: 1m
+          labels:
+            severity: critical
+            service: '{{ $labels.job }}'
+          annotations:
+            summary: "Service {{ $labels.job }} is down"
+            description: "{{ $labels.job }} has been down for more than 1 minute"
+    
+    - name: performance
+      interval: 30s
+      rules:
+        - alert: HighResponseTime
+          expr: http_request_duration_seconds{quantile="0.99"} > 2
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High response time detected"
+            description: "P99 latency is above 2 seconds for 5 minutes"
+        
+        - alert: HighErrorRate
+          expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.01
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High error rate detected"
+            description: "Error rate is above 1% for 5 minutes"
+    
+    - name: resources
+      interval: 30s
+      rules:
+        - alert: HighMemoryUsage
+          expr: process_resident_memory_bytes / 1024 / 1024 > 500
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High memory usage"
+            description: "Process using more than 500MB RAM"
+        
+        - alert: HighCPUUsage
+          expr: rate(process_cpu_seconds_total[5m]) * 100 > 80
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High CPU usage"
+            description: "CPU usage above 80% for 5 minutes"
+    
+    - name: business
+      interval: 1m
+      rules:
+        - alert: LowSMSDeliveryRate
+          expr: sms_delivery_rate < 0.95
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "SMS delivery rate below 95%"
+            description: "SMS delivery rate is {{ $value }}%"
+        
+        - alert: HighCallFailureRate
+          expr: rate(vapi_calls_failed_total[5m]) > 0.05
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High call failure rate"
+            description: "Call failure rate above 5%"
+
+# ============================================
+# GRAFANA DASHBOARDS
+# ============================================
+dashboards:
+  - name: "Drain Fortin Overview"
+    uid: "drain-fortin-main"
+    panels:
+      - title: "Request Rate"
+        type: graph
+        query: "rate(http_requests_total[5m])"
+      
+      - title: "Error Rate"
+        type: graph
+        query: "rate(http_requests_total{status=~'5..'}[5m])"
+      
+      - title: "Response Time P99"
+        type: graph
+        query: "histogram_quantile(0.99, http_request_duration_seconds)"
+      
+      - title: "Active Users"
+        type: stat
+        query: "active_users_total"
+      
+      - title: "SMS Sent Today"
+        type: stat
+        query: "increase(sms_sent_total[24h])"
+      
+      - title: "Call Success Rate"
+        type: gauge
+        query: "rate(vapi_calls_success_total[5m]) / rate(vapi_calls_total[5m])"
+  
+  - name: "CRM Dashboard"
+    uid: "drain-fortin-crm"
+    panels:
+      - title: "Active Clients"
+        type: stat
+        query: "crm_clients_active"
+      
+      - title: "Interventions Today"
+        type: stat
+        query: "increase(crm_interventions_total[24h])"
+      
+      - title: "Priority Alerts"
+        type: table
+        query: "crm_alerts_by_priority"
+
+# ============================================
+# LOGGING CONFIGURATION
+# ============================================
+logging:
+  level: info
+  format: json
+  outputs:
+    - type: file
+      path: /var/log/drain-fortin/app.log
+      rotation:
+        max_size: 100MB
+        max_age: 30d
+        max_backups: 10
+    
+    - type: stdout
+      format: pretty
+      level: warn
+  
+  structured_fields:
+    - timestamp
+    - level
+    - service
+    - trace_id
+    - user_id
+    - method
+    - path
+    - status
+    - duration
+    - error
+
+# ============================================
+# HEALTH CHECKS
+# ============================================
+health_checks:
+  - name: frontend
+    url: https://drainfortin.com/health
+    interval: 30s
+    timeout: 10s
+    success_threshold: 2
+    failure_threshold: 3
+  
+  - name: api
+    url: https://api.drainfortin.com/health
+    interval: 30s
+    timeout: 10s
+    method: GET
+    expected_status: 200
+  
+  - name: supabase
+    url: https://phiduqxcufdmgjvdipyu.supabase.co/rest/v1/
+    interval: 60s
+    timeout: 10s
+    headers:
+      apikey: "${SUPABASE_ANON_KEY}"
+  
+  - name: webhook
+    url: https://api.drainfortin.com/vapi-webhook/health
+    interval: 60s
+    timeout: 10s
+
+# ============================================
+# NOTIFICATION CHANNELS
+# ============================================
+notifications:
+  channels:
+    - name: email
+      type: email
+      config:
+        to: ["ops@drainfortin.com", "dev@drainfortin.com"]
+        from: "monitoring@drainfortin.com"
+        smtp_host: smtp.gmail.com
+        smtp_port: 587
+        smtp_auth: true
+    
+    - name: slack
+      type: slack
+      config:
+        webhook_url: "${SLACK_WEBHOOK_URL}"
+        channel: "#alerts"
+        username: "Drain Fortin Monitor"
+    
+    - name: pagerduty
+      type: pagerduty
+      config:
+        integration_key: "${PAGERDUTY_KEY}"
+        severity_mapping:
+          critical: P1
+          warning: P3
+          info: P5
+  
+  routing:
+    - match:
+        severity: critical
+      receivers: [email, slack, pagerduty]
+      continue: false
+    
+    - match:
+        severity: warning
+      receivers: [slack, email]
+      continue: false
+    
+    - match:
+        severity: info
+      receivers: [slack]
+
+# ============================================
+# SLA TARGETS
+# ============================================
+sla:
+  availability: 99.9%  # Three nines
+  response_time_p99: 2000ms
+  error_rate: 1%
+  sms_delivery_rate: 95%
+  call_success_rate: 90%
+
+# ============================================
+# RETENTION POLICIES
+# ============================================
+retention:
+  metrics: 30d
+  logs: 90d
+  traces: 7d
+  alerts: 365d
