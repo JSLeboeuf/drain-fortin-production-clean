@@ -8,7 +8,11 @@ import { logger } from '@/lib/logger';
 
 export function getApiBaseUrl(): string {
   const env: any = (import.meta as any).env || {};
-  return String(env.NEXT_PUBLIC_API_BASE_URL || env.VITE_API_BASE_URL || 'http://localhost:8080');
+  const penv: any = (globalThis as any).process?.env || {};
+  const fromImport = env.NEXT_PUBLIC_API_BASE_URL || env.VITE_API_BASE_URL;
+  const fromProcess = penv.NEXT_PUBLIC_API_BASE_URL || penv.VITE_API_BASE_URL;
+  const fromGlobal = (globalThis as any).NEXT_PUBLIC_API_BASE_URL || (globalThis as any).VITE_API_BASE_URL;
+  return String(fromImport || fromProcess || fromGlobal || 'http://localhost:8080');
 }
 
 const API_BASE_URL = getApiBaseUrl();
@@ -72,4 +76,3 @@ export const apiClient = {
 };
 
 export default apiClient;
-
