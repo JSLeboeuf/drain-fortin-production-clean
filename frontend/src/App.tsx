@@ -12,6 +12,12 @@ import GlobalShortcuts from "@/components/GlobalShortcuts";
 import GlobalHelpOverlay from "@/components/GlobalHelpOverlay";
 import GlobalFab from "@/components/GlobalFab";
 
+// Nouveaux composants modernes
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import { ModernLayout } from "@/components/layout/ModernLayout";
+import { CommandPalette } from "@/components/ui/command-palette";
+import { ModernToaster } from "@/components/ui/modern-toaster";
+
 // Route-based code splitting avec lazy loading
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const Calls = lazy(() => import("@/pages/Calls"));
@@ -74,18 +80,25 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <GlobalP1Banner />
-          <NetworkStatusBanner />
-          <GlobalShortcuts />
-          <GlobalHelpOverlay />
-          <GlobalFab />
-          <SkipLink />
-          <Toaster />
-          <Suspense fallback={<Fallback />}>
-            <Router />
-          </Suspense>
-        </TooltipProvider>
+        <ThemeProvider defaultTheme="light" enableSystem>
+          <TooltipProvider>
+            <GlobalP1Banner />
+            <NetworkStatusBanner />
+            <GlobalShortcuts />
+            <GlobalHelpOverlay />
+            <GlobalFab />
+            <SkipLink />
+            <Toaster />
+            <ModernToaster />
+            <CommandPalette />
+            
+            <ModernLayout>
+              <Suspense fallback={<Fallback />}>
+                <Router />
+              </Suspense>
+            </ModernLayout>
+          </TooltipProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

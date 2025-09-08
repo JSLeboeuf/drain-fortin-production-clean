@@ -22,6 +22,9 @@ import { useAllAlerts, useEnhancedMetrics } from "@/hooks/useAlerts";
 import { useState, useEffect } from "react";
 
 export default function Dashboard() {
+  // Import du nouveau dashboard moderne
+  const { ModernDashboard } = require('@/components/dashboard/ModernDashboard');
+  
   // Utiliser les hooks synchronisés avec Supabase
   const { 
     calls: recentCalls, 
@@ -38,6 +41,9 @@ export default function Dashboard() {
   const alerts = useAllAlerts();
   const [dismissedAlerts, setDismissedAlerts] = useState<string[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  
+  // Afficher le dashboard moderne par défaut
+  const [useModernUI, setUseModernUI] = useState(true);
   
   // Notifications P1 - désactivées temporairement pour éviter les erreurs
   const hasP1Active = activeCalls?.some(c => c.priority === 'P1') || false;
@@ -84,6 +90,11 @@ export default function Dashboard() {
         </main>
       </div>
     );
+  }
+
+  // Afficher le dashboard moderne si activé
+  if (useModernUI) {
+    return <ModernDashboard />;
   }
 
   return (

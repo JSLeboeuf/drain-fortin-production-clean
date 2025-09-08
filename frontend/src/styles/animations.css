@@ -268,6 +268,123 @@
 .animation-fill-forwards { animation-fill-mode: forwards; }
 .animation-fill-backwards { animation-fill-mode: backwards; }
 
+/* Dark Mode Transitions */
+.theme-transition {
+  transition: 
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: 
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Theme-aware gradient animations */
+@keyframes theme-gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.theme-gradient {
+  background: linear-gradient(
+    270deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--secondary)) 50%,
+    hsl(var(--accent)) 100%
+  );
+  background-size: 400% 400%;
+  animation: theme-gradient-shift 8s ease infinite;
+}
+
+/* Premium glow effects that adapt to theme */
+.premium-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: linear-gradient(
+    45deg,
+    hsl(var(--primary) / 0.5),
+    hsl(var(--secondary) / 0.5),
+    hsl(var(--accent) / 0.5)
+  );
+  border-radius: inherit;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask-composite: xor;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.premium-glow:hover::before {
+  opacity: 1;
+}
+
+/* Skeleton loaders with theme awareness */
+@keyframes skeleton-wave {
+  0% {
+    transform: translateX(-100%);
+  }
+  50%, 100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-loader {
+  position: relative;
+  background-color: hsl(var(--muted));
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.skeleton-loader::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--background) / 0.8),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: skeleton-wave 2s infinite;
+}
+
+/* Loading spinner with theme colors */
+@keyframes theme-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-theme {
+  border: 2px solid hsl(var(--muted));
+  border-left: 2px solid hsl(var(--primary));
+  border-radius: 50%;
+  animation: theme-spin 1s linear infinite;
+}
+
 /* Utility for disabling animations */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -276,5 +393,12 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  
+  .theme-transition,
+  .theme-transition *,
+  .theme-transition *::before,
+  .theme-transition *::after {
+    transition: none !important;
   }
 }
