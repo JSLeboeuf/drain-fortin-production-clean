@@ -1,0 +1,294 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  DENO_VERSION: '1.46'
+
+jobs:
+  # ==========================================
+  # PR VALIDATION AND ANALYSIS
+  # ==========================================
+  pr-validation:
+    name: 'PR Validation'
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    outputs:
+      changes-frontend: ${{ steps.changes.outputs.frontend }}
+      changes-backend: ${{ steps.changes.outputs.backend }}
+      changes-config: ${{ steps.changes.outputs.config }}
+      pr-size: ${{ steps.analyze.outputs.size }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+            config:
+              - '.github/**'
+              - 'docker-compose.yml'
+              - 'Dockerfile'
+              - '*.md'
+
+      - name: Analyze PR size and complexity
+        id: analyze
+        run: |
+          # Calculate lines of code changed
+          ADDITIONS=$(git diff --numstat ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | awk '{sum+=$1} END {print sum}')
+          DELETIONS=$(git diff --numstat ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | awk '{sum+=$2} END {print sum}')
+          FILES_CHANGED=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | wc -l)
+          
+          TOTAL_CHANGES=$((ADDITIONS + DELETIONS))
+          
+          # Determine PR size
+          if [ $TOTAL_CHANGES -lt 50 ]; then
+            SIZE="small"
+            EMOJI="🟢"
+          elif [ $TOTAL_CHANGES -lt 200 ]; then
+            SIZE="medium"
+            EMOJI="🟡"
+          else
+            SIZE="large"
+            EMOJI="🔴"
+          fi
+          
+          echo "size=$SIZE" >> $GITHUB_OUTPUT
+          echo "additions=$ADDITIONS" >> $GITHUB_OUTPUT
+          echo "deletions=$DELETIONS" >> $GITHUB_OUTPUT
+          echo "files=$FILES_CHANGED" >> $GITHUB_OUTPUT
+          echo "emoji=$EMOJI" >> $GITHUB_OUTPUT
+
+      - name: Comment PR analysis
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr-analysis
+          message: |
+            ## 📊 Pull Request Analysis
+            
+            **Size**: ${{ steps.analyze.outputs.emoji }} ${{ steps.analyze.outputs.size }}
+            **Changes**: +${{ steps.analyze.outputs.additions }} / -${{ steps.analyze.outputs.deletions }} lines across ${{ steps.analyze.outputs.files }} files
+            
+            **Modified Components**:
+            ${{ steps.changes.outputs.frontend == 'true' && '- 🔧 Frontend' || '' }}
+            ${{ steps.changes.outputs.backend == 'true' && '- ⚙️ Backend' || '' }}
+            ${{ steps.changes.outputs.config == 'true' && '- 📝 Configuration' || '' }}
+
+  # ==========================================
+  # FRONTEND PR CHECKS
+  # ==========================================
+  pr-frontend-checks:
+    name: 'Frontend PR Checks'
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    if: needs.pr-validation.outputs.changes-frontend == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci --prefer-offline
+
+      - name: Run type checking
+        run: |
+          cd frontend
+          npm run type-check || npx tsc --noEmit
+
+      - name: Run linting
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Run Prettier check
+        run: |
+          cd frontend
+          npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css,md}"
+
+      - name: Run unit tests
+        run: |
+          cd frontend
+          npm run test:run -- --coverage
+
+      - name: Check bundle size
+        run: |
+          cd frontend
+          npm run build
+          
+          # Analyze bundle size
+          BUNDLE_SIZE=$(du -sk dist | cut -f1)
+          echo "Bundle size: ${BUNDLE_SIZE}KB"
+          
+          # Set threshold (500KB)
+          if [ $BUNDLE_SIZE -gt 500 ]; then
+            echo "⚠️ Bundle size is large: ${BUNDLE_SIZE}KB"
+            echo "Consider code splitting or tree shaking"
+          else
+            echo "✅ Bundle size is acceptable: ${BUNDLE_SIZE}KB"
+          fi
+
+  # ==========================================
+  # BACKEND PR CHECKS
+  # ==========================================
+  pr-backend-checks:
+    name: 'Backend PR Checks'
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    if: needs.pr-validation.outputs.changes-backend == 'true'
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+
+      - name: Deno lint and format check
+        run: |
+          cd backend
+          deno lint --unstable
+          deno fmt --check
+
+      - name: Deno type check
+        run: |
+          cd backend
+          find supabase/functions -name "*.ts" -exec deno check {} \;
+
+      - name: Install Supabase CLI
+        run: |
+          npm install -g @supabase/cli@latest
+
+      - name: Start Supabase local development
+        run: |
+          cd backend
+          supabase start --db-url postgresql://postgres:postgres@localhost:5432/postgres
+
+      - name: Run backend tests
+        if: false  # Enable when tests exist
+        run: |
+          cd backend
+          deno test --allow-all --coverage=coverage supabase/functions/
+
+  # ==========================================
+  # SECURITY AND COMPLIANCE CHECKS
+  # ==========================================
+  pr-security-checks:
+    name: 'Security PR Checks'
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/secrets
+            p/owasp-top-ten
+          generateSarif: "1"
+
+      - name: Upload Semgrep results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      - name: License compliance check
+        if: needs.pr-validation.outputs.changes-frontend == 'true'
+        run: |
+          cd frontend
+          npm ci --prefer-offline
+          npx license-checker --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;0BSD;Unlicense;CC0-1.0' --excludePrivatePackages
+
+  # ==========================================
+  # PR SUMMARY AND RECOMMENDATIONS
+  # ==========================================
+  pr-summary:
+    name: 'PR Summary'
+    runs-on: ubuntu-latest
+    needs: [pr-validation, pr-frontend-checks, pr-backend-checks, pr-security-checks]
+    if: always()
+    steps:
+      - name: Generate PR summary
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr-summary
+          message: |
+            ## 🚀 Pull Request Summary
+            
+            **Status Overview**:
+            - Validation: ${{ needs.pr-validation.result == 'success' && '✅' || '❌' }}
+            - Frontend Checks: ${{ needs.pr-frontend-checks.result == 'success' && '✅' || needs.pr-frontend-checks.result == 'skipped' && '⏭️' || '❌' }}
+            - Backend Checks: ${{ needs.pr-backend-checks.result == 'success' && '✅' || needs.pr-backend-checks.result == 'skipped' && '⏭️' || '❌' }}
+            - Security Checks: ${{ needs.pr-security-checks.result == 'success' && '✅' || '❌' }}
+            
+            **PR Size**: ${{ needs.pr-validation.outputs.pr-size }}
+            
+            ${{ needs.pr-validation.outputs.pr-size == 'large' && '⚠️ **Large PR Warning**: Consider breaking this into smaller PRs for easier review.' || '' }}
+            
+            **Next Steps**:
+            ${{ needs.pr-frontend-checks.result == 'failure' && '- 🔧 Fix frontend issues before merge' || '' }}
+            ${{ needs.pr-backend-checks.result == 'failure' && '- ⚙️ Fix backend issues before merge' || '' }}
+            ${{ needs.pr-security-checks.result == 'failure' && '- 🔒 Resolve security issues before merge' || '' }}
+            ${{ (needs.pr-frontend-checks.result == 'success' || needs.pr-frontend-checks.result == 'skipped') && (needs.pr-backend-checks.result == 'success' || needs.pr-backend-checks.result == 'skipped') && needs.pr-security-checks.result == 'success' && '- ✅ Ready for review and merge!' || '' }}
+
+      - name: Auto-assign reviewers for large PRs
+        if: needs.pr-validation.outputs.pr-size == 'large'
+        uses: kentaro-m/auto-assign-action@v1.2.5
+        with:
+          configuration-path: '.github/auto-assign.yml'

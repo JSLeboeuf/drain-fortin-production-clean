@@ -1,11 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/utils/logger';
 
 // Configuration Supabase depuis les variables d'environnement
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://phiduqxcufdmgjvdipyu.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoaWR1cXhjdWZkbWdqdmRpcHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxODQ5ODEsImV4cCI6MjA2Mjc2MDk4MX0.YyiZxzU6DuZsFwXLebdMqRJHhWlnVYyDgJz1HVsIjvI';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Validation des variables d'environnement
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase configuration missing!');
+  const errorMessage = 'Missing Supabase environment variables. Please check your .env file.';
+  logger.error(errorMessage, { 
+    hasUrl: !!supabaseUrl, 
+    hasKey: !!supabaseAnonKey 
+  });
+  throw new Error(errorMessage);
 }
 
 // Créer le client Supabase
@@ -75,7 +82,7 @@ export const supabaseServices = {
       .limit(limit);
 
     if (error) {
-      console.error('Error fetching calls:', error);
+      logger.error('Error fetching calls', error);
       return [];
     }
 
@@ -91,7 +98,7 @@ export const supabaseServices = {
       .limit(limit);
 
     if (error) {
-      console.error('Error fetching leads:', error);
+      logger.error('Error fetching leads', error);
       return [];
     }
 
@@ -107,7 +114,7 @@ export const supabaseServices = {
       .limit(limit);
 
     if (error) {
-      console.error('Error fetching SMS logs:', error);
+      logger.error('Error fetching SMS logs', error);
       return [];
     }
 
@@ -148,7 +155,7 @@ export const supabaseServices = {
         conversionRate: totalCalls > 0 ? Math.round((totalLeads / totalCalls) * 100) : 0
       };
     } catch (error) {
-      console.error('Error fetching dashboard metrics:', error);
+      logger.error('Error fetching dashboard metrics', error);
       return {
         totalCalls: 0,
         totalLeads: 0,

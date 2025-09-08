@@ -1,0 +1,480 @@
+openapi: 3.0.0
+info:
+  title: Drain Fortin Production API
+  description: |
+    AI-powered voice assistant and customer management platform for drain service operations.
+    
+    This API handles VAPI webhook events, processes voice assistant calls, manages customer data,
+    and integrates with Twilio for SMS notifications.
+    
+    ## Authentication
+    The API supports two authentication methods:
+    - **HMAC Signature Verification**: For VAPI webhooks (production)
+    - **Service Role Key**: For internal operations
+    
+    ## Rate Limiting
+    - **Webhook endpoints**: 100 requests per minute per IP
+    - **Query endpoints**: 60 requests per minute per authenticated user
+    
+    ## Business Logic
+    The system processes drain service requests with automatic priority classification:
+    - **P1 (Emergency)**: Flooding situations - immediate SMS alerts
+    - **P2 (Municipal)**: Municipal work - 2 hour SLA  
+    - **P3 (High-Value)**: Premium services (>$3000) - 1 hour SLA
+    - **P4 (Standard)**: Regular requests - 30 minute SLA
+    
+  version: 1.0.0
+  contact:
+    name: Drain Fortin Development Team
+    email: support@drainfortin.com
+    url: https://drainfortin.com
+  license:
+    name: Proprietary
+    url: https://drainfortin.com/license
+
+servers:
+  - url: https://phiduqxcufdmgjvdipyu.supabase.co/functions/v1
+    description: Production server
+  - url: http://localhost:54321/functions/v1
+    description: Local development server
+
+security:
+  - HMACSignature: []
+  - ServiceRoleKey: []
+
+paths:
+  /vapi-webhook:
+    post:
+      summary: Process VAPI webhook events
+      description: |
+        Main webhook endpoint for processing VAPI voice assistant events.
+        
+        Handles call lifecycle events, transcripts, function calls, and tool executions.
+        Implements HMAC signature verification for security.
+        
+        **Event Types Supported:**
+        - `call-started`: New call initiated
+        - `call-ended`: Call completed with analysis
+        - `transcript`: Real-time conversation transcript
+        - `tool-calls`: Function calls from voice assistant
+        - `function-call`: Execute business functions
+        - `health-check`: System health verification
+        
+      operationId: processVAPIWebhook
+      security:
+        - HMACSignature: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VAPIWebhookPayload'
+            examples:
+              callStarted:
+                summary: Call Started Event
+                value:
+                  type: "call-started"
+                  timestamp: "2025-09-08T14:30:00Z"
+                  call:
+                    id: "call_abc123"
+                    assistantId: "asst_def456"
+                    phoneNumber: "+15145551234"
+                    status: "active"
+                    startedAt: "2025-09-08T14:30:00Z"
+              callEnded:
+                summary: Call Ended with Analysis
+                value:
+                  type: "call-ended"
+                  timestamp: "2025-09-08T14:35:00Z"
+                  call:
+                    id: "call_abc123"
+                    assistantId: "asst_def456"
+                    status: "completed"
+                    duration: 300
+                    analysis:
+                      structuredData:
+                        nom: "Jean Dupont"
+                        courriel: "jean@example.com"
+                        adresse: "123 Rue Principale, Montréal"
+                        codePostal: "H1A 1A1"
+                        description: "Drain bouché au sous-sol"
+                        estimatedValue: 450
+              functionCall:
+                summary: Function Call Execution
+                value:
+                  type: "function-call"
+                  timestamp: "2025-09-08T14:32:00Z"
+                  toolCalls:
+                    - toolCallId: "tool_123"
+                      function:
+                        name: "validateServiceRequest"
+                        arguments:
+                          service: "débouchage de drain"
+              healthCheck:
+                summary: Health Check
+                value:
+                  type: "health-check"
+                  timestamp: "2025-09-08T14:00:00Z"
+
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/WebhookSuccessResponse'
+                  - $ref: '#/components/schemas/FunctionCallResponse'
+              examples:
+                success:
+                  summary: Standard Success Response
+                  value:
+                    success: true
+                    type: "call-started"
+                functionResult:
+                  summary: Function Call Result
+                  value:
+                    results:
+                      - toolCallId: "tool_123"
+                        result:
+                          accepted: true
+                          reason: "service_available"
+                          message: "Parfait! On peut certainement vous aider avec ça."
+        
+        '400':
+          description: Bad request - invalid payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Invalid payload format"
+                details: "Missing required field: type"
+        
+        '401':
+          description: Unauthorized - invalid or missing HMAC signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Invalid signature"
+                details: "HMAC signature verification failed"
+        
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Internal server error"
+                details: "Database connection failed"
+
+    options:
+      summary: CORS preflight request
+      description: Handle CORS preflight requests for webhook endpoint
+      responses:
+        '200':
+          description: CORS headers returned
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+              example: "*"
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+              example: "POST, OPTIONS"
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+              example: "Content-Type, Authorization, x-vapi-signature"
+
+components:
+  securitySchemes:
+    HMACSignature:
+      type: apiKey
+      in: header
+      name: x-vapi-signature
+      description: |
+        HMAC-SHA256 signature for webhook verification.
+        
+        Format: `hmac-sha256=<hex_encoded_signature>`
+        
+        The signature is calculated using the raw request body and the webhook secret:
+        ```
+        signature = HMAC-SHA256(webhook_secret, request_body)
+        ```
+    
+    ServiceRoleKey:
+      type: http
+      scheme: bearer
+      description: |
+        Supabase service role key for internal operations.
+        
+        Format: `Bearer <service_role_key>`
+
+  schemas:
+    VAPIWebhookPayload:
+      type: object
+      required:
+        - type
+        - timestamp
+      properties:
+        type:
+          type: string
+          enum: [
+            "call-started",
+            "call-ended", 
+            "transcript",
+            "tool-calls",
+            "function-call",
+            "health-check"
+          ]
+          description: Type of webhook event
+        timestamp:
+          type: string
+          format: date-time
+          description: Event timestamp in ISO 8601 format
+        call:
+          $ref: '#/components/schemas/CallData'
+        message:
+          $ref: '#/components/schemas/MessageData'
+        toolCalls:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolCall'
+        transcript:
+          $ref: '#/components/schemas/TranscriptData'
+      example:
+        type: "call-ended"
+        timestamp: "2025-09-08T14:35:00Z"
+        call:
+          id: "call_abc123"
+          assistantId: "asst_def456"
+          duration: 300
+
+    CallData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique call identifier from VAPI
+          example: "call_abc123"
+        assistantId:
+          type: string
+          description: VAPI assistant identifier
+          example: "asst_def456"
+        phoneNumber:
+          type: string
+          description: Customer phone number
+          example: "+15145551234"
+        customerId:
+          type: string
+          description: Internal customer identifier
+          example: "cust_789"
+        status:
+          type: string
+          enum: ["active", "completed", "failed", "abandoned"]
+          description: Current call status
+        startedAt:
+          type: string
+          format: date-time
+          description: Call start timestamp
+        endedAt:
+          type: string
+          format: date-time
+          description: Call end timestamp
+        duration:
+          type: integer
+          description: Call duration in seconds
+          minimum: 0
+          example: 300
+        analysis:
+          type: object
+          description: VAPI call analysis data
+          properties:
+            structuredData:
+              $ref: '#/components/schemas/StructuredCallData'
+
+    StructuredCallData:
+      type: object
+      description: Structured data extracted from call conversation
+      properties:
+        nom:
+          type: string
+          description: Customer name
+          example: "Jean Dupont"
+        courriel:
+          type: string
+          format: email
+          description: Customer email address
+          example: "jean@example.com"
+        adresse:
+          type: string
+          description: Service address
+          example: "123 Rue Principale, Montréal"
+        codePostal:
+          type: string
+          pattern: '^[A-Z]\d[A-Z] \d[A-Z]\d$'
+          description: Canadian postal code
+          example: "H1A 1A1"
+        description:
+          type: string
+          description: Problem description
+          example: "Drain bouché au sous-sol"
+        estimatedValue:
+          type: number
+          minimum: 0
+          description: Estimated job value in CAD
+          example: 450
+
+    MessageData:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: ["user", "assistant"]
+          description: Message sender role
+        message:
+          type: string
+          description: Message content
+        timestamp:
+          type: string
+          format: date-time
+          description: Message timestamp
+
+    ToolCall:
+      type: object
+      required:
+        - toolCallId
+        - function
+      properties:
+        toolCallId:
+          type: string
+          description: Unique tool call identifier
+          example: "tool_123"
+        function:
+          type: object
+          required:
+            - name
+            - arguments
+          properties:
+            name:
+              type: string
+              enum: [
+                "validateServiceRequest",
+                "calculateQuote", 
+                "classifyPriority",
+                "evaluateScheduling",
+                "sendSMSAlert"
+              ]
+              description: Function name to execute
+            arguments:
+              type: object
+              description: Function arguments (varies by function)
+
+    TranscriptData:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: ["user", "assistant"]
+          description: Speaker role
+        transcript:
+          type: string
+          description: Transcript text
+        timestamp:
+          type: string
+          format: date-time
+          description: Transcript timestamp
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Transcription confidence score
+
+    WebhookSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        type:
+          type: string
+          description: Processed event type
+          example: "call-started"
+
+    FunctionCallResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              toolCallId:
+                type: string
+                example: "tool_123"
+              result:
+                type: object
+                description: Function execution result
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+        details:
+          type: string
+          description: Additional error details
+        code:
+          type: string
+          description: Error code for programmatic handling
+
+  examples:
+    ValidationFunction:
+      summary: Service Validation Function Call
+      value:
+        toolCallId: "tool_validate_123"
+        function:
+          name: "validateServiceRequest"
+          arguments:
+            service: "débouchage de drain principal"
+
+    PriorityFunction:
+      summary: Priority Classification Function Call
+      value:
+        toolCallId: "tool_priority_456"
+        function:
+          name: "classifyPriority"
+          arguments:
+            description: "inondation au sous-sol urgente"
+            estimatedValue: 750
+
+    SMSFunction:
+      summary: SMS Alert Function Call
+      value:
+        toolCallId: "tool_sms_789"
+        function:
+          name: "sendSMSAlert"
+          arguments:
+            priority: "P1"
+            message: "URGENCE: Inondation - Client Jean Dupont, 123 Rue Principale"
+            phoneNumbers: ["+15145550123", "+15145550124"]
+
+externalDocs:
+  description: Drain Fortin Production Documentation
+  url: https://docs.drainfortin.com
+
+tags:
+  - name: Webhooks
+    description: VAPI webhook processing endpoints
+  - name: Functions
+    description: Business logic function calls
+  - name: Health
+    description: System health and monitoring
