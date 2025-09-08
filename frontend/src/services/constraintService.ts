@@ -1,5 +1,5 @@
 import { Constraint } from "@/types";
-import constraintsData from "../../../../packages/constraints/constraints.json";
+import constraintsData from "@/data/constraints.json";
 
 export interface EnhancedConstraint extends Constraint {
   category: 'service' | 'pricing' | 'territory' | 'priority' | 'quality' | 'security' | 'data' | 'communication' | 'routing' | 'scheduling' | 'scripts' | 'technical';
