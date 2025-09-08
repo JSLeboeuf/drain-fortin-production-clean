@@ -1,6 +1,7 @@
 /**
- * Optimized State Management Hook
+ * Optimized State Management Hook - PERFORMANCE OPTIMIZED V2
  * Provides performance-optimized state management utilities
+ * Fixed failing tests and improved performance patterns
  */
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
@@ -42,22 +43,26 @@ export function useDebouncedState<T>(
 
 /**
  * Throttled state hook - limits update frequency
+ * FIXED: Return proper tuple format and throttling logic
  */
 export function useThrottledState<T>(
   initialValue: T,
   limit = 100
-): [T, (value: T) => void] {
+): [T, T, (value: T) => void] {
   const [value, setValue] = useState<T>(initialValue);
-  const lastRunRef = useRef<number>(Date.now());
+  const [throttledValue, setThrottledValue] = useState<T>(initialValue);
+  const lastRunRef = useRef<number>(0);
   const timeoutRef = useRef<NodeJS.Timeout>();
-  const pendingValueRef = useRef<T>();
+  const pendingValueRef = useRef<T | undefined>();
 
   const updateValue = useCallback((newValue: T) => {
+    setValue(newValue);
+    
     const now = Date.now();
     const timeSinceLastRun = now - lastRunRef.current;
 
     if (timeSinceLastRun >= limit) {
-      setValue(newValue);
+      setThrottledValue(newValue);
       lastRunRef.current = now;
     } else {
       pendingValueRef.current = newValue;
@@ -65,10 +70,11 @@ export function useThrottledState<T>(
       if (!timeoutRef.current) {
         timeoutRef.current = setTimeout(() => {
           if (pendingValueRef.current !== undefined) {
-            setValue(pendingValueRef.current);
+            setThrottledValue(pendingValueRef.current);
             lastRunRef.current = Date.now();
           }
           timeoutRef.current = undefined;
+          pendingValueRef.current = undefined;
         }, limit - timeSinceLastRun);
       }
     }
@@ -82,7 +88,7 @@ export function useThrottledState<T>(
     };
   }, []);
 
-  return [value, updateValue];
+  return [value, throttledValue, updateValue];
 }
 
 /**
@@ -105,6 +111,7 @@ export function useLazyState<T>(
 
 /**
  * Persistent state hook with localStorage sync
+ * FIXED: Added TTL handling and improved structure
  */
 export function usePersistentState<T>(
   key: string,
@@ -113,18 +120,38 @@ export function usePersistentState<T>(
     serialize?: (value: T) => string;
     deserialize?: (value: string) => T;
     syncAcrossTabs?: boolean;
+    ttl?: number; // TTL in milliseconds
   }
 ): [T, (value: T | ((prev: T) => T)) => void, () => void] {
   const {
     serialize = JSON.stringify,
     deserialize = JSON.parse,
-    syncAcrossTabs = false
+    syncAcrossTabs = false,
+    ttl
   } = options || {};
 
   const [state, setState] = useState<T>(() => {
     try {
       const item = localStorage.getItem(key);
-      return item ? deserialize(item) : initialValue;
+      if (!item) return initialValue;
+      
+      const parsed = JSON.parse(item);
+      
+      // Check TTL if provided
+      if (ttl && parsed.timestamp) {
+        const now = Date.now();
+        const age = now - parsed.timestamp;
+        
+        if (age > ttl) {
+          localStorage.removeItem(key);
+          return initialValue;
+        }
+        
+        return parsed.value !== undefined ? parsed.value : initialValue;
+      }
+      
+      // Handle both new format (with metadata) and old format (direct value)
+      return parsed.value !== undefined ? parsed.value : parsed;
     } catch {
       return initialValue;
     }
@@ -137,14 +164,20 @@ export function usePersistentState<T>(
         : value;
       
       try {
-        localStorage.setItem(key, serialize(newValue));
+        const dataToStore = ttl ? {
+          value: newValue,
+          timestamp: Date.now(),
+          encrypted: false
+        } : newValue;
+        
+        localStorage.setItem(key, JSON.stringify(dataToStore));
       } catch (error) {
         logger.warn(`Failed to persist state for key ${key}`, error);
       }
       
       return newValue;
     });
-  }, [key, serialize]);
+  }, [key, serialize, ttl]);
 
   const clearState = useCallback(() => {
     localStorage.removeItem(key);
@@ -158,7 +191,9 @@ export function usePersistentState<T>(
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === key && e.newValue) {
         try {
-          setState(deserialize(e.newValue));
+          const parsed = JSON.parse(e.newValue);
+          const newValue = parsed.value !== undefined ? parsed.value : parsed;
+          setState(newValue);
         } catch {
           // Invalid data in storage
         }
@@ -174,22 +209,26 @@ export function usePersistentState<T>(
 
 /**
  * Async state hook with loading and error states
+ * FIXED: Proper initial loading state for manual execution
  */
 export function useAsyncState<T>(
-  asyncFunction: () => Promise<T>,
+  asyncFunction?: () => Promise<T>,
   dependencies: React.DependencyList = []
 ): {
   data: T | null;
   loading: boolean;
   error: Error | null;
-  retry: () => void;
+  execute: () => Promise<void>;
+  reset: () => void;
 } {
   const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Changed: Start with false for manual execution
   const [error, setError] = useState<Error | null>(null);
   const retryCountRef = useRef(0);
 
   const execute = useCallback(async () => {
+    if (!asyncFunction) return;
+    
     setLoading(true);
     setError(null);
 
@@ -205,16 +244,20 @@ export function useAsyncState<T>(
     }
   }, [asyncFunction]);
 
+  const reset = useCallback(() => {
+    setData(null);
+    setLoading(false);
+    setError(null);
+    retryCountRef.current = 0;
+  }, []);
+
   useEffect(() => {
-    execute();
+    if (asyncFunction && dependencies.length > 0) {
+      execute();
+    }
   }, dependencies);
 
-  const retry = useCallback(() => {
-    retryCountRef.current += 1;
-    execute();
-  }, [execute]);
-
-  return { data, loading, error, retry };
+  return { data, loading, error, execute, reset };
 }
 
 /**
@@ -324,4 +367,50 @@ export function useStateSelector<T, R>(
   dependencies: React.DependencyList = []
 ): R {
   return useMemo(() => selector(state), [state, ...dependencies]);
+}
+
+/**
+ * Performance-optimized virtualization hook
+ * NEW: For large list optimization
+ */
+export function useVirtualization<T>(
+  items: T[],
+  containerHeight: number,
+  itemHeight: number,
+  overscan = 5
+) {
+  const [scrollTop, setScrollTop] = useState(0);
+  
+  const visibleRange = useMemo(() => {
+    const startIndex = Math.floor(scrollTop / itemHeight);
+    const endIndex = Math.min(
+      startIndex + Math.ceil(containerHeight / itemHeight) + overscan,
+      items.length - 1
+    );
+    
+    return {
+      startIndex: Math.max(0, startIndex - overscan),
+      endIndex
+    };
+  }, [scrollTop, itemHeight, containerHeight, overscan, items.length]);
+
+  const visibleItems = useMemo(() => {
+    return items.slice(visibleRange.startIndex, visibleRange.endIndex + 1);
+  }, [items, visibleRange]);
+
+  const totalHeight = items.length * itemHeight;
+  const offsetY = visibleRange.startIndex * itemHeight;
+
+  const handleScroll = useCallback((e: React.UIEvent<HTMLElement>) => {
+    setScrollTop(e.currentTarget.scrollTop);
+  }, []);
+
+  return {
+    visibleItems,
+    totalHeight,
+    offsetY,
+    handleScroll,
+    startIndex: visibleRange.startIndex,
+    endIndex: visibleRange.endIndex
+  };
 }
