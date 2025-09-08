@@ -1,8 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CRMDashboard } from './CRMDashboard';
 import * as statsService from '../../services/statsService';
+
+// Test wrapper avec QueryClient
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false }
+    }
+  });
+  
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+};
 
 // Mock des services
 vi.mock('../../services/statsService');
@@ -32,7 +49,7 @@ describe('CRMDashboard', () => {
       revenue: { month: 45000, year: 380000 }
     });
 
-    render(<CRMDashboard />);
+    render(<CRMDashboard />, { wrapper: createWrapper() });
 
     // Vérifier que les sections principales sont présentes
     await waitFor(() => {
@@ -57,7 +74,7 @@ describe('CRMDashboard', () => {
 
     vi.spyOn(statsService, 'getDashboardStats').mockResolvedValue(mockStats);
     
-    render(<CRMDashboard />);
+    render(<CRMDashboard />, { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(statsService.getDashboardStats).toHaveBeenCalled();
@@ -72,7 +89,7 @@ describe('CRMDashboard', () => {
 
     vi.spyOn(statsService, 'getActiveAlerts').mockResolvedValue(mockAlerts);
 
-    render(<CRMDashboard />);
+    render(<CRMDashboard />, { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(screen.getByText(/P1/)).toBeInTheDocument();
@@ -85,7 +102,7 @@ describe('CRMDashboard', () => {
       new Error('Network error')
     );
 
-    render(<CRMDashboard />);
+    render(<CRMDashboard />, { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(screen.getByText(/erreur de chargement/i)).toBeInTheDocument();
@@ -102,7 +119,7 @@ describe('CRMDashboard', () => {
       revenue: { month: 45000, year: 380000 }
     });
 
-    render(<CRMDashboard />);
+    render(<CRMDashboard />, { wrapper: createWrapper() });
 
     expect(statsService.getDashboardStats).toHaveBeenCalledTimes(1);
 
