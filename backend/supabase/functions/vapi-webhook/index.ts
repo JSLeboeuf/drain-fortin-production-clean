@@ -126,35 +126,179 @@ async function processFunction(name: string, args: any): Promise<any> {
       return { window: w, canSchedule: true, message: `Nous pouvons planifier dans ${w}.` };
     }
     case 'sendSMSAlert': {
-      const pr = (args.priority || '').toString();
-      const message: string = (args.message || '').toString();
-      let dest: string[] = [];
-      if (Array.isArray(args.phoneNumbers)) dest = args.phoneNumbers.map((x: any) => String(x));
-      else if (typeof args.phoneNumbers === 'string') dest = [args.phoneNumbers];
+      // Extract client info and urgency from args
+      const clientName = args.clientName || 'Non fourni';
+      const clientPhone = args.clientPhone || 'Non fourni';
+      const clientAddress = args.clientAddress || 'Non fournie';
+      const clientCity = args.clientCity || '';
+      const clientPostalCode = args.clientPostalCode || '';
+      const problemDescription = args.problemDescription || args.description || 'Non spécifié';
+      
+      // Classify priority
+      const priorityInfo = classifyPriority(problemDescription, args.estimatedValue);
+      const priority = args.priority || priorityInfo.priority;
+      
+      // Create or update client in database
+      let clientId: string | null = null;
+      try {
+        const { data: clientData, error: clientError } = await supabase.rpc('upsert_client', {
+          p_phone: clientPhone,
+          p_first_name: clientName.split(' ')[0] || null,
+          p_last_name: clientName.split(' ').slice(1).join(' ') || null,
+          p_address: clientAddress,
+          p_city: clientCity,
+          p_postal_code: clientPostalCode
+        });
+        if (!clientError && clientData) {
+          clientId = clientData;
+        }
+      } catch (err) {
+        console.error('Error upserting client:', err);
+      }
+      
+      // Internal team numbers (these would be configured in environment)
+      const INTERNAL_TEAM_NUMBERS = [
+        '+14502803222' // For testing - would be replaced with actual team numbers
+      ];
+      
+      // Build urgency-based message for internal team
+      let urgencyPrefix = '';
+      let urgencyEmoji = '';
+      
+      switch (priority) {
+        case 'P1':
+          urgencyPrefix = 'URGENCE IMMÉDIATE';
+          urgencyEmoji = '🚨';
+          break;
+        case 'P2':
+          urgencyPrefix = 'PRIORITÉ MUNICIPALE';
+          urgencyEmoji = '⚠️';
+          break;
+        case 'P3':
+          urgencyPrefix = 'SERVICE MAJEUR';
+          urgencyEmoji = '🔧';
+          break;
+        default:
+          urgencyPrefix = 'SERVICE STANDARD';
+          urgencyEmoji = '📋';
+      }
+      
+      // Compose message for internal team with client info
+      const internalMessage = `${urgencyEmoji} ${urgencyPrefix} - Drain Fortin\n\n` +
+        `CLIENT: ${clientName}\n` +
+        `TÉL: ${clientPhone}\n` +
+        `ADRESSE: ${clientAddress}\n` +
+        `PROBLÈME: ${problemDescription}\n` +
+        `PRIORITÉ: ${priority}\n` +
+        `\nRappeler le client rapidement.`;
+      
+      // Create internal alert in database
+      if (clientId) {
+        try {
+          const { data: alertData, error: alertError } = await supabase.rpc('create_internal_alert', {
+            p_client_id: clientId,
+            p_priority: priority,
+            p_title: `${urgencyPrefix} - ${clientName}`,
+            p_message: internalMessage,
+            p_client_info: {
+              name: clientName,
+              phone: clientPhone,
+              address: clientAddress,
+              problem: problemDescription
+            },
+            p_call_id: args.callId || null
+          });
+          if (alertError) {
+            console.error('Error creating alert:', alertError);
+          }
+        } catch (err) {
+          console.error('Error creating internal alert:', err);
+        }
+      }
+      
       if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_FROM) {
         return { sent: false, error: 'twilio_not_configured' };
       }
+      
       const sids: string[] = [];
-      for (const to of dest) {
+      const errors: string[] = [];
+      const smsIds: string[] = [];
+      
+      // Send to all internal team members
+      for (const teamNumber of INTERNAL_TEAM_NUMBERS) {
         const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
         const body = new URLSearchParams();
         body.set('From', TWILIO_FROM);
-        body.set('To', to);
-        body.set('Body', message);
+        body.set('To', teamNumber);
+        body.set('Body', internalMessage);
         const auth = 'Basic ' + btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
-        const resp = await fetch(url, {
-          method: 'POST',
-          headers: { 'Authorization': auth, 'Content-Type': 'application/x-www-form-urlencoded' },
-          body
-        });
-        if (!resp.ok) {
-          const txt = await resp.text();
-          return { sent: false, error: 'twilio_send_failed', status: resp.status, body: txt };
+        
+        try {
+          const resp = await fetch(url, {
+            method: 'POST',
+            headers: { 'Authorization': auth, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body
+          });
+          
+          if (!resp.ok) {
+            const txt = await resp.text();
+            errors.push(`Failed to send to ${teamNumber}: ${txt}`);
+            
+            // Log failed SMS to database
+            if (clientId) {
+              await supabase.from('sms_messages').insert({
+                client_id: clientId,
+                to_number: teamNumber,
+                from_number: TWILIO_FROM,
+                message: internalMessage,
+                sms_type: 'alert_internal',
+                priority: priority,
+                urgency_level: priority === 'P1' ? 'immediate' : priority === 'P2' ? 'high' : 'medium',
+                status: 'failed',
+                error_message: txt
+              });
+            }
+          } else {
+            const json = await resp.json();
+            if (json && json.sid) {
+              sids.push(json.sid);
+              
+              // Log successful SMS to database
+              if (clientId) {
+                const { data: smsData, error: smsError } = await supabase.from('sms_messages').insert({
+                  client_id: clientId,
+                  call_id: args.callId || null,
+                  to_number: teamNumber,
+                  from_number: TWILIO_FROM,
+                  message: internalMessage,
+                  sms_type: 'alert_internal',
+                  priority: priority,
+                  urgency_level: priority === 'P1' ? 'immediate' : priority === 'P2' ? 'high' : 'medium',
+                  twilio_sid: json.sid,
+                  status: 'sent',
+                  metadata: { twilio_response: json }
+                }).select('id').single();
+                
+                if (smsData) {
+                  smsIds.push(smsData.id);
+                }
+              }
+            }
+          }
+        } catch (err) {
+          errors.push(`Error sending to ${teamNumber}: ${err}`);
         }
-        const json = await resp.json();
-        if (json && json.sid) sids.push(json.sid);
       }
-      return { sent: true, sids, priority: pr };
+      
+      return { 
+        sent: sids.length > 0, 
+        sids, 
+        smsIds,
+        clientId,
+        priority,
+        recipientsCount: INTERNAL_TEAM_NUMBERS.length,
+        errors: errors.length > 0 ? errors : undefined
+      };
     }
     default:
       return { error: 'Function not found', message: "Cette fonction n'est pas disponible." };
