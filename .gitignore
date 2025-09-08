@@ -11,9 +11,18 @@ build/
 .nuxt/
 .vite/
 
-# Environment files
+# Environment files - CRITICAL SECURITY
 .env
-.env.local
+.env.*
+!.env.example
+!.env.example.secure
+!.env.test
+frontend/.env
+frontend/.env.*
+backend/.env
+backend/.env.*
+**/*.env
+*.env.backup
 .env.development.local
 .env.test.local
 .env.production.local
