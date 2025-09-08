@@ -1,0 +1,273 @@
+/* Import custom animations (must precede other statements) */
+@import './styles/animations.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Premium background avec subtle gradient */
+  --background: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(210 20% 98%) 100%);
+  --background-solid: hsl(0 0% 100%);
+  --foreground: hsl(222.2 84% 4.9%);
+  
+  /* Cards avec elevation premium */
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(222.2 84% 4.9%);
+  --card-shadow: 0 4px 20px hsla(222.2, 84%, 4.9%, 0.08);
+  --card-shadow-hover: 0 8px 30px hsla(222.2, 84%, 4.9%, 0.12);
+  
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(222.2 84% 4.9%);
+  
+  /* Palette Drain Fortin Premium */
+  --primary: hsl(200 95% 45%); /* Bleu québécois premium */
+  --primary-foreground: hsl(0 0% 100%);
+  --primary-hover: hsl(200 95% 40%);
+  --primary-gradient: linear-gradient(135deg, hsl(200 95% 45%) 0%, hsl(210 100% 50%) 100%);
+  
+  --secondary: hsl(25 95% 53%); /* Orange Drain Fortin accent */
+  --secondary-foreground: hsl(0 0% 100%);
+  --secondary-hover: hsl(25 95% 48%);
+  
+  --muted: hsl(210 25% 97%);
+  --muted-foreground: hsl(215.4 16.3% 46.9%);
+  
+  --accent: hsl(161 94% 30%); /* Vert succès québécois */
+  --accent-foreground: hsl(210 40% 98%);
+  --accent-hover: hsl(161 94% 25%);
+  
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: hsl(210 40% 98%);
+  
+  /* Borders plus subtils */
+  --border: hsl(214.3 31.8% 91.4%);
+  --border-hover: hsl(214.3 31.8% 85%);
+  --input: hsl(214.3 31.8% 91.4%);
+  --ring: hsl(200 95% 45%);
+  
+  /* Palette Drain Fortin Premium */
+  --drain-fortin-blue: hsl(200 95% 45%);
+  --drain-fortin-blue-light: hsl(200 95% 85%);
+  --drain-fortin-orange: hsl(25 95% 53%);
+  --drain-fortin-green: hsl(161 94% 30%);
+  --drain-fortin-red: hsl(350 85% 55%);
+  
+  /* Charts couleurs premium */
+  --chart-1: hsl(200 95% 45%); /* Bleu principal */
+  --chart-2: hsl(161 94% 30%); /* Vert succès */
+  --chart-3: hsl(25 95% 53%);  /* Orange alertes */
+  --chart-4: hsl(270 95% 60%); /* Violet premium */
+  --chart-5: hsl(350 85% 55%); /* Rouge urgence */
+  
+  /* Gradients premium */
+  --gradient-primary: linear-gradient(135deg, hsl(200 95% 45%) 0%, hsl(220 100% 55%) 100%);
+  --gradient-success: linear-gradient(135deg, hsl(161 94% 30%) 0%, hsl(140 90% 35%) 100%);
+  --gradient-warning: linear-gradient(135deg, hsl(25 95% 53%) 0%, hsl(35 100% 55%) 100%);
+  --gradient-danger: linear-gradient(135deg, hsl(350 85% 55%) 0%, hsl(0 84% 60%) 100%);
+  --sidebar: hsl(0 0% 100%);
+  --sidebar-foreground: hsl(222.2 84% 4.9%);
+  --sidebar-primary: hsl(161 94% 30%);
+  --sidebar-primary-foreground: hsl(210 40% 98%);
+  --sidebar-accent: hsl(160 100% 25%);
+  --sidebar-accent-foreground: hsl(210 40% 98%);
+  --sidebar-border: hsl(214.3 31.8% 91.4%);
+  --sidebar-ring: hsl(161 94% 30%);
+  /* Typography premium */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-mono: 'JetBrains Mono', Menlo, monospace;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Spacing et radius premium */
+  --radius: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --priority-p1: hsl(0 84.2% 60.2%);
+  --priority-p2: hsl(38.3 92.1% 50.2%);
+  --priority-p3: hsl(47.9 95.8% 53.1%);
+  --priority-p4: hsl(142.1 76.2% 36.3%);
+  --priority-p1-bg: hsl(0 93.3% 94.1%);
+  --priority-p2-bg: hsl(48 100% 96.1%);
+  --priority-p3-bg: hsl(55 91.7% 95.3%);
+  --priority-p4-bg: hsl(138 76.5% 96.7%);
+  /* Offsets for global banners */
+  --top-banner-offset: 0px;
+  --banner-offset: 0px;
+}
+
+.dark {
+  --background: hsl(0 0% 0%);
+  --foreground: hsl(200 6.6667% 91.1765%);
+  --card: hsl(228 9.8039% 10%);
+  --card-foreground: hsl(0 0% 85.0980%);
+  --popover: hsl(0 0% 0%);
+  --popover-foreground: hsl(200 6.6667% 91.1765%);
+  --primary: hsl(217 91% 60%);
+  --primary-foreground: hsl(210 40% 98%);
+  --secondary: hsl(195.0000 15.3846% 94.9020%);
+  --secondary-foreground: hsl(222.2 84% 4.9%);
+  --muted: hsl(0 0% 9.4118%);
+  --muted-foreground: hsl(210 3.3898% 46.2745%);
+  --accent: hsl(228 9.8039% 10%);
+  --accent-foreground: hsl(200 6.6667% 91.1765%);
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: hsl(210 40% 98%);
+  --border: hsl(210 5.2632% 14.9020%);
+  --input: hsl(207.6923 27.6596% 18.4314%);
+  --ring: hsl(217 91% 60%);
+  --sidebar: hsl(228 9.8039% 10%);
+  --sidebar-foreground: hsl(0 0% 85.0980%);
+  --sidebar-primary: hsl(217 91% 60%);
+  --sidebar-primary-foreground: hsl(210 40% 98%);
+  --sidebar-accent: hsl(228 9.8039% 10%);
+  --sidebar-accent-foreground: hsl(200 6.6667% 91.1765%);
+  --sidebar-border: hsl(210 5.2632% 14.9020%);
+  --sidebar-ring: hsl(217 91% 60%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+  /* Ensure main content never hides under the top P1 banner */
+  main[role="main"], #main {
+    padding-top: calc(var(--top-banner-offset, 0px));
+  }
+  /* Accessible Skip Link */
+  .skip-link {
+    position: absolute;
+    left: 0;
+    top: -40px;
+    background: #0b5fff;
+    color: white;
+    padding: 8px 12px;
+    z-index: 1000;
+    border-radius: 0 0 6px 6px;
+    transition: top 0.15s ease;
+  }
+  .skip-link:focus {
+    top: 0;
+    outline: 3px solid #ffcc00;
+  }
+}
+
+@layer components {
+  /* Performance: avoid off-screen rendering cost */
+  [data-panel] {
+    content-visibility: auto;
+    contain-intrinsic-size: 800px 600px;
+  }
+  /* Priority badges premium */
+  .priority-p1 {
+    @apply text-red-700 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 dark:text-red-300 dark:from-red-950/50 dark:to-red-900/50 dark:border-red-800;
+    box-shadow: 0 2px 8px hsla(0, 84%, 60%, 0.15);
+  }
+  
+  .priority-p2 {
+    @apply text-orange-700 bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 dark:text-orange-300 dark:from-orange-950/50 dark:to-orange-900/50 dark:border-orange-800;
+    box-shadow: 0 2px 8px hsla(25, 95%, 53%, 0.15);
+  }
+  
+  .priority-p3 {
+    @apply text-yellow-700 bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200 dark:text-yellow-300 dark:from-yellow-950/50 dark:to-yellow-900/50 dark:border-yellow-800;
+    box-shadow: 0 2px 8px hsla(47, 96%, 53%, 0.15);
+  }
+  
+  .priority-p4 {
+    @apply text-green-700 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 dark:text-green-300 dark:from-green-950/50 dark:to-green-900/50 dark:border-green-800;
+    box-shadow: 0 2px 8px hsla(161, 94%, 30%, 0.15);
+  }
+
+  /* Cards premium avec hover effects */
+  .card-premium {
+    @apply bg-card border border-border rounded-xl shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:border-primary hover:-translate-y-1;
+  }
+  
+  .card-gradient {
+    background: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(210 20% 98%) 100%);
+    border: 1px solid hsl(214.3 31.8% 91.4%);
+  }
+
+  /* Buttons premium */
+  .btn-primary-gradient {
+    background: var(--gradient-primary);
+    @apply text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:-translate-y-0.5;
+  }
+  
+  .btn-success-gradient {
+    background: var(--gradient-success);
+    @apply text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:-translate-y-0.5;
+  }
+
+  /* Animations fluides */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+  
+  .animate-pulse-urgent {
+    animation: pulseUrgent 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .live-indicator {
+    position: relative;
+  }
+
+  .live-indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -12px;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(45deg, hsl(0 84% 60%) 0%, hsl(25 95% 53%) 100%);
+    border-radius: 50%;
+    animation: livePulse 2s ease-in-out infinite;
+    box-shadow: 0 0 10px hsla(0, 84%, 60%, 0.5);
+  }
+  
+  /* Quebec flag inspired elements */
+  .quebec-accent {
+    border-left: 4px solid hsl(200 95% 45%);
+    background: linear-gradient(90deg, hsl(200 95% 97%) 0%, transparent 100%);
+  }
+}
+
+/* Keyframes pour animations premium */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseUrgent {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+  50% { opacity: 0.6; transform: translateY(-50%) scale(1.2); }
+}
