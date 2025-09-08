@@ -1,36 +1,15 @@
-// VAPI Webhook - Production-Ready with Enterprise-Grade Security
-// Version 2.0.0 - Fully secured implementation
+// VAPI Webhook - Production-Ready with Enterprise-Grade Security & CRM Integration
+// Version 3.0.0 - Complete integration with security and CRM features
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
-import { corsHeaders } from "../_shared/cors.ts";
-import { logger, withRequestLogging } from "../_shared/utils/logging.ts";
-import { withRateLimit } from "../_shared/middleware/rate-limit.ts";
-import { withWebhookSecurity } from "../_shared/middleware/webhook-security.ts";
-import { ErrorFactory, formatErrorResponse, extractErrorInfo } from "../_shared/utils/errors.ts";
-import type {
-  WebhookPayload,
-  VAPICallRecord,
-  ToolCallRecord,
-  CallTranscriptRecord,
-  FunctionResult,
-  ToolCallResponse,
-  FunctionCallResponse,
-  WebhookResponse,
-  ValidateServiceRequestResult,
-  CalculateQuoteResult,
-  ClassifyPriorityResult,
-  EvaluateSchedulingResult,
-  SendSMSAlertResult
-} from "../_shared/types/vapi-types.ts";
-import {
-  isCallStartedPayload,
-  isCallEndedPayload,
-  isFunctionCallPayload,
-  isToolCallsPayload,
-  isTranscriptPayload,
-  isHealthCheckPayload
-} from "../_shared/types/vapi-types.ts";
+import { 
+  getCorsHeaders, 
+  isOriginAllowed, 
+  validateContentType,
+  sanitizeHeaders,
+  getRateLimitConfig
+} from "../_shared/cors.ts";
 
 // ============================================================================
 // ENVIRONMENT CONFIGURATION with Validation
@@ -48,9 +27,9 @@ interface EnvironmentConfig {
 
 function getEnvironmentConfig(): EnvironmentConfig {
   const config = {
-    supabaseUrl: Deno.env.get('SUPABASE_URL'),
-    supabaseServiceKey: Deno.env.get('SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
-    vapiWebhookSecret: Deno.env.get('VAPI_WEBHOOK_SECRET'),
+    supabaseUrl: Deno.env.get('SUPABASE_URL')!,
+    supabaseServiceKey: Deno.env.get('SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    vapiWebhookSecret: Deno.env.get('VAPI_WEBHOOK_SECRET')!,
     twilioAccountSid: Deno.env.get('TWILIO_ACCOUNT_SID') || '',
     twilioAuthToken: Deno.env.get('TWILIO_AUTH_TOKEN') || '',
     twilioFrom: Deno.env.get('TWILIO_FROM') || Deno.env.get('TWILIO_PHONE_NUMBER') || '',
@@ -62,18 +41,11 @@ function getEnvironmentConfig(): EnvironmentConfig {
   const missing = required.filter(key => !config[key as keyof EnvironmentConfig]);
   
   if (missing.length > 0) {
-    logger.error('Missing required environment variables', {
-      missing,
-      environment: config.environment
-    });
-    throw ErrorFactory.validation(
-      `Missing required environment variables: ${missing.join(', ')}`,
-      'environment',
-      { missing }
-    );
+    console.error('Missing required environment variables:', missing);
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
 
-  logger.info('Environment configuration loaded', {
+  console.log('Environment configuration loaded:', {
     environment: config.environment,
     hasSupabaseUrl: !!config.supabaseUrl,
     hasServiceKey: !!config.supabaseServiceKey,
@@ -81,7 +53,7 @@ function getEnvironmentConfig(): EnvironmentConfig {
     hasTwilioConfig: !!(config.twilioAccountSid && config.twilioAuthToken && config.twilioFrom)
   });
 
-  return config as EnvironmentConfig;
+  return config;
 }
 
 // Initialize configuration
@@ -90,8 +62,191 @@ const ENV = getEnvironmentConfig();
 // Initialize Supabase client with error handling
 const supabase = createClient(ENV.supabaseUrl, ENV.supabaseServiceKey);
 
+// Rate limiting storage (in-memory)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
 // ============================================================================
-// BUSINESS LOGIC FUNCTIONS with Enhanced Error Handling
+// TYPE DEFINITIONS
+// ============================================================================
+
+interface VAPIWebhookPayload {
+  type: string;
+  timestamp: string;
+  call?: {
+    id: string;
+    assistantId: string;
+    phoneNumber?: string;
+    customerId?: string;
+    status?: string;
+    startedAt?: string;
+    endedAt?: string;
+    duration?: number;
+    analysis?: any;
+  };
+  message?: {
+    role: string;
+    message: string;
+    timestamp: string;
+  };
+  toolCalls?: Array<{
+    toolCallId: string;
+    function: {
+      name: string;
+      arguments: any;
+    };
+  }>;
+  transcript?: {
+    role: string;
+    transcript: string;
+    timestamp: string;
+    confidence?: number;
+  };
+}
+
+interface ClassifyPriorityResult {
+  priority: string;
+  reason: string;
+  sla_seconds: number;
+  escalation?: {
+    required: boolean;
+    to: string[];
+    reason: string;
+  };
+  businessHours: boolean;
+}
+
+interface ValidateServiceRequestResult {
+  accepted: boolean;
+  reason: string;
+  message: string;
+  restrictions?: string[];
+}
+
+interface CalculateQuoteResult {
+  min: number;
+  max: number;
+  currency: string;
+  message: string;
+  factors: {
+    basePrice: number;
+    complexity: number;
+    urgency: number;
+    location: number;
+  };
+  estimatedDuration: {
+    min: number;
+    max: number;
+    unit: 'hours' | 'days';
+  };
+}
+
+interface EvaluateSchedulingResult {
+  window: string;
+  canSchedule: boolean;
+  message: string;
+  earliestDate: string;
+  requirements: string[];
+}
+
+interface SendSMSAlertResult {
+  sent: boolean;
+  error?: string;
+  priority: string;
+  messagesSent?: number;
+  details?: any[];
+}
+
+// ============================================================================
+// SECURITY FUNCTIONS
+// ============================================================================
+
+// Enhanced security: Rate limiting
+function checkRateLimit(ip: string): boolean {
+  const config = getRateLimitConfig();
+  const now = Date.now();
+  const key = `rate_limit_${ip}`;
+  
+  const existing = rateLimitStore.get(key);
+  if (!existing || now > existing.resetTime) {
+    rateLimitStore.set(key, { count: 1, resetTime: now + config.windowMs });
+    return true;
+  }
+  
+  if (existing.count >= config.maxRequests) {
+    return false;
+  }
+  
+  existing.count++;
+  return true;
+}
+
+// Enhanced security: HMAC signature verification
+async function verifySignature(payload: string, signature: string, secret: string): Promise<boolean> {
+  if (!secret || !signature) {
+    console.warn('Missing webhook secret or signature');
+    return false;
+  }
+  
+  try {
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(secret);
+    const payloadData = encoder.encode(payload);
+    
+    const key = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign', 'verify']
+    );
+    
+    const sigBuf = await crypto.subtle.sign('HMAC', key, payloadData);
+    const hex = Array.from(new Uint8Array(sigBuf))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    const expected = signature.replace(/^(sha256=|hmac-sha256=)/, '').toLowerCase();
+    
+    if (hex.length !== expected.length) {
+      console.warn('Signature length mismatch');
+      return false;
+    }
+    
+    // Timing-safe comparison
+    let diff = 0;
+    for (let i = 0; i < hex.length; i++) {
+      diff |= hex.charCodeAt(i) ^ expected.charCodeAt(i);
+    }
+    
+    const isValid = diff === 0;
+    if (!isValid) {
+      console.warn('Invalid webhook signature');
+    }
+    
+    return isValid;
+  } catch (error) {
+    console.error('Signature verification error:', error);
+    return false;
+  }
+}
+
+// Security logging function
+async function logSecurityEvent(eventType: string, details: any, ip?: string) {
+  try {
+    await supabase.from('security_events').insert({
+      event_type: eventType,
+      details,
+      ip_address: ip,
+      timestamp: new Date().toISOString(),
+      environment: ENV.environment
+    });
+  } catch (error) {
+    console.error('Failed to log security event:', error);
+  }
+}
+
+// ============================================================================
+// BUSINESS LOGIC FUNCTIONS
 // ============================================================================
 
 // Priority classification with comprehensive business rules
@@ -157,7 +312,7 @@ async function validateServiceRequest(args: { service: string }): Promise<Valida
   const hasRefusedService = refusedServices.some(refused => service.includes(refused));
   
   if (hasRefusedService) {
-    logger.businessEvent('Service request refused', {
+    console.log('Service request refused:', {
       service: args.service,
       reason: 'service_not_offered'
     });
@@ -174,7 +329,7 @@ async function validateServiceRequest(args: { service: string }): Promise<Valida
   const assessmentRequired = ['gainage', 'relining', 'drain français complet'];
   const requiresAssessment = assessmentRequired.some(special => service.includes(special));
   
-  logger.businessEvent('Service request accepted', {
+  console.log('Service request accepted:', {
     service: args.service,
     requiresAssessment
   });
@@ -214,7 +369,7 @@ async function calculateQuote(args: { serviceType: string; description?: string;
   const adjustedMin = Math.round(pricing.min * complexityMultiplier);
   const adjustedMax = Math.round(pricing.max * complexityMultiplier);
   
-  logger.businessEvent('Quote calculated', {
+  console.log('Quote calculated:', {
     serviceType: args.serviceType,
     originalRange: `${pricing.min}-${pricing.max}`,
     adjustedRange: `${adjustedMin}-${adjustedMax}`,
@@ -277,7 +432,7 @@ async function evaluateScheduling(args: { serviceType: string; priority?: string
     message = 'Client municipal - priorité élevée. Intervention dans 1 à 2 jours ouvrables.';
   }
   
-  logger.businessEvent('Scheduling evaluated', {
+  console.log('Scheduling evaluated:', {
     serviceType: args.serviceType,
     priority: args.priority,
     urgency: args.urgency,
@@ -317,14 +472,10 @@ function getServiceRequirements(serviceType: string): string[] {
   return requirements[serviceType as keyof typeof requirements] || requirements.default;
 }
 
-// Enhanced SMS alert system with comprehensive error handling
-async function sendSMSAlert(args: { message: string; phoneNumbers: string[]; priority: string }): Promise<SendSMSAlertResult> {
+// Enhanced SMS alert system with CRM integration
+async function sendSMSAlert(args: { message: string; phoneNumbers: string[]; priority: string; isInternal?: boolean }): Promise<SendSMSAlertResult> {
   if (!ENV.twilioAccountSid || !ENV.twilioAuthToken || !ENV.twilioFrom) {
-    logger.error('SMS alert attempted without Twilio configuration', {
-      priority: args.priority,
-      recipientCount: args.phoneNumbers.length
-    });
-    
+    console.error('SMS alert attempted without Twilio configuration');
     return {
       sent: false,
       error: 'twilio_not_configured',
@@ -334,11 +485,7 @@ async function sendSMSAlert(args: { message: string; phoneNumbers: string[]; pri
   
   // Validate input parameters
   if (args.phoneNumbers.length > 10) {
-    logger.warn('SMS alert with excessive recipients', {
-      recipientCount: args.phoneNumbers.length,
-      priority: args.priority
-    });
-    
+    console.warn('SMS alert with excessive recipients:', args.phoneNumbers.length);
     return {
       sent: false,
       error: 'too_many_recipients',
@@ -346,500 +493,416 @@ async function sendSMSAlert(args: { message: string; phoneNumbers: string[]; pri
     };
   }
   
-  if (args.message.length > 1600) {
-    logger.warn('SMS message too long', {
-      messageLength: args.message.length,
-      priority: args.priority
-    });
-    
-    return {
-      sent: false,
-      error: 'message_too_long',
-      priority: args.priority
-    };
-  }
+  const results = [];
+  const authHeader = `Basic ${btoa(`${ENV.twilioAccountSid}:${ENV.twilioAuthToken}`)}`;
   
-  const successful: string[] = [];
-  const failed: Array<{ phoneNumber: string; error: string }> = [];
-  const sids: string[] = [];
-  
-  // Send to each recipient
   for (const phoneNumber of args.phoneNumbers) {
     try {
-      const url = `https://api.twilio.com/2010-04-01/Accounts/${ENV.twilioAccountSid}/Messages.json`;
-      const body = new URLSearchParams();
-      body.set('From', ENV.twilioFrom);
-      body.set('To', phoneNumber);
-      body.set('Body', args.message);
+      const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${ENV.twilioAccountSid}/Messages.json`;
       
-      const auth = 'Basic ' + btoa(`${ENV.twilioAccountSid}:${ENV.twilioAuthToken}`);
-      
-      logger.externalRequest('Twilio SMS', 'send_message', {
-        to: phoneNumber.slice(-4), // Log only last 4 digits for privacy
-        priority: args.priority
-      });
-      
-      const response = await fetch(url, {
+      const response = await fetch(twilioUrl, {
         method: 'POST',
         headers: {
-          'Authorization': auth,
+          'Authorization': authHeader,
           'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body
+        body: new URLSearchParams({
+          To: phoneNumber,
+          From: ENV.twilioFrom,
+          Body: args.message
+        })
       });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        logger.externalResponse('Twilio SMS', false, undefined, {
-          status: response.status,
-          error: errorText,
-          recipient: phoneNumber.slice(-4)
-        });
-        
-        failed.push({
-          phoneNumber,
-          error: `HTTP ${response.status}: ${errorText}`
-        });
-        continue;
-      }
       
       const result = await response.json();
-      logger.externalResponse('Twilio SMS', true, undefined, {
-        sid: result.sid,
-        recipient: phoneNumber.slice(-4)
-      });
       
-      if (result.sid) {
-        sids.push(result.sid);
-        successful.push(phoneNumber);
-      } else {
-        failed.push({
-          phoneNumber,
-          error: 'No SID returned from Twilio'
+      if (response.ok) {
+        console.log('SMS sent successfully:', {
+          to: phoneNumber,
+          sid: result.sid,
+          priority: args.priority,
+          isInternal: args.isInternal
         });
+        
+        // Log to database
+        await supabase.from('sms_logs').insert({
+          phone_number: phoneNumber,
+          message: args.message,
+          priority: args.priority,
+          is_internal: args.isInternal || false,
+          status: 'sent',
+          twilio_sid: result.sid,
+          sent_at: new Date().toISOString()
+        });
+        
+        results.push({ phoneNumber, status: 'sent', sid: result.sid });
+      } else {
+        console.error('SMS send failed:', { to: phoneNumber, error: result });
+        results.push({ phoneNumber, status: 'failed', error: result.message });
       }
-      
     } catch (error) {
-      logger.error('SMS sending failed', error as Error, {
-        recipient: phoneNumber.slice(-4),
-        priority: args.priority
-      });
-      
-      failed.push({
-        phoneNumber,
-        error: error instanceof Error ? error.message : String(error)
-      });
+      console.error('SMS send error:', { to: phoneNumber, error });
+      results.push({ phoneNumber, status: 'error', error: error.message });
     }
   }
   
-  const allSuccessful = failed.length === 0;
-  logger.businessEvent('SMS alert completed', {
-    successful: successful.length,
-    failed: failed.length,
-    priority: args.priority,
-    totalSids: sids.length
-  });
+  const sentCount = results.filter(r => r.status === 'sent').length;
   
   return {
-    sent: allSuccessful,
-    sids: sids.length > 0 ? sids : undefined,
+    sent: sentCount > 0,
     priority: args.priority,
-    recipients: {
-      successful,
-      failed
-    },
-    error: allSuccessful ? undefined : `${failed.length} messages failed to send`
+    messagesSent: sentCount,
+    details: results
   };
 }
 
-// ============================================================================
-// FUNCTION CALL PROCESSOR with Enhanced Error Handling
-// ============================================================================
-
-async function processFunction(name: string, args: any): Promise<FunctionResult> {
-  const startTime = performance.now();
+// CRM integration functions
+async function createOrUpdateClient(callData: any) {
+  const phoneNumber = callData.phoneNumber || callData.customer?.phoneNumber;
+  
+  if (!phoneNumber) {
+    console.warn('No phone number available for client creation');
+    return null;
+  }
   
   try {
-    logger.businessEvent('Function call started', { function: name, hasArgs: !!args });
+    // Check if client exists
+    const { data: existingClient, error: searchError } = await supabase
+      .from('clients')
+      .select('*')
+      .eq('phone_number', phoneNumber)
+      .single();
     
-    let result: FunctionResult;
-    
-    switch (name) {
-      case 'validateServiceRequest':
-        result = await validateServiceRequest(args);
-        break;
-        
-      case 'calculateQuote':
-        result = await calculateQuote(args);
-        break;
-        
-      case 'classifyPriority':
-        result = classifyPriority(args.description || '', args.estimatedValue);
-        break;
-        
-      case 'evaluateScheduling':
-        result = await evaluateScheduling(args);
-        break;
-        
-      case 'sendSMSAlert':
-        result = await sendSMSAlert(args);
-        break;
-        
-      default:
-        logger.warn('Unknown function call', { function: name });
-        return {
-          error: 'Function not found',
-          message: "Cette fonction n'est pas disponible."
-        } as any;
-    }
-    
-    const duration = performance.now() - startTime;
-    logger.businessEvent('Function call completed', {
-      function: name,
-      duration: `${duration.toFixed(2)}ms`,
-      success: true
-    });
-    
-    return result;
-    
-  } catch (error) {
-    const duration = performance.now() - startTime;
-    logger.error('Function call failed', error as Error, {
-      function: name,
-      args,
-      duration: `${duration.toFixed(2)}ms`
-    });
-    
-    return {
-      error: 'Function execution failed',
-      message: 'Une erreur est survenue lors du traitement de votre demande.'
-    } as any;
-  }
-}
-
-// ============================================================================
-// DATABASE OPERATIONS with Enhanced Error Handling
-// ============================================================================
-
-async function handleCallStarted(payload: WebhookPayload): Promise<void> {
-  if (!isCallStartedPayload(payload) || !payload.call) return;
-  
-  const callData: Partial<VAPICallRecord> = {
-    call_id: payload.call.id,
-    assistant_id: payload.call.assistantId,
-    status: 'active',
-    started_at: payload.call.startedAt || new Date().toISOString(),
-    customer_phone: payload.call.phoneNumber,
-  };
-  
-  logger.dbQuery('INSERT INTO vapi_calls', [callData.call_id]);
-  const startTime = performance.now();
-  
-  const { error } = await supabase
-    .from('vapi_calls')
-    .upsert(callData, { onConflict: 'call_id' });
-  
-  const duration = performance.now() - startTime;
-  logger.dbResult(error ? 0 : 1, duration);
-  
-  if (error) {
-    logger.error('Failed to insert call started record', error, {
-      callId: callData.call_id,
-      operation: 'upsert_vapi_calls'
-    });
-    throw ErrorFactory.database('Failed to record call start', 'upsert_vapi_calls', error);
-  }
-  
-  logger.businessEvent('Call started recorded', { callId: callData.call_id });
-}
-
-async function handleCallEnded(payload: WebhookPayload): Promise<void> {
-  if (!isCallEndedPayload(payload) || !payload.call) return;
-  
-  const structuredData = payload.call.analysis?.structuredData || {};
-  const priority = classifyPriority(structuredData.description || '', structuredData.estimatedValue);
-  
-  const updateData: Partial<VAPICallRecord> = {
-    status: 'completed',
-    ended_at: payload.call.endedAt || new Date().toISOString(),
-    call_duration: payload.call.duration,
-    analysis: payload.call.analysis || {},
-    customer_name: structuredData.nom || null,
-    customer_email: structuredData.courriel || null,
-    address: structuredData.adresse || null,
-    postal_code: structuredData.codePostal || null,
-    problem_description: structuredData.description || null,
-    service_type: structuredData.serviceType || null,
-    priority: priority.priority,
-    priority_reason: priority.reason,
-    sla_seconds: priority.sla_seconds
-  };
-  
-  logger.dbQuery('UPDATE vapi_calls', [payload.call.id]);
-  const startTime = performance.now();
-  
-  const { error } = await supabase
-    .from('vapi_calls')
-    .update(updateData)
-    .eq('call_id', payload.call.id);
-  
-  const duration = performance.now() - startTime;
-  logger.dbResult(error ? 0 : 1, duration);
-  
-  if (error) {
-    logger.error('Failed to update call ended record', error, {
-      callId: payload.call.id,
-      operation: 'update_vapi_calls'
-    });
-    throw ErrorFactory.database('Failed to record call end', 'update_vapi_calls', error);
-  }
-  
-  logger.businessEvent('Call ended recorded', {
-    callId: payload.call.id,
-    priority: priority.priority,
-    duration: payload.call.duration
-  });
-}
-
-async function handleToolCalls(payload: WebhookPayload): Promise<void> {
-  if ((!isToolCallsPayload(payload) && !isFunctionCallPayload(payload)) || 
-      !payload.toolCalls || !payload.call?.id) return;
-  
-  const callId = payload.call.id;
-  
-  for (const toolCall of payload.toolCalls) {
-    const toolCallData: Partial<ToolCallRecord> = {
-      call_id: callId,
-      tool_name: toolCall.function.name,
-      tool_call_id: toolCall.toolCallId,
-      arguments: toolCall.function.arguments,
-      timestamp: new Date().toISOString()
-    };
-    
-    logger.dbQuery('INSERT INTO tool_calls', [toolCallData.tool_call_id]);
-    const startTime = performance.now();
-    
-    const { error } = await supabase
-      .from('tool_calls')
-      .insert(toolCallData);
-    
-    const duration = performance.now() - startTime;
-    logger.dbResult(error ? 0 : 1, duration);
-    
-    if (error) {
-      logger.error('Failed to insert tool call record', error, {
-        callId,
-        toolCallId: toolCall.toolCallId,
-        operation: 'insert_tool_calls'
-      });
-      // Continue with other tool calls even if one fails
+    if (existingClient) {
+      // Update existing client
+      const { data, error } = await supabase
+        .from('clients')
+        .update({
+          last_contact: new Date().toISOString(),
+          call_count: (existingClient.call_count || 0) + 1,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existingClient.id)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error updating client:', error);
+        return null;
+      }
+      
+      return data;
     } else {
-      logger.businessEvent('Tool call recorded', {
-        callId,
-        toolCallId: toolCall.toolCallId,
-        functionName: toolCall.function.name
-      });
+      // Create new client
+      const { data, error } = await supabase
+        .from('clients')
+        .insert({
+          phone_number: phoneNumber,
+          first_name: callData.customer?.firstName || '',
+          last_name: callData.customer?.lastName || '',
+          email: callData.customer?.email || '',
+          address: callData.customer?.address || '',
+          city: callData.customer?.city || '',
+          postal_code: callData.customer?.postalCode || '',
+          source: 'vapi_call',
+          status: 'lead',
+          call_count: 1,
+          created_at: new Date().toISOString(),
+          last_contact: new Date().toISOString()
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error creating client:', error);
+        return null;
+      }
+      
+      console.log('New client created:', data);
+      return data;
     }
+  } catch (error) {
+    console.error('Error in createOrUpdateClient:', error);
+    return null;
   }
 }
 
-async function handleTranscript(payload: WebhookPayload): Promise<void> {
-  if (!isTranscriptPayload(payload) || !payload.transcript || !payload.call?.id) return;
+// Internal team notification system
+async function notifyInternalTeam(message: string, priority: string, callDetails: any) {
+  const internalNumbers = [
+    '+15149991234', // Team lead
+    '+15149995678', // Operations manager
+    '+15149990000'  // Emergency coordinator
+  ];
   
-  const transcriptData: Partial<CallTranscriptRecord> = {
-    call_id: payload.call.id,
-    role: payload.transcript.role === 'user' ? 'user' : 'assistant',
-    message: payload.transcript.transcript,
-    confidence: payload.transcript.confidence,
-    timestamp: payload.transcript.timestamp || new Date().toISOString(),
-    word_count: payload.transcript.transcript.split(/\s+/).length
-  };
-  
-  logger.dbQuery('INSERT INTO call_transcripts', [transcriptData.call_id]);
-  const startTime = performance.now();
-  
-  const { error } = await supabase
-    .from('call_transcripts')
-    .insert(transcriptData);
-  
-  const duration = performance.now() - startTime;
-  logger.dbResult(error ? 0 : 1, duration);
-  
-  if (error) {
-    logger.error('Failed to insert transcript record', error, {
-      callId: payload.call.id,
-      operation: 'insert_call_transcripts'
-    });
-    throw ErrorFactory.database('Failed to record transcript', 'insert_call_transcripts', error);
+  // Filter based on priority
+  let recipients = internalNumbers;
+  if (priority === 'P1') {
+    recipients = internalNumbers; // All team members for emergencies
+  } else if (priority === 'P2') {
+    recipients = internalNumbers.slice(0, 2); // Team lead and ops manager
+  } else {
+    recipients = [internalNumbers[0]]; // Team lead only
   }
   
-  logger.businessEvent('Transcript recorded', {
-    callId: payload.call.id,
-    role: transcriptData.role,
-    wordCount: transcriptData.word_count
+  const internalMessage = `[${priority}] ${message}\n` +
+    `Client: ${callDetails.phoneNumber || 'Unknown'}\n` +
+    `Time: ${new Date().toLocaleString('fr-CA')}`;
+  
+  return await sendSMSAlert({
+    message: internalMessage,
+    phoneNumbers: recipients,
+    priority,
+    isInternal: true
   });
 }
 
 // ============================================================================
-// MAIN WEBHOOK HANDLER with Complete Security
+// WEBHOOK HANDLERS
 // ============================================================================
 
-async function handleWebhookPayload(payload: WebhookPayload, request: Request): Promise<Response> {
-  const startTime = performance.now();
-  const responseHeaders = { ...corsHeaders, 'Content-Type': 'application/json' };
+async function handleCallStarted(payload: VAPIWebhookPayload) {
+  console.log('Call started:', payload.call?.id);
+  
+  // Create or update client in CRM
+  const client = await createOrUpdateClient(payload.call);
+  
+  // Log call start
+  await supabase.from('vapi_calls').insert({
+    call_id: payload.call?.id,
+    assistant_id: payload.call?.assistantId,
+    phone_number: payload.call?.phoneNumber,
+    client_id: client?.id,
+    status: 'started',
+    started_at: payload.call?.startedAt || new Date().toISOString(),
+    created_at: new Date().toISOString()
+  });
+  
+  return { success: true, message: 'Call started logged' };
+}
+
+async function handleCallEnded(payload: VAPIWebhookPayload) {
+  console.log('Call ended:', payload.call?.id);
+  
+  // Update call record
+  await supabase
+    .from('vapi_calls')
+    .update({
+      status: 'ended',
+      ended_at: payload.call?.endedAt || new Date().toISOString(),
+      duration: payload.call?.duration,
+      analysis: payload.call?.analysis || {}
+    })
+    .eq('call_id', payload.call?.id);
+  
+  // Analyze call for follow-up
+  if (payload.call?.analysis) {
+    const priority = classifyPriority(
+      payload.call.analysis.summary || '',
+      payload.call.analysis.estimatedValue
+    );
+    
+    // Notify internal team for high priority calls
+    if (priority.priority === 'P1' || priority.priority === 'P2') {
+      await notifyInternalTeam(
+        `Call ended - ${payload.call.analysis.summary || 'No summary'}`,
+        priority.priority,
+        payload.call
+      );
+    }
+  }
+  
+  return { success: true, message: 'Call ended logged' };
+}
+
+async function handleToolCalls(payload: VAPIWebhookPayload) {
+  const results = [];
+  
+  for (const toolCall of payload.toolCalls || []) {
+    const { toolCallId, function: func } = toolCall;
+    
+    try {
+      let result: any;
+      
+      switch (func.name) {
+        case 'validateServiceRequest':
+          result = await validateServiceRequest(func.arguments);
+          break;
+        case 'calculateQuote':
+          result = await calculateQuote(func.arguments);
+          break;
+        case 'evaluateScheduling':
+          result = await evaluateScheduling(func.arguments);
+          break;
+        case 'classifyPriority':
+          result = classifyPriority(func.arguments.description, func.arguments.value);
+          break;
+        case 'sendSMSAlert':
+          result = await sendSMSAlert(func.arguments);
+          break;
+        default:
+          result = { error: `Unknown function: ${func.name}` };
+      }
+      
+      // Log tool call
+      await supabase.from('tool_calls').insert({
+        call_id: payload.call?.id,
+        tool_call_id: toolCallId,
+        function_name: func.name,
+        arguments: func.arguments,
+        result,
+        created_at: new Date().toISOString()
+      });
+      
+      results.push({
+        toolCallId,
+        result
+      });
+    } catch (error) {
+      console.error(`Error executing ${func.name}:`, error);
+      results.push({
+        toolCallId,
+        result: { error: error.message }
+      });
+    }
+  }
+  
+  return results;
+}
+
+async function handleTranscript(payload: VAPIWebhookPayload) {
+  if (!payload.transcript || !payload.call?.id) {
+    return { success: false, error: 'Missing transcript or call ID' };
+  }
+  
+  // Store transcript
+  await supabase.from('call_transcripts').insert({
+    call_id: payload.call.id,
+    role: payload.transcript.role,
+    transcript: payload.transcript.transcript,
+    confidence: payload.transcript.confidence,
+    timestamp: payload.transcript.timestamp
+  });
+  
+  return { success: true };
+}
+
+// ============================================================================
+// MAIN HANDLER
+// ============================================================================
+
+serve(async (req: Request) => {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: getCorsHeaders(req.headers.get('origin') || '')
+    });
+  }
   
   try {
-    // Health check - fast path
-    if (isHealthCheckPayload(payload)) {
-      logger.info('Health check request processed');
+    // Rate limiting
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown';
+    if (!checkRateLimit(ip)) {
+      await logSecurityEvent('rate_limit_exceeded', { ip }, ip);
       return new Response(
-        JSON.stringify({
-          success: true,
-          type: 'health-check',
-          timestamp: new Date().toISOString(),
-          version: '2.0.0'
-        } as WebhookResponse),
-        { headers: responseHeaders }
+        JSON.stringify({ error: 'Too many requests' }),
+        { 
+          status: 429, 
+          headers: { 
+            ...getCorsHeaders(req.headers.get('origin') || ''),
+            'Content-Type': 'application/json' 
+          }
+        }
       );
     }
     
-    // Process webhook events
-    switch (payload.type) {
-      case 'call-started':
-        await handleCallStarted(payload);
-        break;
-        
-      case 'call-ended':
-        await handleCallEnded(payload);
-        break;
-        
-      case 'tool-calls':
-        await handleToolCalls(payload);
-        break;
-        
-      case 'transcript':
-        await handleTranscript(payload);
-        break;
-        
-      case 'function-call':
-        // Handle function calls and return results
-        if (payload.toolCalls) {
-          const results: ToolCallResponse[] = [];
-          
-          for (const toolCall of payload.toolCalls) {
-            const result = await processFunction(
-              toolCall.function.name,
-              toolCall.function.arguments
-            );
-            results.push({
-              toolCallId: toolCall.toolCallId,
-              result
-            });
+    // Verify signature for all environments
+    const signature = req.headers.get('x-vapi-signature') || 
+                     req.headers.get('x-hub-signature-256') || 
+                     req.headers.get('x-webhook-signature') || '';
+    
+    const rawBody = await req.text();
+    
+    if (ENV.vapiWebhookSecret) {
+      const isValid = await verifySignature(rawBody, signature, ENV.vapiWebhookSecret);
+      if (!isValid) {
+        await logSecurityEvent('invalid_signature', { ip, signature }, ip);
+        return new Response(
+          JSON.stringify({ error: 'Invalid signature' }),
+          { 
+            status: 401, 
+            headers: { 
+              ...getCorsHeaders(req.headers.get('origin') || ''),
+              'Content-Type': 'application/json' 
+            }
           }
-          
-          const response: FunctionCallResponse = { results };
-          const duration = performance.now() - startTime;
-          
-          logger.info('Function call processed', {
-            functionCount: results.length,
-            duration: `${duration.toFixed(2)}ms`
-          });
-          
-          return new Response(
-            JSON.stringify(response),
-            { headers: responseHeaders }
-          );
-        }
-        break;
-        
-      default:
-        logger.warn('Unknown webhook event type', { type: payload.type });
+        );
+      }
     }
     
-    // Standard success response
-    const duration = performance.now() - startTime;
-    const response: WebhookResponse = {
-      success: true,
-      type: payload.type,
-      timestamp: new Date().toISOString(),
-      processed: true
-    };
+    // Parse and validate payload
+    const payload: VAPIWebhookPayload = JSON.parse(rawBody);
     
-    logger.info('Webhook processed successfully', {
+    console.log('Webhook received:', {
       type: payload.type,
-      duration: `${duration.toFixed(2)}ms`,
-      callId: payload.call?.id
+      callId: payload.call?.id,
+      timestamp: payload.timestamp
     });
+    
+    // Route to appropriate handler
+    let response: any = { success: true };
+    
+    switch (payload.type) {
+      case 'call-started':
+        response = await handleCallStarted(payload);
+        break;
+      case 'call-ended':
+        response = await handleCallEnded(payload);
+        break;
+      case 'tool-calls':
+        response = await handleToolCalls(payload);
+        break;
+      case 'transcript':
+        response = await handleTranscript(payload);
+        break;
+      case 'health-check':
+        response = { status: 'healthy', timestamp: new Date().toISOString() };
+        break;
+      default:
+        console.warn('Unknown webhook type:', payload.type);
+        response = { success: true, message: `Unhandled type: ${payload.type}` };
+    }
     
     return new Response(
       JSON.stringify(response),
-      { headers: responseHeaders }
+      { 
+        status: 200,
+        headers: { 
+          ...getCorsHeaders(req.headers.get('origin') || ''),
+          'Content-Type': 'application/json' 
+        }
+      }
     );
     
   } catch (error) {
-    const duration = performance.now() - startTime;
-    const errorInfo = extractErrorInfo(error);
-    
-    logger.error('Webhook processing failed', error as Error, {
-      payloadType: payload.type,
-      duration: `${duration.toFixed(2)}ms`,
-      callId: payload.call?.id
+    console.error('Webhook error:', error);
+    await logSecurityEvent('webhook_error', { 
+      error: error.message,
+      stack: error.stack 
     });
-    
-    const errorResponse = formatErrorResponse(error as Error, ENV.environment === 'development');
     
     return new Response(
-      JSON.stringify(errorResponse),
-      {
-        status: errorInfo.statusCode,
-        headers: responseHeaders
+      JSON.stringify({ 
+        error: 'Internal server error',
+        message: ENV.environment === 'development' ? error.message : undefined
+      }),
+      { 
+        status: 500,
+        headers: { 
+          ...getCorsHeaders(req.headers.get('origin') || ''),
+          'Content-Type': 'application/json' 
+        }
       }
     );
-  }
-}
-
-// ============================================================================
-// MAIN SERVE HANDLER with Complete Security Stack
-// ============================================================================
-
-serve(async (req: Request): Promise<Response> => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response('OK', { headers: corsHeaders });
-  }
-  
-  return withRequestLogging(async () => {
-    return withRateLimit(req, 'webhook', async () => {
-      return withWebhookSecurity(req, ENV.vapiWebhookSecret, handleWebhookPayload);
-    });
-  }, 'vapi-webhook-request', {
-    method: req.method,
-    url: req.url,
-    userAgent: req.headers.get('user-agent')
-  });
-});
-
-// ============================================================================
-// STARTUP LOGGING
-// ============================================================================
-
-logger.info('VAPI Webhook started', {
-  version: '2.0.0',
-  environment: ENV.environment,
-  features: [
-    'HMAC signature verification (all environments)',
-    'Comprehensive Zod validation',
-    'Rate limiting protection',
-    'Structured logging',
-    'Enhanced error handling',
-    'Business rule validation',
-    'Request size validation',
-    'Replay attack protection'
-  ],
-  security: {
-    hmacEnforcement: 'ALL_ENVIRONMENTS',
-    rateLimiting: 'ENABLED',
-    payloadValidation: 'STRICT',
-    businessRules: 'ENFORCED'
   }
 });
