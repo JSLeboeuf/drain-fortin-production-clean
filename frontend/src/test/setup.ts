@@ -1,126 +1,109 @@
 import '@testing-library/jest-dom';
+import { expect, afterEach, vi, beforeAll, afterAll } from 'vitest';
 import { cleanup } from '@testing-library/react';
-import { afterEach, beforeAll, afterAll, vi } from 'vitest';
-import React from 'react';
+import * as matchers from '@testing-library/jest-dom/matchers';
 
-// Configuration globale pour tous les tests
-beforeAll(() => {
-  // Mock console methods to reduce noise in tests
-  vi.spyOn(console, 'warn').mockImplementation(() => {});
-  vi.spyOn(console, 'error').mockImplementation(() => {});
-  
-  // Mock window.matchMedia (pour les tests de responsive design)
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation(query => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(), // deprecated
-      removeListener: vi.fn(), // deprecated
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  });
+// Extend Vitest's expect with jest-dom matchers
+expect.extend(matchers);
 
-  // Mock ResizeObserver
-  global.ResizeObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  }));
-
-  // Mock IntersectionObserver
-  global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  }));
-
-  // Mock scrollTo
-  Object.defineProperty(window, 'scrollTo', {
-    value: vi.fn(),
-    writable: true,
-  });
-
-  // Mock WebSocket pour les tests
-  global.WebSocket = vi.fn().mockImplementation(() => ({
-    send: vi.fn(),
-    close: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    readyState: 1, // OPEN
-    CONNECTING: 0,
-    OPEN: 1,
-    CLOSING: 2,
-    CLOSED: 3,
-  }));
-});
-
-// Cleanup après chaque test
+// Cleanup after each test
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
 });
 
-afterAll(() => {
-  vi.restoreAllMocks();
+// Mock window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
 });
 
-// Configuration des timeouts pour les tests async
-vi.setConfig({
-  testTimeout: 10000,
-});
+// Mock IntersectionObserver
+global.IntersectionObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
 
-// Helper pour simuler les délais
-export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+// Mock ResizeObserver
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
 
-// Mock pour localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-
-  return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => {
-      store[key] = value.toString();
-    }),
-    removeItem: vi.fn((key: string) => {
-      delete store[key];
-    }),
-    clear: vi.fn(() => {
-      store = {};
-    }),
-    length: 0,
-    key: vi.fn(() => null),
-  };
-})();
-
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-});
-
-Object.defineProperty(window, 'sessionStorage', {
-  value: localStorageMock,
-});
-
-// Configuration pour les tests avec React Query
-export const createQueryClientWrapper = () => {
-  const { QueryClient, QueryClientProvider } = require('@tanstack/react-query');
-  
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-        cacheTime: Infinity,
-      },
-      mutations: {
-        retry: false,
-      },
+// Mock crypto.randomUUID
+Object.defineProperty(window, 'crypto', {
+  value: {
+    randomUUID: () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    getRandomValues: (arr: any) => {
+      for (let i = 0; i < arr.length; i++) {
+        arr[i] = Math.floor(Math.random() * 256);
+      }
+      return arr;
     },
-  });
+  },
+});
 
-  return ({ children }: { children: React.ReactNode }) => {
-    return React.createElement(QueryClientProvider, { client: queryClient }, children);
-  };
+// Mock environment variables
+vi.mock('import.meta', () => ({
+  env: {
+    VITE_SUPABASE_URL: 'https://test.supabase.co',
+    VITE_SUPABASE_ANON_KEY: 'test-anon-key',
+    VITE_API_BASE_URL: 'http://localhost:3000',
+    DEV: true,
+    PROD: false,
+  },
+}));
+
+// Mock fetch globally
+global.fetch = vi.fn();
+
+// Mock localStorage
+const localStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+  key: vi.fn(),
+  length: 0,
 };
+global.localStorage = localStorageMock as Storage;
+
+// Mock sessionStorage
+const sessionStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+  key: vi.fn(),
+  length: 0,
+};
+global.sessionStorage = sessionStorageMock as Storage;
+
+// Suppress console errors during tests (optional)
+const originalError = console.error;
+beforeAll(() => {
+  console.error = (...args: any[]) => {
+    if (
+      typeof args[0] === 'string' &&
+      args[0].includes('Warning: ReactDOM.render')
+    ) {
+      return;
+    }
+    originalError.call(console, ...args);
+  };
+});
+
+afterAll(() => {
+  console.error = originalError;
+});

@@ -29,6 +29,7 @@ const GuillaumeSettings = lazy(() => import("@/pages/settings/GuillaumeSettings"
 const ClientIntake = lazy(() => import("@/pages/ClientIntake"));
 const PricingTool = lazy(() => import("@/pages/PricingTool"));
 const Templates = lazy(() => import("@/pages/Templates"));
+const CRM = lazy(() => import("@/pages/CRM"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 // Composant de fallback pour le chargement
@@ -60,6 +61,7 @@ function Router() {
       <Route path="/intake" component={ClientIntake} />
       <Route path="/pricing" component={PricingTool} />
       <Route path="/templates" component={Templates} />
+      <Route path="/crm" component={CRM} />
       <Route path="/monitoring" component={RealTimeMonitoring} />
       <Route path="/test" component={Test} />
       <Route path="/test-connections" component={TestConnections} />

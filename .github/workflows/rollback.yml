@@ -1,0 +1,547 @@
+name: Emergency Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        type: choice
+        options:
+          - production
+          - staging
+      rollback_type:
+        description: 'Type of rollback'
+        required: true
+        type: choice
+        options:
+          - previous-deployment
+          - specific-commit
+          - safe-known-good
+      commit_sha:
+        description: 'Specific commit SHA (for specific-commit rollback)'
+        required: false
+        type: string
+      reason:
+        description: 'Reason for rollback'
+        required: true
+        type: string
+
+concurrency:
+  group: rollback-${{ inputs.environment }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ==========================================
+  # ROLLBACK VALIDATION
+  # ==========================================
+  validate-rollback:
+    name: 'Validate Rollback Request'
+    runs-on: ubuntu-latest
+    outputs:
+      target-sha: ${{ steps.determine-target.outputs.target-sha }}
+      target-url: ${{ steps.determine-target.outputs.target-url }}
+      rollback-approved: ${{ steps.validate.outputs.approved }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate rollback request
+        id: validate
+        run: |
+          echo "🔍 Validating rollback request..."
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Rollback Type: ${{ inputs.rollback_type }}"
+          echo "Reason: ${{ inputs.reason }}"
+          echo "Requested by: ${{ github.actor }}"
+          
+          # Validate environment
+          if [[ "${{ inputs.environment }}" == "production" ]]; then
+            echo "⚠️ PRODUCTION ROLLBACK REQUESTED"
+            echo "This is a critical operation that will affect live users"
+          fi
+          
+          # Validate reason is provided
+          if [[ -z "${{ inputs.reason }}" || "${{ inputs.reason }}" == " " ]]; then
+            echo "❌ Rollback reason is required"
+            exit 1
+          fi
+          
+          echo "✅ Rollback request validated"
+          echo "approved=true" >> $GITHUB_OUTPUT
+
+      - name: Determine rollback target
+        id: determine-target
+        run: |
+          case "${{ inputs.rollback_type }}" in
+            "previous-deployment")
+              # Get the previous successful deployment
+              TARGET_SHA=$(git log --format="%H" --grep="deploy" -n 2 | tail -1)
+              if [[ -z "$TARGET_SHA" ]]; then
+                TARGET_SHA=$(git log --format="%H" -n 2 | tail -1)
+              fi
+              echo "🎯 Rolling back to previous deployment: $TARGET_SHA"
+              ;;
+            "specific-commit")
+              if [[ -z "${{ inputs.commit_sha }}" ]]; then
+                echo "❌ Commit SHA is required for specific-commit rollback"
+                exit 1
+              fi
+              TARGET_SHA="${{ inputs.commit_sha }}"
+              # Validate commit exists
+              if ! git cat-file -e "$TARGET_SHA"; then
+                echo "❌ Commit $TARGET_SHA does not exist"
+                exit 1
+              fi
+              echo "🎯 Rolling back to specific commit: $TARGET_SHA"
+              ;;
+            "safe-known-good")
+              # Find last commit tagged as stable
+              TARGET_SHA=$(git describe --tags --abbrev=0 2>/dev/null | xargs git rev-list -n 1 2>/dev/null || git log --format="%H" -n 5 | tail -1)
+              echo "🎯 Rolling back to safe known good state: $TARGET_SHA"
+              ;;
+            *)
+              echo "❌ Invalid rollback type: ${{ inputs.rollback_type }}"
+              exit 1
+              ;;
+          esac
+          
+          echo "target-sha=$TARGET_SHA" >> $GITHUB_OUTPUT
+          
+          # Get commit details
+          COMMIT_MESSAGE=$(git log --format="%s" -n 1 "$TARGET_SHA")
+          COMMIT_AUTHOR=$(git log --format="%an" -n 1 "$TARGET_SHA")
+          COMMIT_DATE=$(git log --format="%ad" -n 1 "$TARGET_SHA")
+          
+          echo "📋 Rollback target details:"
+          echo "  SHA: $TARGET_SHA"
+          echo "  Message: $COMMIT_MESSAGE"
+          echo "  Author: $COMMIT_AUTHOR"
+          echo "  Date: $COMMIT_DATE"
+
+      - name: Create rollback issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔄 Emergency Rollback - ${{ inputs.environment }}`,
+              body: `# Emergency Rollback Initiated
+              
+              **Environment**: ${{ inputs.environment }}
+              **Rollback Type**: ${{ inputs.rollback_type }}
+              **Target SHA**: ${{ steps.determine-target.outputs.target-sha }}
+              **Reason**: ${{ inputs.reason }}
+              **Initiated By**: ${{ github.actor }}
+              **Timestamp**: ${new Date().toISOString()}
+              
+              ## Rollback Details
+              - **Workflow Run**: [${context.runId}](${context.server_url}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+              - **Current SHA**: ${context.sha}
+              - **Target SHA**: ${{ steps.determine-target.outputs.target-sha }}
+              
+              ## Post-Rollback Checklist
+              - [ ] Verify application functionality
+              - [ ] Monitor error rates
+              - [ ] Check performance metrics  
+              - [ ] Notify stakeholders
+              - [ ] Update incident documentation
+              - [ ] Plan forward fix
+              
+              **Status**: 🔄 In Progress`,
+              labels: ['rollback', 'emergency', '${{ inputs.environment }}', 'high-priority']
+            });
+            
+            console.log(`Created rollback issue: ${issue.data.number}`);
+
+  # ==========================================
+  # FRONTEND ROLLBACK
+  # ==========================================
+  rollback-frontend:
+    name: 'Rollback Frontend'
+    runs-on: ubuntu-latest
+    needs: validate-rollback
+    if: needs.validate-rollback.outputs.rollback-approved == 'true'
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout target commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate-rollback.outputs.target-sha }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies and build
+        run: |
+          cd frontend
+          npm ci --prefer-offline
+          npm run build
+
+      - name: Deploy rollback to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: ${{ inputs.environment == 'production' && '--prod' || '' }}
+          working-directory: ./frontend
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Verify rollback
+        run: |
+          if [[ "${{ inputs.environment }}" == "production" ]]; then
+            URL="${{ secrets.PRODUCTION_URL }}"
+          else
+            URL="${{ secrets.STAGING_URL }}"
+          fi
+          
+          echo "🔍 Verifying rollback at: $URL"
+          
+          # Health check with retries
+          for i in {1..5}; do
+            if curl -f "$URL/health" --max-time 10; then
+              echo "✅ Health check passed (attempt $i)"
+              break
+            else
+              if [[ $i -eq 5 ]]; then
+                echo "❌ Health check failed after 5 attempts"
+                exit 1
+              fi
+              echo "⚠️ Health check failed (attempt $i), retrying..."
+              sleep 10
+            fi
+          done
+
+  # ==========================================
+  # BACKEND ROLLBACK
+  # ==========================================
+  rollback-backend:
+    name: 'Rollback Backend'
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, rollback-frontend]
+    if: needs.validate-rollback.outputs.rollback-approved == 'true'
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout target commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate-rollback.outputs.target-sha }}
+          fetch-depth: 0
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: '1.46'
+
+      - name: Install Supabase CLI
+        run: npm install -g @supabase/cli
+
+      - name: Link to Supabase project
+        run: |
+          cd backend
+          if [[ "${{ inputs.environment }}" == "production" ]]; then
+            supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+          else
+            supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF_STAGING }}"
+          fi
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Deploy functions rollback
+        run: |
+          cd backend
+          if [[ "${{ inputs.environment }}" == "production" ]]; then
+            supabase functions deploy --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+          else
+            supabase functions deploy --project-ref "${{ secrets.SUPABASE_PROJECT_REF_STAGING }}"
+          fi
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Verify backend rollback
+        run: |
+          if [[ "${{ inputs.environment }}" == "production" ]]; then
+            URL="${{ secrets.SUPABASE_URL }}"
+          else
+            URL="${{ secrets.SUPABASE_URL_STAGING }}"
+          fi
+          
+          echo "🔍 Verifying backend rollback..."
+          
+          for i in {1..3}; do
+            if curl -f "$URL/functions/v1/vapi-webhook" \
+              -H "Content-Type: application/json" \
+              -d '{"type":"health-check"}' \
+              --max-time 15; then
+              echo "✅ Backend health check passed"
+              break
+            else
+              if [[ $i -eq 3 ]]; then
+                echo "❌ Backend health check failed"
+                exit 1
+              fi
+              sleep 10
+            fi
+          done
+
+  # ==========================================
+  # POST-ROLLBACK VALIDATION
+  # ==========================================
+  post-rollback-validation:
+    name: 'Post-Rollback Validation'
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, rollback-frontend, rollback-backend]
+    if: always() && needs.validate-rollback.outputs.rollback-approved == 'true'
+    steps:
+      - name: Comprehensive health checks
+        run: |
+          if [[ "${{ inputs.environment }}" == "production" ]]; then
+            FRONTEND_URL="${{ secrets.PRODUCTION_URL }}"
+            BACKEND_URL="${{ secrets.SUPABASE_URL }}"
+          else
+            FRONTEND_URL="${{ secrets.STAGING_URL }}"
+            BACKEND_URL="${{ secrets.SUPABASE_URL_STAGING }}"
+          fi
+          
+          echo "🔍 Running comprehensive post-rollback validation..."
+          
+          # Multiple validation rounds
+          for round in {1..3}; do
+            echo "Validation round $round/3"
+            
+            # Frontend checks
+            if curl -f "$FRONTEND_URL" --max-time 10 > /dev/null; then
+              echo "✅ Frontend accessible"
+            else
+              echo "❌ Frontend inaccessible"
+              exit 1
+            fi
+            
+            # Backend checks
+            if curl -f "$BACKEND_URL/functions/v1/vapi-webhook" \
+              -H "Content-Type: application/json" \
+              -d '{"type":"ping"}' \
+              --max-time 15 > /dev/null; then
+              echo "✅ Backend responsive"
+            else
+              echo "❌ Backend unresponsive"
+              exit 1
+            fi
+            
+            # Response time check
+            RESPONSE_TIME=$(curl -o /dev/null -s -w "%{time_total}" "$FRONTEND_URL")
+            echo "⏱️ Response time: ${RESPONSE_TIME}s"
+            
+            sleep 30
+          done
+          
+          echo "✅ All post-rollback validations passed"
+
+      - name: Run smoke tests
+        run: |
+          if [[ "${{ inputs.environment }}" == "production" ]]; then
+            URL="${{ secrets.PRODUCTION_URL }}"
+          else
+            URL="${{ secrets.STAGING_URL }}"
+          fi
+          
+          echo "🧪 Running smoke tests..."
+          
+          # Basic navigation tests
+          curl -f "$URL/" --max-time 10
+          curl -f "$URL/health" --max-time 10
+          
+          # API endpoint tests
+          if [[ "${{ inputs.environment }}" == "production" ]]; then
+            curl -f "${{ secrets.SUPABASE_URL }}/functions/v1/vapi-webhook" \
+              -H "Content-Type: application/json" \
+              -d '{"type":"ping"}' --max-time 15
+          fi
+          
+          echo "✅ Smoke tests completed successfully"
+
+      - name: Performance baseline check
+        run: |
+          if [[ "${{ inputs.environment }}" == "production" ]]; then
+            URL="${{ secrets.PRODUCTION_URL }}"
+          else
+            URL="${{ secrets.STAGING_URL }}"
+          fi
+          
+          echo "⚡ Checking performance baseline..."
+          
+          # Install Lighthouse
+          npm install -g lighthouse
+          
+          # Run basic performance check
+          lighthouse "$URL" \
+            --chrome-flags="--headless --no-sandbox" \
+            --output=json \
+            --output-path=./rollback-perf-report.json \
+            --quiet
+          
+          PERF_SCORE=$(node -p "Math.round(JSON.parse(require('fs').readFileSync('./rollback-perf-report.json')).categories.performance.score * 100)")
+          
+          echo "📊 Performance score after rollback: $PERF_SCORE%"
+          
+          if [[ $PERF_SCORE -lt 70 ]]; then
+            echo "⚠️ Performance score is below baseline (70%): $PERF_SCORE%"
+          else
+            echo "✅ Performance is acceptable: $PERF_SCORE%"
+          fi
+
+  # ==========================================
+  # ROLLBACK NOTIFICATION AND REPORTING
+  # ==========================================
+  rollback-notification:
+    name: 'Rollback Notification'
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, rollback-frontend, rollback-backend, post-rollback-validation]
+    if: always() && needs.validate-rollback.outputs.rollback-approved == 'true'
+    steps:
+      - name: Determine rollback status
+        id: status
+        run: |
+          if [[ "${{ needs.rollback-frontend.result }}" == "success" && "${{ needs.rollback-backend.result }}" == "success" && "${{ needs.post-rollback-validation.result }}" == "success" ]]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "emoji=✅" >> $GITHUB_OUTPUT
+            echo "message=Rollback completed successfully" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "emoji=❌" >> $GITHUB_OUTPUT
+            echo "message=Rollback encountered issues" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate rollback report
+        run: |
+          cat > rollback-report.md << EOF
+          # 🔄 Emergency Rollback Report
+          
+          **Environment**: ${{ inputs.environment }}
+          **Status**: ${{ steps.status.outputs.emoji }} ${{ steps.status.outputs.message }}
+          **Initiated By**: ${{ github.actor }}
+          **Timestamp**: $(date -u)
+          **Reason**: ${{ inputs.reason }}
+          
+          ## Rollback Details
+          - **Type**: ${{ inputs.rollback_type }}
+          - **Target SHA**: ${{ needs.validate-rollback.outputs.target-sha }}
+          - **Frontend Status**: ${{ needs.rollback-frontend.result }}
+          - **Backend Status**: ${{ needs.rollback-backend.result }}
+          - **Validation Status**: ${{ needs.post-rollback-validation.result }}
+          
+          ## Environment URLs
+          - **Frontend**: ${{ inputs.environment == 'production' && secrets.PRODUCTION_URL || secrets.STAGING_URL }}
+          - **Backend**: Supabase Functions
+          
+          ## Next Steps
+          - [ ] Monitor application stability
+          - [ ] Investigate root cause of original issue
+          - [ ] Plan and implement proper fix
+          - [ ] Conduct post-incident review
+          
+          ---
+          *Generated by Emergency Rollback Workflow*
+          EOF
+
+      - name: Upload rollback report
+        uses: actions/upload-artifact@v4
+        with:
+          name: rollback-report-${{ inputs.environment }}-${{ github.run_number }}
+          path: rollback-report.md
+
+      - name: Notify via Slack
+        if: always()
+        run: |
+          STATUS="${{ steps.status.outputs.status }}"
+          EMOJI="${{ steps.status.outputs.emoji }}"
+          MESSAGE="${{ steps.status.outputs.message }}"
+          
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H 'Content-type: application/json' \
+            -d "{
+              \"text\": \"$EMOJI Emergency Rollback - ${{ inputs.environment }}\",
+              \"blocks\": [
+                {
+                  \"type\": \"section\",
+                  \"text\": {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*Emergency Rollback ${{ inputs.environment }}* $EMOJI\\n• Status: $MESSAGE\\n• Reason: ${{ inputs.reason }}\\n• Target: \\\`${{ needs.validate-rollback.outputs.target-sha }}\\\`\\n• By: ${{ github.actor }}\\n• <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>\"
+                  }
+                }
+              ]
+            }"
+
+      - name: Update rollback issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Find the rollback issue created earlier
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'rollback',
+              state: 'open',
+              sort: 'created',
+              direction: 'desc',
+              per_page: 1
+            });
+            
+            if (issues.data.length > 0) {
+              const issue = issues.data[0];
+              const status = '${{ steps.status.outputs.status }}';
+              const emoji = status === 'success' ? '✅' : '❌';
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `## Rollback Status Update
+                
+                **Status**: ${emoji} ${{ steps.status.outputs.message }}
+                **Completed**: ${new Date().toISOString()}
+                
+                ### Component Status
+                - Frontend Rollback: ${{ needs.rollback-frontend.result }}
+                - Backend Rollback: ${{ needs.rollback-backend.result }}
+                - Post-Rollback Validation: ${{ needs.post-rollback-validation.result }}
+                
+                ### URLs
+                - Application: ${{ inputs.environment == 'production' && secrets.PRODUCTION_URL || secrets.STAGING_URL }}
+                - Workflow: [${context.runId}](${context.server_url}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+                
+                ${status === 'success' ? '✅ Rollback completed successfully. Monitor the application and plan forward fix.' : '❌ Rollback encountered issues. Immediate investigation required.'}`
+              });
+              
+              if (status === 'success') {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: ['rollback', 'completed', '${{ inputs.environment }}']
+                });
+              } else {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: ['rollback', 'failed', '${{ inputs.environment }}', 'urgent']
+                });
+              }
+            }
