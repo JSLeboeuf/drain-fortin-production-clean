@@ -12,7 +12,5 @@
     "@vitest/coverage-v8": "^1.6.0",
     "vitest": "^1.6.0"
   },
-  "dependencies": {
-    "crypto": "^1.0.1"
-  }
+  "dependencies": {}
 }

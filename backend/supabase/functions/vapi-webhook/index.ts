@@ -5,11 +5,13 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.0";
 import { 
   getCorsHeaders, 
-  isOriginAllowed, 
-  validateContentType,
-  sanitizeHeaders,
-  getRateLimitConfig
+  isOriginAllowed
 } from "../_shared/cors.ts";
+import { withWebhookSecurity } from "../_shared/middleware/webhook-security.ts";
+import { withPersistentRateLimit } from "../_shared/middleware/rate-limit-persistent.ts";
+import { CallService } from "../_shared/services/call-service.ts";
+import { SMSService } from "../_shared/services/sms-service.ts";
+import type { WebhookPayload } from "../_shared/validation/vapi-schemas.ts";
 
 // ============================================================================
 // ENVIRONMENT CONFIGURATION with Validation
@@ -61,9 +63,10 @@ const ENV = getEnvironmentConfig();
 
 // Initialize Supabase client with error handling
 const supabase = createClient(ENV.supabaseUrl, ENV.supabaseServiceKey);
-
-// Rate limiting storage (in-memory)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const callService = new CallService(supabase as any);
+const smsService = (ENV.twilioAccountSid && ENV.twilioAuthToken && ENV.twilioFrom)
+  ? new SMSService({ accountSid: ENV.twilioAccountSid, authToken: ENV.twilioAuthToken, fromNumber: ENV.twilioFrom })
+  : null;
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -160,25 +163,7 @@ interface SendSMSAlertResult {
 // SECURITY FUNCTIONS
 // ============================================================================
 
-// Enhanced security: Rate limiting
-function checkRateLimit(ip: string): boolean {
-  const config = getRateLimitConfig();
-  const now = Date.now();
-  const key = `rate_limit_${ip}`;
-  
-  const existing = rateLimitStore.get(key);
-  if (!existing || now > existing.resetTime) {
-    rateLimitStore.set(key, { count: 1, resetTime: now + config.windowMs });
-    return true;
-  }
-  
-  if (existing.count >= config.maxRequests) {
-    return false;
-  }
-  
-  existing.count++;
-  return true;
-}
+// In-memory rate limiting removed in favor of persistent PG limiter
 
 // Enhanced security: HMAC signature verification
 async function verifySignature(payload: string, signature: string, secret: string): Promise<boolean> {
@@ -472,87 +457,37 @@ function getServiceRequirements(serviceType: string): string[] {
   return requirements[serviceType as keyof typeof requirements] || requirements.default;
 }
 
-// Enhanced SMS alert system with CRM integration
+// Enhanced SMS alert system with CRM integration (sms_messages)
 async function sendSMSAlert(args: { message: string; phoneNumbers: string[]; priority: string; isInternal?: boolean }): Promise<SendSMSAlertResult> {
-  if (!ENV.twilioAccountSid || !ENV.twilioAuthToken || !ENV.twilioFrom) {
+  if (!smsService) {
     console.error('SMS alert attempted without Twilio configuration');
-    return {
-      sent: false,
-      error: 'twilio_not_configured',
-      priority: args.priority
-    };
+    return { sent: false, error: 'twilio_not_configured', priority: args.priority };
   }
-  
-  // Validate input parameters
-  if (args.phoneNumbers.length > 10) {
-    console.warn('SMS alert with excessive recipients:', args.phoneNumbers.length);
-    return {
-      sent: false,
-      error: 'too_many_recipients',
-      priority: args.priority
-    };
+  if (!args.phoneNumbers || args.phoneNumbers.length === 0) {
+    return { sent: false, error: 'no_recipients', priority: args.priority };
   }
-  
-  const results = [];
-  const authHeader = `Basic ${btoa(`${ENV.twilioAccountSid}:${ENV.twilioAuthToken}`)}`;
-  
-  for (const phoneNumber of args.phoneNumbers) {
+
+  const res = await smsService.sendSMSAlert({ to: args.phoneNumbers, message: args.message, priority: args.priority });
+
+  for (const to of args.phoneNumbers) {
     try {
-      const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${ENV.twilioAccountSid}/Messages.json`;
-      
-      const response = await fetch(twilioUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': authHeader,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          To: phoneNumber,
-          From: ENV.twilioFrom,
-          Body: args.message
-        })
+      await supabase.from('sms_messages').insert({
+        call_id: undefined,
+        to_number: to,
+        from_number: ENV.twilioFrom,
+        message: args.message,
+        sms_type: args.isInternal ? 'alert_internal' : 'notification',
+        priority: args.priority,
+        status: res.sent ? 'sent' : 'failed',
+        twilio_sid: res.sids?.[0] || null,
+        sent_at: new Date().toISOString()
       });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
-        console.log('SMS sent successfully:', {
-          to: phoneNumber,
-          sid: result.sid,
-          priority: args.priority,
-          isInternal: args.isInternal
-        });
-        
-        // Log to database
-        await supabase.from('sms_logs').insert({
-          phone_number: phoneNumber,
-          message: args.message,
-          priority: args.priority,
-          is_internal: args.isInternal || false,
-          status: 'sent',
-          twilio_sid: result.sid,
-          sent_at: new Date().toISOString()
-        });
-        
-        results.push({ phoneNumber, status: 'sent', sid: result.sid });
-      } else {
-        console.error('SMS send failed:', { to: phoneNumber, error: result });
-        results.push({ phoneNumber, status: 'failed', error: result.message });
-      }
-    } catch (error) {
-      console.error('SMS send error:', { to: phoneNumber, error });
-      results.push({ phoneNumber, status: 'error', error: error.message });
+    } catch (_) {
+      // Non-blocking persistence error
     }
   }
-  
-  const sentCount = results.filter(r => r.status === 'sent').length;
-  
-  return {
-    sent: sentCount > 0,
-    priority: args.priority,
-    messagesSent: sentCount,
-    details: results
-  };
+
+  return { sent: res.sent, priority: args.priority, messagesSent: res.sids.length, details: res.errors };
 }
 
 // CRM integration functions
@@ -628,32 +563,24 @@ async function createOrUpdateClient(callData: any) {
 
 // Internal team notification system
 async function notifyInternalTeam(message: string, priority: string, callDetails: any) {
-  const internalNumbers = [
-    '+15149991234', // Team lead
-    '+15149995678', // Operations manager
-    '+15149990000'  // Emergency coordinator
-  ];
-  
-  // Filter based on priority
-  let recipients = internalNumbers;
-  if (priority === 'P1') {
-    recipients = internalNumbers; // All team members for emergencies
-  } else if (priority === 'P2') {
-    recipients = internalNumbers.slice(0, 2); // Team lead and ops manager
-  } else {
-    recipients = [internalNumbers[0]]; // Team lead only
+  let recipients: string[] = [];
+  try {
+    const raw = Deno.env.get('SLA_CONTACTS_JSON') || '';
+    if (raw) {
+      const map = JSON.parse(raw);
+      recipients = Array.isArray(map?.[priority]) ? map[priority] : [];
+    }
+  } catch (_) { /* ignore */ }
+  if (recipients.length === 0) {
+    const fallback = Deno.env.get('TWILIO_ALERT_FALLBACK_TO');
+    if (fallback) recipients = [fallback];
   }
-  
+
   const internalMessage = `[${priority}] ${message}\n` +
-    `Client: ${callDetails.phoneNumber || 'Unknown'}\n` +
+    `Client: ${callDetails?.phoneNumber ? callDetails.phoneNumber.replace(/.(?=.{3})/g, '*') : 'Unknown'}\n` +
     `Time: ${new Date().toLocaleString('fr-CA')}`;
-  
-  return await sendSMSAlert({
-    message: internalMessage,
-    phoneNumbers: recipients,
-    priority,
-    isInternal: true
-  });
+
+  return await sendSMSAlert({ message: internalMessage, phoneNumbers: recipients, priority, isInternal: true });
 }
 
 // ============================================================================
@@ -666,15 +593,13 @@ async function handleCallStarted(payload: VAPIWebhookPayload) {
   // Create or update client in CRM
   const client = await createOrUpdateClient(payload.call);
   
-  // Log call start
-  await supabase.from('vapi_calls').insert({
-    call_id: payload.call?.id,
-    assistant_id: payload.call?.assistantId,
-    phone_number: payload.call?.phoneNumber,
-    client_id: client?.id,
-    status: 'started',
-    started_at: payload.call?.startedAt || new Date().toISOString(),
-    created_at: new Date().toISOString()
+  await callService.upsertCall({
+    id: payload.call!.id,
+    assistantId: payload.call!.assistantId,
+    phoneNumber: payload.call?.phoneNumber,
+    customerId: client?.id,
+    status: 'active',
+    startedAt: payload.call?.startedAt || new Date().toISOString()
   });
   
   return { success: true, message: 'Call started logged' };
@@ -683,16 +608,10 @@ async function handleCallStarted(payload: VAPIWebhookPayload) {
 async function handleCallEnded(payload: VAPIWebhookPayload) {
   console.log('Call ended:', payload.call?.id);
   
-  // Update call record
-  await supabase
-    .from('vapi_calls')
-    .update({
-      status: 'ended',
-      ended_at: payload.call?.endedAt || new Date().toISOString(),
-      duration: payload.call?.duration,
-      analysis: payload.call?.analysis || {}
-    })
-    .eq('call_id', payload.call?.id);
+  await callService.processCallEnd({
+    callId: payload.call!.id,
+    analysis: payload.call?.analysis
+  });
   
   // Analyze call for follow-up
   if (payload.call?.analysis) {
@@ -722,6 +641,7 @@ async function handleToolCalls(payload: VAPIWebhookPayload) {
     
     try {
       let result: any;
+      const t0 = performance.now();
       
       switch (func.name) {
         case 'validateServiceRequest':
@@ -734,7 +654,7 @@ async function handleToolCalls(payload: VAPIWebhookPayload) {
           result = await evaluateScheduling(func.arguments);
           break;
         case 'classifyPriority':
-          result = classifyPriority(func.arguments.description, func.arguments.value);
+          result = classifyPriority(func.arguments.description, func.arguments.estimatedValue ?? func.arguments.value);
           break;
         case 'sendSMSAlert':
           result = await sendSMSAlert(func.arguments);
@@ -743,13 +663,15 @@ async function handleToolCalls(payload: VAPIWebhookPayload) {
           result = { error: `Unknown function: ${func.name}` };
       }
       
-      // Log tool call
+      const durationMs = Math.round(performance.now() - t0);
       await supabase.from('tool_calls').insert({
         call_id: payload.call?.id,
         tool_call_id: toolCallId,
-        function_name: func.name,
+        tool_name: func.name,
         arguments: func.arguments,
         result,
+        status: result?.error ? 'failed' : 'success',
+        duration_ms: durationMs,
         created_at: new Date().toISOString()
       });
       
@@ -778,7 +700,7 @@ async function handleTranscript(payload: VAPIWebhookPayload) {
   await supabase.from('call_transcripts').insert({
     call_id: payload.call.id,
     role: payload.transcript.role,
-    transcript: payload.transcript.transcript,
+    message: payload.transcript.transcript,
     confidence: payload.transcript.confidence,
     timestamp: payload.transcript.timestamp
   });
@@ -791,118 +713,45 @@ async function handleTranscript(payload: VAPIWebhookPayload) {
 // ============================================================================
 
 serve(async (req: Request) => {
-  // Handle CORS preflight
+  // Strict CORS and JSON-only
+  const origin = req.headers.get('origin');
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: getCorsHeaders(req.headers.get('origin') || '')
-    });
+    if (!isOriginAllowed(origin)) {
+      return new Response(JSON.stringify({ error: 'CORS origin forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json', ...getCorsHeaders(origin) } });
+    }
+    return new Response(null, { status: 204, headers: getCorsHeaders(origin) });
   }
-  
-  try {
-    // Rate limiting
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown';
-    if (!checkRateLimit(ip)) {
-      await logSecurityEvent('rate_limit_exceeded', { ip }, ip);
-      return new Response(
-        JSON.stringify({ error: 'Too many requests' }),
-        { 
-          status: 429, 
-          headers: { 
-            ...getCorsHeaders(req.headers.get('origin') || ''),
-            'Content-Type': 'application/json' 
-          }
-        }
-      );
-    }
-    
-    // Verify signature for all environments
-    const signature = req.headers.get('x-vapi-signature') || 
-                     req.headers.get('x-hub-signature-256') || 
-                     req.headers.get('x-webhook-signature') || '';
-    
-    const rawBody = await req.text();
-    
-    if (ENV.vapiWebhookSecret) {
-      const isValid = await verifySignature(rawBody, signature, ENV.vapiWebhookSecret);
-      if (!isValid) {
-        await logSecurityEvent('invalid_signature', { ip, signature }, ip);
-        return new Response(
-          JSON.stringify({ error: 'Invalid signature' }),
-          { 
-            status: 401, 
-            headers: { 
-              ...getCorsHeaders(req.headers.get('origin') || ''),
-              'Content-Type': 'application/json' 
-            }
-          }
-        );
-      }
-    }
-    
-    // Parse and validate payload
-    const payload: VAPIWebhookPayload = JSON.parse(rawBody);
-    
-    console.log('Webhook received:', {
-      type: payload.type,
-      callId: payload.call?.id,
-      timestamp: payload.timestamp
-    });
-    
-    // Route to appropriate handler
-    let response: any = { success: true };
-    
-    switch (payload.type) {
-      case 'call-started':
-        response = await handleCallStarted(payload);
-        break;
-      case 'call-ended':
-        response = await handleCallEnded(payload);
-        break;
-      case 'tool-calls':
-        response = await handleToolCalls(payload);
-        break;
-      case 'transcript':
-        response = await handleTranscript(payload);
-        break;
-      case 'health-check':
-        response = { status: 'healthy', timestamp: new Date().toISOString() };
-        break;
-      default:
-        console.warn('Unknown webhook type:', payload.type);
-        response = { success: true, message: `Unhandled type: ${payload.type}` };
-    }
-    
-    return new Response(
-      JSON.stringify(response),
-      { 
-        status: 200,
-        headers: { 
-          ...getCorsHeaders(req.headers.get('origin') || ''),
-          'Content-Type': 'application/json' 
-        }
-      }
-    );
-    
-  } catch (error) {
-    console.error('Webhook error:', error);
-    await logSecurityEvent('webhook_error', { 
-      error: error.message,
-      stack: error.stack 
-    });
-    
-    return new Response(
-      JSON.stringify({ 
-        error: 'Internal server error',
-        message: ENV.environment === 'development' ? error.message : undefined
-      }),
-      { 
-        status: 500,
-        headers: { 
-          ...getCorsHeaders(req.headers.get('origin') || ''),
-          'Content-Type': 'application/json' 
-        }
-      }
-    );
+  if (!isOriginAllowed(origin)) {
+    return new Response(JSON.stringify({ error: 'CORS origin forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json', ...getCorsHeaders(origin) } });
   }
+
+  return await withPersistentRateLimit(req, 'webhook', supabase as any, async () => {
+    return await withWebhookSecurity(req, ENV.vapiWebhookSecret, async (payload: WebhookPayload, request: Request) => {
+      // Route to appropriate handler (payload is already validated)
+      let response: any = { success: true };
+      switch (payload.type) {
+        case 'call-started':
+          response = await handleCallStarted(payload as any);
+          break;
+        case 'call-ended':
+          response = await handleCallEnded(payload as any);
+          break;
+        case 'tool-calls':
+        case 'function-call':
+          response = await handleToolCalls(payload as any);
+          break;
+        case 'transcript':
+          response = await handleTranscript(payload as any);
+          break;
+        case 'health-check':
+          response = { status: 'healthy', timestamp: new Date().toISOString() };
+          break;
+        default:
+          console.warn('Unknown webhook type:', (payload as any).type);
+          response = { success: true, message: `Unhandled type: ${(payload as any).type}` };
+      }
+
+      return new Response(JSON.stringify(response), { status: 200, headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request.headers.get('origin')) } });
+    });
+  });
 });

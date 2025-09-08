@@ -1,60 +1,37 @@
 version: '3.8'
 
-# ==========================================
-# DRAIN FORTIN PRODUCTION - DOCKER COMPOSE
-# Local Development & Testing Environment
-# ==========================================
-
+# Minimal local stack for backend dev/testing
 services:
-  # ==========================================
-  # FRONTEND SERVICE
-  # ==========================================
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
-    container_name: drain-fortin-frontend
-    ports:
-      - "3000:3000"
+  postgres:
+    image: postgres:15-alpine
+    container_name: drain-fortin-postgres
     environment:
-      - NODE_ENV=production
-      - VITE_SUPABASE_URL=${SUPABASE_URL}
-      - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
-    volumes:
-      - ./config:/app/config:ro
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    networks:
-      - drain-fortin-network
-
-  # ==========================================
-  # NGINX REVERSE PROXY
-  # ==========================================
-  nginx:
-    image: nginx:1.25-alpine
-    container_name: drain-fortin-proxy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
     ports:
-      - "80:80"
-      - "443:443"
+      - "54321:5432"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/sites:/etc/nginx/sites-available:ro
-      - ./ssl:/etc/ssl/certs:ro
-    depends_on:
-      - frontend
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
-    networks:
-      - drain-fortin-network
 
-  # ==========================================
-  # MONITORING STACK
-  # ==========================================
+  redis:
+    image: redis:7.2-alpine
+    container_name: drain-fortin-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   prometheus:
     image: prom/prometheus:v2.47.0
     container_name: drain-fortin-prometheus
@@ -66,155 +43,13 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-      - '--storage.tsdb.retention.time=15d'
-      - '--web.enable-lifecycle'
+      - '--storage.tsdb.retention.time=7d'
     restart: unless-stopped
-    networks:
-      - drain-fortin-network
 
-  grafana:
-    image: grafana/grafana:10.1.0
-    container_name: drain-fortin-grafana
-    ports:
-      - "3001:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
-      - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_SMTP_ENABLED=true
-      - GF_SMTP_HOST=${SMTP_HOST:-localhost:587}
-      - GF_SMTP_USER=${SMTP_USER:-admin@drainfortin.com}
-      - GF_SMTP_PASSWORD=${SMTP_PASSWORD:-}
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
-    depends_on:
-      - prometheus
-    restart: unless-stopped
-    networks:
-      - drain-fortin-network
-
-  # ==========================================
-  # LOG AGGREGATION
-  # ==========================================
-  loki:
-    image: grafana/loki:2.9.0
-    container_name: drain-fortin-loki
-    ports:
-      - "3100:3100"
-    volumes:
-      - ./monitoring/loki.yml:/etc/loki/local-config.yaml:ro
-      - loki-data:/loki
-    command: -config.file=/etc/loki/local-config.yaml
-    restart: unless-stopped
-    networks:
-      - drain-fortin-network
-
-  promtail:
-    image: grafana/promtail:2.9.0
-    container_name: drain-fortin-promtail
-    volumes:
-      - /var/log:/var/log:ro
-      - ./monitoring/promtail.yml:/etc/promtail/config.yml:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: -config.file=/etc/promtail/config.yml
-    depends_on:
-      - loki
-    restart: unless-stopped
-    networks:
-      - drain-fortin-network
-
-  # ==========================================
-  # APPLICATION MONITORING
-  # ==========================================
-  node-exporter:
-    image: prom/node-exporter:v1.6.0
-    container_name: drain-fortin-node-exporter
-    ports:
-      - "9100:9100"
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points'
-      - '^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'
-    restart: unless-stopped
-    networks:
-      - drain-fortin-network
-
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.0
-    container_name: drain-fortin-cadvisor
-    ports:
-      - "8080:8080"
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
-    privileged: true
-    devices:
-      - /dev/kmsg
-    restart: unless-stopped
-    networks:
-      - drain-fortin-network
-
-  # ==========================================
-  # UPTIME MONITORING
-  # ==========================================
-  uptime-kuma:
-    image: louislam/uptime-kuma:1.23.0
-    container_name: drain-fortin-uptime
-    ports:
-      - "3001:3001"
-    volumes:
-      - uptime-data:/app/data
-    restart: unless-stopped
-    networks:
-      - drain-fortin-network
-
-  # ==========================================
-  # REDIS FOR CACHING (Optional)
-  # ==========================================
-  redis:
-    image: redis:7.2-alpine
-    container_name: drain-fortin-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
-    command: redis-server /usr/local/etc/redis/redis.conf
-    restart: unless-stopped
-    networks:
-      - drain-fortin-network
-
-# ==========================================
-# NETWORKS
-# ==========================================
 networks:
-  drain-fortin-network:
-    driver: bridge
+  default:
     name: drain-fortin-network
 
-# ==========================================
-# PERSISTENT VOLUMES
-# ==========================================
 volumes:
+  pg-data:
   prometheus-data:
-    name: drain-fortin-prometheus-data
-  grafana-data:
-    name: drain-fortin-grafana-data
-  loki-data:
-    name: drain-fortin-loki-data
-  uptime-data:
-    name: drain-fortin-uptime-data
-  redis-data:
-    name: drain-fortin-redis-data

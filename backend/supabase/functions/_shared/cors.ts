@@ -84,14 +84,9 @@ export function getRateLimitConfig(): RateLimitConfig {
 
 // Security validation helpers
 export function validateContentType(contentType: string | null): boolean {
-  const allowedTypes = [
-    'application/json',
-    'application/x-www-form-urlencoded',
-    'text/plain'
-  ];
-  
+  // Strict JSON-only for webhooks
   if (!contentType) return false;
-  return allowedTypes.some(type => contentType.includes(type));
+  return contentType.includes('application/json');
 }
 
 export function sanitizeHeaders(headers: Headers): Record<string, string> {
