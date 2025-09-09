@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useConstraints, useUpdateConstraint } from "@/hooks/useConstraints";
-import { transformConstraintsData, getConstraintStats } from "@/services/constraintService";
+import { useConstraintsData } from "@/components/settings/hooks/useConstraintsData";
 import { useState } from "react";
 import React from "react";
 
@@ -22,9 +22,8 @@ export default function SettingsConstraints() {
   const [showDevTip, setShowDevTip] = useState(false);
   const [showEnhanced, setShowEnhanced] = useState(true);
   
-  // Load enhanced constraints from JSON
-  const enhancedConstraints = transformConstraintsData();
-  const enhancedStats = getConstraintStats(enhancedConstraints);
+  // Enhanced constraints from backend (via React Query)
+  const { stats: enhancedStats } = useConstraintsData();
 
   const handleToggleConstraint = async (id: string, active: boolean) => {
     try {

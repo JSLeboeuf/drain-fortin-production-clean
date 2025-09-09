@@ -66,6 +66,8 @@ export default defineConfig(({ mode }) => {
         compress: {
           drop_console: mode === 'production', // Supprimer console.* en prod
           drop_debugger: true,
+          pure_funcs: ['console.log', 'console.info'], // Remove specific console methods
+          passes: 2, // Multiple compression passes
         },
         mangle: {
           safari10: true, // Compatibilité Safari
@@ -82,19 +84,20 @@ export default defineConfig(({ mode }) => {
             : 'assets/[name].js',
           assetFileNames: mode === 'production'
             ? 'assets/[name]-[hash].[ext]'
-            : 'assets/[name].[ext]',
-          // Laisser Vite gérer automatiquement le code splitting
-          // pour éviter les chunks vides
+            : 'assets/[name].[ext]'
         },
         // Optimisations supplémentaires
         treeshake: {
           moduleSideEffects: false,
-          preset: 'smallest',
+          preset: 'recommended', // Changed from 'smallest' for better balance
         },
       },
-      // Sécurité: définir les limites pour éviter les attaques
-      chunkSizeWarningLimit: 1000,
+      // Optimized chunk size limits
+      chunkSizeWarningLimit: 500,
       assetsInlineLimit: 4096, // 4KB limite pour l'inlining
+      // Performance optimizations
+      reportCompressedSize: false, // Faster builds
+      cssCodeSplit: true, // Split CSS per async chunk
     },
   };
 });

@@ -12,7 +12,7 @@
     "temperature": 0.7,
     "maxTokens": 150,
     "emotionRecognitionEnabled": true,
-    "numFastTurns": 3
+    "numFastTurns": 5
   },
   "voice": {
     "provider": "11labs",
@@ -20,10 +20,10 @@
     "stability": 0.5,
     "similarityBoost": 0.75,
     "useSpeakerBoost": true,
-    "optimizeStreamingLatency": 4,
+    "optimizeStreamingLatency": 2,
     "enableSsmlParsing": false
   },
-  "firstMessage": "Bonjour! Ici Paul de Drain Fortin. Comment puis-je vous aider aujourd'hui?",
+  "firstMessage": "Bonjour! Ici Paul, agent virtuel de Drain Fortin. Comment puis-je vous aider aujourd’hui?",
   "firstMessageMode": "assistant-speaks-first",
   "hipaaEnabled": false,
   "clientMessages": [
@@ -41,7 +41,7 @@
     "user-interrupted",
     "voice-input"
   ],
-  "silenceTimeoutSeconds": 30,
+  "silenceTimeoutSeconds": 20,
   "maxDurationSeconds": 600,
   "backgroundSound": "off",
   "backchannelingEnabled": true,
@@ -66,7 +66,7 @@
   "transcriber": {
     "provider": "deepgram",
     "model": "nova-2",
-    "language": "fr"
+    "language": "fr-CA"
   },
   "serverUrl": "{{SUPABASE_FUNCTION_URL}}/vapi-webhook",
   "serverUrlSecret": "{{VAPI_WEBHOOK_SECRET}}",

@@ -15,12 +15,16 @@ interface UseConstraintsDataReturn {
   isLoading: boolean;
   error: string | null;
   refreshData: () => Promise<void>;
+  page: number;
+  pageSize: number;
+  total: number;
+  setPage: (n: number) => void;
 }
 
 export function useConstraintsData(options: UseConstraintsDataOptions = {}): UseConstraintsDataReturn {
   const { enableAutoRefresh = false, refreshInterval = 30000 } = options;
 
-  const [page] = useState(1);
+  const [page, setPage] = useState(1);
   const [pageSize] = useState(50);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,17 +33,21 @@ export function useConstraintsData(options: UseConstraintsDataOptions = {}): Use
     queryFn: async () => {
       try {
         const res = await fetchConstraints({ page, pageSize, sort: 'id:asc' });
-        return Array.isArray((res as any).items) ? (res as any).items as EnhancedConstraint[] : [];
+        if (Array.isArray((res as any).items)) {
+          return res as any;
+        }
+        return { items: [] as EnhancedConstraint[], total: 0, page, pageSize } as any;
       } catch (e: any) {
         setError(e?.message || 'Impossible de charger les contraintes');
-        return [] as EnhancedConstraint[];
+        return { items: [] as EnhancedConstraint[], total: 0, page, pageSize } as any;
       }
     },
     staleTime: 60_000,
     refetchInterval: enableAutoRefresh ? refreshInterval : false,
   });
 
-  const constraints = useMemo(() => data ?? [], [data]);
+  const constraints = useMemo(() => (data?.items as EnhancedConstraint[]) ?? [], [data]);
+  const total = useMemo(() => (typeof data?.total === 'number' ? data.total : constraints.length), [data, constraints.length]);
 
   const constraintsByCategory = useMemo(() => {
     try {
@@ -78,5 +86,9 @@ export function useConstraintsData(options: UseConstraintsDataOptions = {}): Use
     isLoading,
     error,
     refreshData,
+    page,
+    pageSize,
+    total,
+    setPage,
   };
 }

@@ -12,12 +12,16 @@ describe('apiClient', () => {
   it('prefers NEXT_PUBLIC_API_BASE_URL over VITE_API_BASE_URL', async () => {
     (import.meta as any).env.NEXT_PUBLIC_API_BASE_URL = 'https://next.example.com';
     (import.meta as any).env.VITE_API_BASE_URL = 'https://vite.example.com';
+    process.env.NEXT_PUBLIC_API_BASE_URL = 'https://next.example.com';
+    process.env.VITE_API_BASE_URL = 'https://vite.example.com';
     expect(getApiBaseUrl()).toBe('https://next.example.com');
   });
 
   it('falls back to VITE_API_BASE_URL', async () => {
     (import.meta as any).env.NEXT_PUBLIC_API_BASE_URL = undefined;
     (import.meta as any).env.VITE_API_BASE_URL = 'https://vite.example.com';
+    delete process.env.NEXT_PUBLIC_API_BASE_URL;
+    process.env.VITE_API_BASE_URL = 'https://vite.example.com';
     expect(getApiBaseUrl()).toBe('https://vite.example.com');
   });
 
@@ -29,4 +33,3 @@ describe('apiClient', () => {
     spy.mockRestore();
   });
 });
-

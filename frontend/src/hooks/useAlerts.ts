@@ -56,7 +56,7 @@ export function useSLAAlerts() {
         .limit(20);
       
       if (error) {
-        console.error('Error fetching SLA alerts:', error);
+        // Error handled silently in production
         return [];
       }
       
@@ -88,7 +88,7 @@ export function useConstraintAlerts() {
         .limit(20);
       
       if (error) {
-        console.error('Error fetching constraint alerts:', error);
+        // Error handled silently in production
         return [];
       }
       

@@ -1,1 +1,359 @@
-/**\n * Test Suite for Type Guards\n * Validates runtime type checking and branded type safety\n */\n\nimport { vi } from 'vitest';\nimport {\n  isString,\n  isNumber,\n  isBoolean,\n  isArray,\n  isObject,\n  isFunction,\n  isNull,\n  isUndefined,\n  isDefined,\n  isNonEmpty,\n  isEmail,\n  isUrl,\n  isPhoneNumber,\n  isDate,\n  isValidJSON,\n  parseJsonSafe,\n  assertNever,\n  createBrandedType,\n  matchesSchema\n} from './guards';\n\ndescribe('Type Guards', () => {\n  describe('Primitive Type Guards', () => {\n    describe('isString', () => {\n      it('should return true for strings', () => {\n        expect(isString('')).toBe(true);\n        expect(isString('hello')).toBe(true);\n        expect(isString(String('test'))).toBe(true);\n      });\n\n      it('should return false for non-strings', () => {\n        expect(isString(123)).toBe(false);\n        expect(isString(null)).toBe(false);\n        expect(isString(undefined)).toBe(false);\n        expect(isString([])).toBe(false);\n        expect(isString({})).toBe(false);\n      });\n    });\n\n    describe('isNumber', () => {\n      it('should return true for numbers', () => {\n        expect(isNumber(0)).toBe(true);\n        expect(isNumber(123)).toBe(true);\n        expect(isNumber(-456)).toBe(true);\n        expect(isNumber(3.14)).toBe(true);\n        expect(isNumber(Number.MAX_VALUE)).toBe(true);\n      });\n\n      it('should return false for non-numbers', () => {\n        expect(isNumber('123')).toBe(false);\n        expect(isNumber(NaN)).toBe(false);\n        expect(isNumber(Infinity)).toBe(false);\n        expect(isNumber(null)).toBe(false);\n        expect(isNumber(undefined)).toBe(false);\n      });\n    });\n\n    describe('isBoolean', () => {\n      it('should return true for booleans', () => {\n        expect(isBoolean(true)).toBe(true);\n        expect(isBoolean(false)).toBe(true);\n        expect(isBoolean(Boolean(1))).toBe(true);\n      });\n\n      it('should return false for non-booleans', () => {\n        expect(isBoolean(1)).toBe(false);\n        expect(isBoolean(0)).toBe(false);\n        expect(isBoolean('true')).toBe(false);\n        expect(isBoolean(null)).toBe(false);\n      });\n    });\n  });\n\n  describe('Complex Type Guards', () => {\n    describe('isArray', () => {\n      it('should return true for arrays', () => {\n        expect(isArray([])).toBe(true);\n        expect(isArray([1, 2, 3])).toBe(true);\n        expect(isArray(new Array(10))).toBe(true);\n      });\n\n      it('should return false for non-arrays', () => {\n        expect(isArray({})).toBe(false);\n        expect(isArray('array')).toBe(false);\n        expect(isArray(null)).toBe(false);\n      });\n\n      it('should work with element type guard', () => {\n        const stringArray = ['a', 'b', 'c'];\n        const mixedArray = ['a', 1, 'c'];\n        \n        expect(isArray(stringArray, isString)).toBe(true);\n        expect(isArray(mixedArray, isString)).toBe(false);\n      });\n    });\n\n    describe('isObject', () => {\n      it('should return true for plain objects', () => {\n        expect(isObject({})).toBe(true);\n        expect(isObject({ key: 'value' })).toBe(true);\n        expect(isObject(Object.create(null))).toBe(true);\n      });\n\n      it('should return false for non-objects', () => {\n        expect(isObject(null)).toBe(false);\n        expect(isObject([])).toBe(false);\n        expect(isObject('object')).toBe(false);\n        expect(isObject(new Date())).toBe(false);\n        expect(isObject(/regex/)).toBe(false);\n      });\n    });\n  });\n\n  describe('Validation Guards', () => {\n    describe('isEmail', () => {\n      it('should return true for valid emails', () => {\n        expect(isEmail('test@example.com')).toBe(true);\n        expect(isEmail('user.name@domain.co.uk')).toBe(true);\n        expect(isEmail('user+tag@example.org')).toBe(true);\n      });\n\n      it('should return false for invalid emails', () => {\n        expect(isEmail('invalid-email')).toBe(false);\n        expect(isEmail('@example.com')).toBe(false);\n        expect(isEmail('user@')).toBe(false);\n        expect(isEmail('user@.com')).toBe(false);\n        expect(isEmail('')).toBe(false);\n      });\n    });\n\n    describe('isUrl', () => {\n      it('should return true for valid URLs', () => {\n        expect(isUrl('https://example.com')).toBe(true);\n        expect(isUrl('http://localhost:3000')).toBe(true);\n        expect(isUrl('https://sub.domain.com/path?query=1#hash')).toBe(true);\n      });\n\n      it('should return false for invalid URLs', () => {\n        expect(isUrl('not-a-url')).toBe(false);\n        expect(isUrl('ftp://example.com')).toBe(false);\n        expect(isUrl('//example.com')).toBe(false);\n        expect(isUrl('')).toBe(false);\n      });\n    });\n\n    describe('isPhoneNumber', () => {\n      it('should return true for valid phone numbers', () => {\n        expect(isPhoneNumber('+1-555-123-4567')).toBe(true);\n        expect(isPhoneNumber('(555) 123-4567')).toBe(true);\n        expect(isPhoneNumber('555.123.4567')).toBe(true);\n        expect(isPhoneNumber('15551234567')).toBe(true);\n      });\n\n      it('should return false for invalid phone numbers', () => {\n        expect(isPhoneNumber('123')).toBe(false);\n        expect(isPhoneNumber('not-a-phone')).toBe(false);\n        expect(isPhoneNumber('')).toBe(false);\n      });\n    });\n  });\n\n  describe('Utility Guards', () => {\n    describe('isDefined', () => {\n      it('should return true for defined values', () => {\n        expect(isDefined('')).toBe(true);\n        expect(isDefined(0)).toBe(true);\n        expect(isDefined(false)).toBe(true);\n        expect(isDefined([])).toBe(true);\n        expect(isDefined({})).toBe(true);\n      });\n\n      it('should return false for undefined values', () => {\n        expect(isDefined(undefined)).toBe(false);\n        expect(isDefined(null)).toBe(false);\n      });\n    });\n\n    describe('isNonEmpty', () => {\n      it('should return true for non-empty values', () => {\n        expect(isNonEmpty('text')).toBe(true);\n        expect(isNonEmpty([1, 2, 3])).toBe(true);\n        expect(isNonEmpty({ key: 'value' })).toBe(true);\n      });\n\n      it('should return false for empty values', () => {\n        expect(isNonEmpty('')).toBe(false);\n        expect(isNonEmpty([])).toBe(false);\n        expect(isNonEmpty({})).toBe(false);\n        expect(isNonEmpty(null)).toBe(false);\n        expect(isNonEmpty(undefined)).toBe(false);\n      });\n    });\n  });\n\n  describe('JSON Guards', () => {\n    describe('isValidJSON', () => {\n      it('should return true for valid JSON strings', () => {\n        expect(isValidJSON('{\"key\": \"value\"}')).toBe(true);\n        expect(isValidJSON('[1, 2, 3]')).toBe(true);\n        expect(isValidJSON('\"string\"')).toBe(true);\n        expect(isValidJSON('123')).toBe(true);\n        expect(isValidJSON('true')).toBe(true);\n      });\n\n      it('should return false for invalid JSON strings', () => {\n        expect(isValidJSON('{invalid}')).toBe(false);\n        expect(isValidJSON('[1, 2, 3')).toBe(false);\n        expect(isValidJSON('undefined')).toBe(false);\n        expect(isValidJSON('')).toBe(false);\n      });\n    });\n\n    describe('parseJsonSafe', () => {\n      it('should parse valid JSON with type guard', () => {\n        const jsonString = '{\"name\": \"John\", \"age\": 30}';\n        const schema = (obj: any): obj is { name: string; age: number } => \n          isObject(obj) && isString(obj.name) && isNumber(obj.age);\n        \n        const result = parseJsonSafe(jsonString, schema);\n        \n        expect(result.success).toBe(true);\n        if (result.success) {\n          expect(result.data.name).toBe('John');\n          expect(result.data.age).toBe(30);\n        }\n      });\n\n      it('should handle invalid JSON', () => {\n        const invalidJson = '{invalid json';\n        const result = parseJsonSafe(invalidJson, isObject);\n        \n        expect(result.success).toBe(false);\n        if (!result.success) {\n          expect(result.error).toContain('Invalid JSON');\n        }\n      });\n\n      it('should handle type guard failure', () => {\n        const jsonString = '{\"not\": \"expected\"}';\n        const schema = (obj: any): obj is { name: string; age: number } => \n          isObject(obj) && isString(obj.name) && isNumber(obj.age);\n        \n        const result = parseJsonSafe(jsonString, schema);\n        \n        expect(result.success).toBe(false);\n        if (!result.success) {\n          expect(result.error).toContain('Type validation failed');\n        }\n      });\n    });\n  });\n\n  describe('Schema Matching', () => {\n    describe('matchesSchema', () => {\n      it('should validate objects against schema', () => {\n        const schema = {\n          name: isString,\n          age: isNumber,\n          active: isBoolean\n        };\n        \n        const validObject = {\n          name: 'John',\n          age: 30,\n          active: true\n        };\n        \n        const invalidObject = {\n          name: 'John',\n          age: '30', // Wrong type\n          active: true\n        };\n        \n        expect(matchesSchema(validObject, schema)).toBe(true);\n        expect(matchesSchema(invalidObject, schema)).toBe(false);\n      });\n\n      it('should handle optional properties', () => {\n        const schema = {\n          required: isString,\n          optional: (val: any) => val === undefined || isString(val)\n        };\n        \n        const objectWithOptional = { required: 'test', optional: 'value' };\n        const objectWithoutOptional = { required: 'test' };\n        \n        expect(matchesSchema(objectWithOptional, schema)).toBe(true);\n        expect(matchesSchema(objectWithoutOptional, schema)).toBe(true);\n      });\n    });\n  });\n\n  describe('Branded Types', () => {\n    describe('createBrandedType', () => {\n      it('should create branded type validators', () => {\n        const isUserId = createBrandedType<string, 'UserId'>(\n          isString,\n          (val) => val.length > 0 && val.startsWith('user_')\n        );\n        \n        expect(isUserId('user_123')).toBe(true);\n        expect(isUserId('invalid')).toBe(false);\n        expect(isUserId(123 as any)).toBe(false);\n      });\n\n      it('should work with numeric branded types', () => {\n        const isPositiveInt = createBrandedType<number, 'PositiveInt'>(\n          isNumber,\n          (val) => Number.isInteger(val) && val > 0\n        );\n        \n        expect(isPositiveInt(5)).toBe(true);\n        expect(isPositiveInt(-5)).toBe(false);\n        expect(isPositiveInt(3.14)).toBe(false);\n        expect(isPositiveInt('5' as any)).toBe(false);\n      });\n    });\n  });\n\n  describe('Exhaustive Checks', () => {\n    describe('assertNever', () => {\n      it('should throw for unexpected values', () => {\n        const unexpectedValue = 'unexpected' as never;\n        \n        expect(() => assertNever(unexpectedValue)).toThrow(\n          'Unexpected value: unexpected'\n        );\n      });\n\n      it('should be used in exhaustive switch statements', () => {\n        type Status = 'loading' | 'success' | 'error';\n        \n        function handleStatus(status: Status) {\n          switch (status) {\n            case 'loading':\n              return 'Loading...';\n            case 'success':\n              return 'Success!';\n            case 'error':\n              return 'Error occurred';\n            default:\n              return assertNever(status);\n          }\n        }\n        \n        expect(handleStatus('loading')).toBe('Loading...');\n        expect(handleStatus('success')).toBe('Success!');\n        expect(handleStatus('error')).toBe('Error occurred');\n      });\n    });\n  });\n});
+/**
+ * Test Suite for Type Guards
+ * Validates runtime type checking and branded type safety
+ */
+
+import { vi } from 'vitest';
+import {
+  isString,
+  isNumber,
+  isBoolean,
+  isArray,
+  isObject,
+  isFunction,
+  isNull,
+  isUndefined,
+  isDefined,
+  isNonEmpty,
+  isEmail,
+  isUrl,
+  isPhoneNumber,
+  isDate,
+  isValidJSON,
+  parseJsonSafe,
+  assertNever,
+  createBrandedType,
+  matchesSchema
+} from './guards';
+
+describe('Type Guards', () => {
+  describe('Primitive Type Guards', () => {
+    describe('isString', () => {
+      it('should return true for strings', () => {
+        expect(isString('')).toBe(true);
+        expect(isString('hello')).toBe(true);
+        expect(isString(String('test'))).toBe(true);
+      });
+
+      it('should return false for non-strings', () => {
+        expect(isString(123)).toBe(false);
+        expect(isString(null)).toBe(false);
+        expect(isString(undefined)).toBe(false);
+        expect(isString([])).toBe(false);
+        expect(isString({})).toBe(false);
+      });
+    });
+
+    describe('isNumber', () => {
+      it('should return true for numbers', () => {
+        expect(isNumber(0)).toBe(true);
+        expect(isNumber(123)).toBe(true);
+        expect(isNumber(-456)).toBe(true);
+        expect(isNumber(3.14)).toBe(true);
+        expect(isNumber(Number.MAX_VALUE)).toBe(true);
+      });
+
+      it('should return false for non-numbers', () => {
+        expect(isNumber('123')).toBe(false);
+        expect(isNumber(NaN)).toBe(false);
+        expect(isNumber(Infinity)).toBe(false);
+        expect(isNumber(null)).toBe(false);
+        expect(isNumber(undefined)).toBe(false);
+      });
+    });
+
+    describe('isBoolean', () => {
+      it('should return true for booleans', () => {
+        expect(isBoolean(true)).toBe(true);
+        expect(isBoolean(false)).toBe(true);
+        expect(isBoolean(Boolean(1))).toBe(true);
+      });
+
+      it('should return false for non-booleans', () => {
+        expect(isBoolean(1)).toBe(false);
+        expect(isBoolean(0)).toBe(false);
+        expect(isBoolean('true')).toBe(false);
+        expect(isBoolean(null)).toBe(false);
+      });
+    });
+  });
+
+  describe('Complex Type Guards', () => {
+    describe('isArray', () => {
+      it('should return true for arrays', () => {
+        expect(isArray([])).toBe(true);
+        expect(isArray([1, 2, 3])).toBe(true);
+        expect(isArray(new Array(10))).toBe(true);
+      });
+
+      it('should return false for non-arrays', () => {
+        expect(isArray({})).toBe(false);
+        expect(isArray('array')).toBe(false);
+        expect(isArray(null)).toBe(false);
+      });
+
+      it('should work with element type guard', () => {
+        const stringArray = ['a', 'b', 'c'];
+        const mixedArray = ['a', 1, 'c'];
+        
+        expect(isArray(stringArray, isString)).toBe(true);
+        expect(isArray(mixedArray, isString)).toBe(false);
+      });
+    });
+
+    describe('isObject', () => {
+      it('should return true for plain objects', () => {
+        expect(isObject({})).toBe(true);
+        expect(isObject({ key: 'value' })).toBe(true);
+        expect(isObject(Object.create(null))).toBe(true);
+      });
+
+      it('should return false for non-objects', () => {
+        expect(isObject(null)).toBe(false);
+        expect(isObject([])).toBe(false);
+        expect(isObject('object')).toBe(false);
+        expect(isObject(new Date())).toBe(false);
+        expect(isObject(/regex/)).toBe(false);
+      });
+    });
+  });
+
+  describe('Validation Guards', () => {
+    describe('isEmail', () => {
+      it('should return true for valid emails', () => {
+        expect(isEmail('test@example.com')).toBe(true);
+        expect(isEmail('user.name@domain.co.uk')).toBe(true);
+        expect(isEmail('user+tag@example.org')).toBe(true);
+      });
+
+      it('should return false for invalid emails', () => {
+        expect(isEmail('invalid-email')).toBe(false);
+        expect(isEmail('@example.com')).toBe(false);
+        expect(isEmail('user@')).toBe(false);
+        expect(isEmail('user@.com')).toBe(false);
+        expect(isEmail('')).toBe(false);
+      });
+    });
+
+    describe('isUrl', () => {
+      it('should return true for valid URLs', () => {
+        expect(isUrl('https://example.com')).toBe(true);
+        expect(isUrl('http://localhost:3000')).toBe(true);
+        expect(isUrl('https://sub.domain.com/path?query=1#hash')).toBe(true);
+      });
+
+      it('should return false for invalid URLs', () => {
+        expect(isUrl('not-a-url')).toBe(false);
+        expect(isUrl('ftp://example.com')).toBe(false);
+        expect(isUrl('//example.com')).toBe(false);
+        expect(isUrl('')).toBe(false);
+      });
+    });
+
+    describe('isPhoneNumber', () => {
+      it('should return true for valid phone numbers', () => {
+        expect(isPhoneNumber('+1-555-123-4567')).toBe(true);
+        expect(isPhoneNumber('(555) 123-4567')).toBe(true);
+        expect(isPhoneNumber('555.123.4567')).toBe(true);
+        expect(isPhoneNumber('15551234567')).toBe(true);
+      });
+
+      it('should return false for invalid phone numbers', () => {
+        expect(isPhoneNumber('123')).toBe(false);
+        expect(isPhoneNumber('not-a-phone')).toBe(false);
+        expect(isPhoneNumber('')).toBe(false);
+      });
+    });
+  });
+
+  describe('Utility Guards', () => {
+    describe('isDefined', () => {
+      it('should return true for defined values', () => {
+        expect(isDefined('')).toBe(true);
+        expect(isDefined(0)).toBe(true);
+        expect(isDefined(false)).toBe(true);
+        expect(isDefined([])).toBe(true);
+        expect(isDefined({})).toBe(true);
+      });
+
+      it('should return false for undefined values', () => {
+        expect(isDefined(undefined)).toBe(false);
+        expect(isDefined(null)).toBe(false);
+      });
+    });
+
+    describe('isNonEmpty', () => {
+      it('should return true for non-empty values', () => {
+        expect(isNonEmpty('text')).toBe(true);
+        expect(isNonEmpty([1, 2, 3])).toBe(true);
+        expect(isNonEmpty({ key: 'value' })).toBe(true);
+      });
+
+      it('should return false for empty values', () => {
+        expect(isNonEmpty('')).toBe(false);
+        expect(isNonEmpty([])).toBe(false);
+        expect(isNonEmpty({})).toBe(false);
+        expect(isNonEmpty(null)).toBe(false);
+        expect(isNonEmpty(undefined)).toBe(false);
+      });
+    });
+  });
+
+  describe('JSON Guards', () => {
+    describe('isValidJSON', () => {
+      it('should return true for valid JSON strings', () => {
+        expect(isValidJSON('{"key": "value"}')).toBe(true);
+        expect(isValidJSON('[1, 2, 3]')).toBe(true);
+        expect(isValidJSON('"string"')).toBe(true);
+        expect(isValidJSON('123')).toBe(true);
+        expect(isValidJSON('true')).toBe(true);
+      });
+
+      it('should return false for invalid JSON strings', () => {
+        expect(isValidJSON('{invalid}')).toBe(false);
+        expect(isValidJSON('[1, 2, 3')).toBe(false);
+        expect(isValidJSON('undefined')).toBe(false);
+        expect(isValidJSON('')).toBe(false);
+      });
+    });
+
+    describe('parseJsonSafe', () => {
+      it('should parse valid JSON with type guard', () => {
+        const jsonString = '{"name": "John", "age": 30}';
+        const schema = (obj: any): obj is { name: string; age: number } => 
+          isObject(obj) && isString(obj.name) && isNumber(obj.age);
+        
+        const result = parseJsonSafe(jsonString, schema);
+        
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.data.name).toBe('John');
+          expect(result.data.age).toBe(30);
+        }
+      });
+
+      it('should handle invalid JSON', () => {
+        const invalidJson = '{invalid json';
+        const result = parseJsonSafe(invalidJson, isObject);
+        
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error).toContain('Invalid JSON');
+        }
+      });
+
+      it('should handle type guard failure', () => {
+        const jsonString = '{"not": "expected"}';
+        const schema = (obj: any): obj is { name: string; age: number } => 
+          isObject(obj) && isString(obj.name) && isNumber(obj.age);
+        
+        const result = parseJsonSafe(jsonString, schema);
+        
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error).toContain('Type validation failed');
+        }
+      });
+    });
+  });
+
+  describe('Schema Matching', () => {
+    describe('matchesSchema', () => {
+      it('should validate objects against schema', () => {
+        const schema = {
+          name: isString,
+          age: isNumber,
+          active: isBoolean
+        };
+        
+        const validObject = {
+          name: 'John',
+          age: 30,
+          active: true
+        };
+        
+        const invalidObject = {
+          name: 'John',
+          age: '30', // Wrong type
+          active: true
+        };
+        
+        expect(matchesSchema(validObject, schema)).toBe(true);
+        expect(matchesSchema(invalidObject, schema)).toBe(false);
+      });
+
+      it('should handle optional properties', () => {
+        const schema = {
+          required: isString,
+          optional: (val: any) => val === undefined || isString(val)
+        };
+        
+        const objectWithOptional = { required: 'test', optional: 'value' };
+        const objectWithoutOptional = { required: 'test' };
+        
+        expect(matchesSchema(objectWithOptional, schema)).toBe(true);
+        expect(matchesSchema(objectWithoutOptional, schema)).toBe(true);
+      });
+    });
+  });
+
+  describe('Branded Types', () => {
+    describe('createBrandedType', () => {
+      it('should create branded type validators', () => {
+        const isUserId = createBrandedType<string, 'UserId'>(
+          isString,
+          (val) => val.length > 0 && val.startsWith('user_')
+        );
+        
+        expect(isUserId('user_123')).toBe(true);
+        expect(isUserId('invalid')).toBe(false);
+        expect(isUserId(123 as any)).toBe(false);
+      });
+
+      it('should work with numeric branded types', () => {
+        const isPositiveInt = createBrandedType<number, 'PositiveInt'>(
+          isNumber,
+          (val) => Number.isInteger(val) && val > 0
+        );
+        
+        expect(isPositiveInt(5)).toBe(true);
+        expect(isPositiveInt(-5)).toBe(false);
+        expect(isPositiveInt(3.14)).toBe(false);
+        expect(isPositiveInt('5' as any)).toBe(false);
+      });
+    });
+  });
+
+  describe('Exhaustive Checks', () => {
+    describe('assertNever', () => {
+      it('should throw for unexpected values', () => {
+        const unexpectedValue = 'unexpected' as never;
+        
+        expect(() => assertNever(unexpectedValue)).toThrow(
+          'Unexpected value: unexpected'
+        );
+      });
+
+      it('should be used in exhaustive switch statements', () => {
+        type Status = 'loading' | 'success' | 'error';
+        
+        function handleStatus(status: Status) {
+          switch (status) {
+            case 'loading':
+              return 'Loading...';
+            case 'success':
+              return 'Success!';
+            case 'error':
+              return 'Error occurred';
+            default:
+              return assertNever(status);
+          }
+        }
+        
+        expect(handleStatus('loading')).toBe('Loading...');
+        expect(handleStatus('success')).toBe('Success!');
+        expect(handleStatus('error')).toBe('Error occurred');
+      });
+    });
+  });
+});

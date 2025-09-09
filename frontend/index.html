@@ -1,16 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="description" content="Système de gestion des appels et interventions pour Drain Fortin avec Paul, l'assistant vocal IA" />
+    <meta name="theme-color" content="#0066CC" />
+    <title>Drain Fortin - Système de Gestion</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    
+    <!-- Preconnect to external origins -->
+    <link rel="preconnect" href="https://api.supabase.co" crossorigin />
+    <link rel="dns-prefetch" href="https://api.supabase.co" />
+    
     <!-- SESSION SAFETY: External fonts disabled in DEV to ensure no-outbound policy -->
     <style>
-      :root { --font-sans: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; }
-      body { font-family: var(--font-sans); }
+      :root { 
+        --font-sans: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; 
+      }
+      body { 
+        font-family: var(--font-sans);
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      #root {
+        min-height: 100vh;
+      }
+      .init-spinner {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
     </style>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(
+            (registration) => {
+              console.log('[SW] Registration successful:', registration.scope);
+            },
+            (err) => {
+              console.log('[SW] Registration failed:', err);
+            }
+          );
+        });
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Loading spinner while React loads -->
+      <div class="init-spinner">
+        <svg width="50" height="50" viewBox="0 0 50 50">
+          <circle cx="25" cy="25" r="20" stroke="#0066CC" stroke-width="3" fill="none" opacity="0.3"/>
+          <circle cx="25" cy="25" r="20" stroke="#0066CC" stroke-width="3" fill="none" 
+            stroke-dasharray="80 20" stroke-linecap="round">
+            <animateTransform attributeName="transform" type="rotate" 
+              from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- SESSION SAFETY: External banners/scripts disabled (no-outbound) -->
   </body>
