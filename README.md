@@ -225,7 +225,7 @@ MIT License - see [LICENSE](LICENSE) file
 
 - **Issues**: [GitHub Issues](https://github.com/JSLeboeuf/drain-fortin-production-clean/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/JSLeboeuf/drain-fortin-production-clean/discussions)
-- **Email**: support@drainfortin.com
+- **Email**: support@autoscaleai.ca
 
 ---
 
