@@ -1,424 +1,243 @@
-/**
- * React Performance Hooks
- * Optimization utilities for React components
- */
+import { useEffect, useRef, useCallback, useState } from 'react';
 
-import { useRef, useCallback, useEffect, useMemo, useState, DependencyList } from 'react';
-import { logger } from '@/lib/logger';
-
-// Deep comparison hook for expensive calculations
-export function useDeepCompareMemo<T>(
-  factory: () => T,
-  deps: DependencyList
-): T {
-  const ref = useRef<DependencyList>();
-  const signalRef = useRef<number>(0);
-
-  if (!ref.current || !deepEqual(deps, ref.current)) {
-    ref.current = deps;
-    signalRef.current += 1;
-  }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(factory, [signalRef.current]);
-}
-
-// Deep equality check
-function deepEqual(a: any, b: any): boolean {
-  if (a === b) return true;
-  
-  if (a instanceof Date && b instanceof Date) {
-    return a.getTime() === b.getTime();
-  }
-  
-  if (!a || !b || (typeof a !== 'object' && typeof b !== 'object')) {
-    return a === b;
-  }
-  
-  if (a === null || a === undefined || b === null || b === undefined) {
-    return false;
-  }
-  
-  if (a.prototype !== b.prototype) return false;
-  
-  const keys = Object.keys(a);
-  if (keys.length !== Object.keys(b).length) return false;
-  
-  return keys.every(k => deepEqual(a[k], b[k]));
-}
-
-// Prevent unnecessary re-renders with stable callbacks
-export function useStableCallback<T extends (...args: any[]) => any>(
-  callback: T
-): T {
-  const callbackRef = useRef<T>(callback);
-  
-  useEffect(() => {
-    callbackRef.current = callback;
+// Performance monitoring hook
+export function usePerformanceMonitor(componentName: string) {
+  const renderCount = useRef(0);
+  const renderStartTime = useRef(0);
+  const [metrics, setMetrics] = useState({
+    renderCount: 0,
+    avgRenderTime: 0,
+    lastRenderTime: 0,
   });
-  
-  return useCallback(
-    ((...args) => callbackRef.current(...args)) as T,
-    []
-  );
+
+  useEffect(() => {
+    renderCount.current++;
+    const renderTime = performance.now() - renderStartTime.current;
+    
+    setMetrics(prev => ({
+      renderCount: renderCount.current,
+      avgRenderTime: (prev.avgRenderTime * (renderCount.current - 1) + renderTime) / renderCount.current,
+      lastRenderTime: renderTime,
+    }));
+
+    // Log performance issues
+    if (renderTime > 16.67) { // More than 1 frame (60fps)
+      // Performance warning removed for production
+    }
+
+    // Report to monitoring service in production
+    if (import.meta.env.PROD && renderCount.current % 100 === 0) {
+      // Send metrics to monitoring service
+      fetch('/api/metrics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          component: componentName,
+          metrics,
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {}); // Silent fail
+    }
+  });
+
+  useEffect(() => {
+    renderStartTime.current = performance.now();
+  });
+
+  return metrics;
 }
 
-// Batch state updates
-export function useBatchedUpdates<T extends Record<string, any>>(
-  initialState: T
-): [T, (updates: Partial<T> | ((prev: T) => Partial<T>)) => void] {
-  const [state, setState] = useState(initialState);
-  const pendingUpdates = useRef<Partial<T>>({});
-  const rafRef = useRef<number>();
-
-  const batchUpdate = useCallback((updates: Partial<T> | ((prev: T) => Partial<T>)) => {
-    const newUpdates = typeof updates === 'function' ? updates(state) : updates;
-    Object.assign(pendingUpdates.current, newUpdates);
-
-    if (!rafRef.current) {
-      rafRef.current = requestAnimationFrame(() => {
-        setState(prev => ({ ...prev, ...pendingUpdates.current }));
-        pendingUpdates.current = {};
-        rafRef.current = undefined;
-      });
-    }
-  }, [state]);
+// Memory leak detector
+export function useMemoryLeakDetector(componentName: string) {
+  const mounted = useRef(true);
+  const timers = useRef(new Set<NodeJS.Timeout>());
+  const subscriptions = useRef(new Set<() => void>());
 
   useEffect(() => {
     return () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
+      mounted.current = false;
+      
+      // Check for active timers
+      if (timers.current.size > 0) {
+        // Memory leak detection removed for production
+        timers.current.forEach(timer => clearTimeout(timer));
       }
+      
+      // Check for active subscriptions
+      if (subscriptions.current.size > 0) {
+        // Memory leak detection removed for production
+        subscriptions.current.forEach(unsub => unsub());
+      }
+    };
+  }, [componentName]);
+
+  const safeSetTimeout = useCallback((callback: () => void, delay: number) => {
+    const timer = setTimeout(() => {
+      if (mounted.current) {
+        callback();
+        timers.current.delete(timer);
+      }
+    }, delay);
+    timers.current.add(timer);
+    return timer;
+  }, []);
+
+  const safeClearTimeout = useCallback((timer: NodeJS.Timeout) => {
+    clearTimeout(timer);
+    timers.current.delete(timer);
+  }, []);
+
+  const addSubscription = useCallback((unsubscribe: () => void) => {
+    subscriptions.current.add(unsubscribe);
+    return () => {
+      unsubscribe();
+      subscriptions.current.delete(unsubscribe);
     };
   }, []);
 
-  return [state, batchUpdate];
-}
-
-// Measure component render performance
-export function useRenderTime(componentName: string) {
-  const renderCount = useRef(0);
-  const renderTime = useRef(0);
-  const startTime = useRef(performance.now());
-
-  useEffect(() => {
-    renderCount.current += 1;
-    renderTime.current = performance.now() - startTime.current;
-    
-    if (renderTime.current > 16) { // Longer than one frame
-      logger.warn(`Slow render detected`, {
-        component: componentName,
-        renderCount: renderCount.current,
-        renderTime: `${renderTime.current.toFixed(2)}ms`
-      });
-    }
-    
-    startTime.current = performance.now();
-  });
-
   return {
-    renderCount: renderCount.current,
-    lastRenderTime: renderTime.current
+    safeSetTimeout,
+    safeClearTimeout,
+    addSubscription,
+    isMounted: () => mounted.current,
   };
 }
 
-// Lazy initial state
-export function useLazyInitialState<T>(
-  factory: () => T
+// Debounced value hook
+export function useDebouncedValue<T>(value: T, delay: number = 500): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Throttled callback hook
+export function useThrottledCallback<T extends (...args: any[]) => any>(
+  callback: T,
+  delay: number = 100
 ): T {
-  const [state] = useState(factory);
-  return state;
-}
+  const lastRun = useRef(0);
+  const timeout = useRef<NodeJS.Timeout>();
 
-// Previous value hook
-export function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T>();
-  
-  useEffect(() => {
-    ref.current = value;
-  });
-  
-  return ref.current;
-}
-
-// Compare and log changes
-export function useWhyDidYouUpdate<T extends Record<string, any>>(
-  name: string,
-  props: T
-) {
-  const previousProps = useRef<T>();
-  
-  useEffect(() => {
-    if (previousProps.current) {
-      const allKeys = Object.keys({ ...previousProps.current, ...props });
-      const changedProps: Record<string, any> = {};
-      
-      allKeys.forEach(key => {
-        if (previousProps.current![key] !== props[key]) {
-          changedProps[key] = {
-            from: previousProps.current![key],
-            to: props[key]
-          };
-        }
-      });
-      
-      if (Object.keys(changedProps).length) {
-        logger.debug(`[${name}] Props changed`, changedProps);
-      }
-    }
+  return useCallback((...args: Parameters<T>) => {
+    const now = Date.now();
     
-    previousProps.current = props;
-  });
-}
-
-// Selective subscription hook
-export function useSelectiveSubscription<T, S>(
-  source: T,
-  selector: (source: T) => S,
-  equalityFn?: (a: S, b: S) => boolean
-): S {
-  const [selectedState, setSelectedState] = useState(() => selector(source));
-  const selectorRef = useRef(selector);
-  const equalityFnRef = useRef(equalityFn || Object.is);
-  const selectedStateRef = useRef(selectedState);
-  
-  useEffect(() => {
-    selectorRef.current = selector;
-    equalityFnRef.current = equalityFn || Object.is;
-  });
-  
-  useEffect(() => {
-    const newSelectedState = selectorRef.current(source);
-    
-    if (!equalityFnRef.current(newSelectedState, selectedStateRef.current)) {
-      selectedStateRef.current = newSelectedState;
-      setSelectedState(newSelectedState);
-    }
-  }, [source]);
-  
-  return selectedState;
-}
-
-// Unmount check hook
-export function useIsMounted(): () => boolean {
-  const isMounted = useRef(false);
-  
-  useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
-  
-  return useCallback(() => isMounted.current, []);
-}
-
-// Async effect hook
-export function useAsyncEffect(
-  effect: () => Promise<void>,
-  deps?: DependencyList
-): void {
-  const isMounted = useIsMounted();
-  
-  useEffect(() => {
-    const runEffect = async () => {
-      try {
-        await effect();
-      } catch (error) {
-        if (isMounted()) {
-          logger.error('Async effect error', error);
-        }
-      }
-    };
-    
-    runEffect();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
-}
-
-// Page visibility hook
-export function usePageVisibility() {
-  const [isVisible, setIsVisible] = useState(
-    typeof document !== 'undefined' ? !document.hidden : true
-  );
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      setIsVisible(!document.hidden);
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
-
-  return isVisible;
-}
-
-// Idle callback hook
-export function useIdleCallback(
-  callback: IdleRequestCallback,
-  options?: IdleRequestOptions
-): void {
-  const savedCallback = useRef(callback);
-  
-  useEffect(() => {
-    savedCallback.current = callback;
-  });
-  
-  useEffect(() => {
-    const handleIdle: IdleRequestCallback = (deadline) => {
-      savedCallback.current(deadline);
-    };
-    
-    if ('requestIdleCallback' in window) {
-      const id = window.requestIdleCallback(handleIdle, options);
-      return () => window.cancelIdleCallback(id);
+    if (now - lastRun.current >= delay) {
+      callback(...args);
+      lastRun.current = now;
     } else {
-      // Fallback for unsupported browsers
-      const id = setTimeout(() => {
-        handleIdle({
-          didTimeout: false,
-          timeRemaining: () => 0
-        } as IdleDeadline);
-      }, 1);
-      return () => clearTimeout(id);
+      clearTimeout(timeout.current);
+      timeout.current = setTimeout(() => {
+        callback(...args);
+        lastRun.current = Date.now();
+      }, delay - (now - lastRun.current));
     }
-  }, [options]);
+  }, [callback, delay]) as T;
 }
 
-// Memory leak detection
-export function useMemoryLeakDetector(
-  componentName: string,
-  threshold = 10
+// Intersection observer for lazy loading
+export function useIntersectionObserver(
+  ref: React.RefObject<Element>,
+  options?: IntersectionObserverInit
 ) {
-  const instanceCount = useRef(0);
-  const instanceId = useRef(Math.random());
-  
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const [hasIntersected, setHasIntersected] = useState(false);
+
   useEffect(() => {
-    instanceCount.current += 1;
-    
-    if (instanceCount.current > threshold) {
-      logger.warn(`Potential memory leak detected`, {
-        component: componentName,
-        instances: instanceCount.current,
-        id: instanceId.current
-      });
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsIntersecting(entry.isIntersecting);
+      if (entry.isIntersecting) {
+        setHasIntersected(true);
+      }
+    }, options);
+
+    if (ref.current) {
+      observer.observe(ref.current);
     }
-    
+
     return () => {
-      instanceCount.current -= 1;
+      observer.disconnect();
     };
-  }, [componentName, threshold]);
+  }, [ref, options]);
+
+  return { isIntersecting, hasIntersected };
 }
 
-// Render optimization with memo dependencies
-export function useOptimizedRender<T extends Record<string, any>>(
-  props: T,
-  customCompare?: (prev: T, next: T) => boolean
-): boolean {
-  const prevPropsRef = useRef<T>(props);
-  const [, forceRender] = useState({});
-  
-  const shouldRender = customCompare
-    ? !customCompare(prevPropsRef.current, props)
-    : !shallowEqual(prevPropsRef.current, props);
-  
-  if (shouldRender) {
-    prevPropsRef.current = props;
-    forceRender({});
-  }
-  
-  return shouldRender;
-}
-
-function shallowEqual(obj1: any, obj2: any): boolean {
-  const keys1 = Object.keys(obj1);
-  const keys2 = Object.keys(obj2);
-  
-  if (keys1.length !== keys2.length) return false;
-  
-  return keys1.every(key => obj1[key] === obj2[key]);
-}
-
-// Virtual list hook
+// Virtual list hook for large datasets
 export function useVirtualList<T>({
   items,
   itemHeight,
   containerHeight,
-  overscan = 3
+  overscan = 3,
 }: {
   items: T[];
-  itemHeight: number | ((index: number) => number);
+  itemHeight: number;
   containerHeight: number;
   overscan?: number;
 }) {
   const [scrollTop, setScrollTop] = useState(0);
-  
-  const visibleRange = useMemo(() => {
-    const getItemOffset = (index: number) => {
-      if (typeof itemHeight === 'function') {
-        let offset = 0;
-        for (let i = 0; i < index; i++) {
-          offset += itemHeight(i);
-        }
-        return offset;
-      }
-      return index * itemHeight;
-    };
-    
-    const getTotalHeight = () => {
-      if (typeof itemHeight === 'function') {
-        return items.reduce((acc, _, i) => acc + itemHeight(i), 0);
-      }
-      return items.length * itemHeight;
-    };
-    
-    let startIndex = 0;
-    let accumulatedHeight = 0;
-    
-    // Find start index
-    while (startIndex < items.length && accumulatedHeight < scrollTop) {
-      const height = typeof itemHeight === 'function' 
-        ? itemHeight(startIndex)
-        : itemHeight;
-      accumulatedHeight += height;
-      if (accumulatedHeight < scrollTop) startIndex++;
-    }
-    
-    startIndex = Math.max(0, startIndex - overscan);
-    
-    // Find end index
-    let endIndex = startIndex;
-    accumulatedHeight = 0;
-    
-    while (endIndex < items.length && accumulatedHeight < containerHeight + scrollTop) {
-      const height = typeof itemHeight === 'function'
-        ? itemHeight(endIndex)
-        : itemHeight;
-      accumulatedHeight += height;
-      endIndex++;
-    }
-    
-    endIndex = Math.min(items.length, endIndex + overscan);
-    
-    return {
-      startIndex,
-      endIndex,
-      visibleItems: items.slice(startIndex, endIndex),
-      totalHeight: getTotalHeight(),
-      offsetY: getItemOffset(startIndex)
-    };
-  }, [items, itemHeight, containerHeight, overscan, scrollTop]);
-  
-  const handleScroll = useCallback((e: React.UIEvent<HTMLElement>) => {
+
+  const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
+  const endIndex = Math.min(
+    items.length - 1,
+    Math.ceil((scrollTop + containerHeight) / itemHeight) + overscan
+  );
+
+  const visibleItems = items.slice(startIndex, endIndex + 1);
+  const totalHeight = items.length * itemHeight;
+  const offsetY = startIndex * itemHeight;
+
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollTop(e.currentTarget.scrollTop);
   }, []);
-  
+
   return {
-    ...visibleRange,
-    handleScroll
+    visibleItems,
+    totalHeight,
+    offsetY,
+    handleScroll,
+    startIndex,
+    endIndex,
   };
+}
+
+// Request idle callback hook
+export function useIdleCallback(callback: () => void, delay: number = 0) {
+  useEffect(() => {
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(callback, { timeout: delay });
+      return () => window.cancelIdleCallback(id);
+    } else {
+      const timer = setTimeout(callback, delay);
+      return () => clearTimeout(timer);
+    }
+  }, [callback, delay]);
+}
+
+// Render time measurement
+export function useRenderTime(componentName: string) {
+  const renderStart = useRef(performance.now());
+  
+  useEffect(() => {
+    const renderTime = performance.now() - renderStart.current;
+    
+    if (import.meta.env.DEV) {
+      // Render time logging removed for production
+    }
+    
+    // Track slow renders
+    if (renderTime > 50) {
+      // Slow render warning removed for production
+    }
+  });
+  
+  // Reset for next render
+  renderStart.current = performance.now();
 }

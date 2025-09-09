@@ -3,12 +3,16 @@ import { useEffect } from "react";
 import { supabase, supabaseServices, VapiCall, Lead, SMSLog } from "@/lib/supabase";
 import api from "@/lib/api";
 
-// Hook pour récupérer les appels depuis Supabase
+// Hook pour récupérer les appels depuis Supabase avec optimisations
 export function useSupabaseCalls(limit = 10) {
   return useQuery({
     queryKey: ['supabase', 'calls', limit],
     queryFn: () => supabaseServices.getRecentCalls(limit),
     refetchInterval: 10000, // Refresh toutes les 10 secondes
+    staleTime: 5000, // Data stays fresh for 5 seconds
+    gcTime: 300000, // Keep in cache for 5 minutes
+    refetchOnWindowFocus: false, // Prevent refetch on tab focus
+    refetchOnMount: 'always',
   });
 }
 
@@ -48,8 +52,7 @@ export function useRealtimeCalls() {
       queryClient.invalidateQueries({ queryKey: ['supabase', 'calls'] });
       queryClient.invalidateQueries({ queryKey: ['supabase', 'dashboard_metrics'] });
       
-      // Notification optionnelle
-      console.log('Nouvel appel reçu:', newCall);
+      // Notification removed for production
     });
 
     return () => {
@@ -116,7 +119,7 @@ export function useConstraints() {
         .order('category', { ascending: true });
       
       if (error) {
-        console.error('Error fetching constraints:', error);
+        // Error handled silently in production
         return [];
       }
       
@@ -137,7 +140,7 @@ export function usePricingRules() {
         .order('priority', { ascending: true });
       
       if (error) {
-        console.error('Error fetching pricing rules:', error);
+        // Error handled silently in production
         return [];
       }
       

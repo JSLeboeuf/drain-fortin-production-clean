@@ -303,6 +303,62 @@ export function sanitizeForLogging(payload: WebhookPayload): Record<string, any>
   return sanitized;
 }
 
+// Parse raw JSON and validate strictly against schemas
+export async function parseAndValidateWebhookPayload(raw: string): Promise<{
+  valid: boolean;
+  payload?: WebhookPayload;
+  errors: string[];
+  securityWarnings: string[];
+}> {
+  const warnings: string[] = [];
+  const MAX_BYTES = 1024 * 1024; // 1MB
+
+  if (!validatePayloadSize(raw, MAX_BYTES)) {
+    return {
+      valid: false,
+      errors: [
+        `Payload too large: ${(new TextEncoder().encode(raw).length)} bytes (max ${MAX_BYTES})`
+      ],
+      securityWarnings: warnings
+    };
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+
+    // Validate with Zod
+    const result = validateWebhookPayload(parsed);
+    if (!result.success) {
+      return {
+        valid: false,
+        errors: result.errors.errors.map(e => `${e.path.join('.')}: ${e.message}`),
+        securityWarnings: warnings
+      };
+    }
+
+    // Soft warn on unusually large but acceptable payloads (>500KB)
+    const size = new TextEncoder().encode(raw).length;
+    if (size > 512 * 1024) {
+      warnings.push(`Large payload size: ${size} bytes`);
+    }
+
+    return {
+      valid: true,
+      payload: result.data,
+      errors: [],
+      securityWarnings: warnings
+    };
+  } catch (err) {
+    return {
+      valid: false,
+      errors: [
+        `Invalid JSON: ${err instanceof Error ? err.message : String(err)}`
+      ],
+      securityWarnings: warnings
+    };
+  }
+}
+
 // Business validation functions
 export function validateBusinessRules(payload: WebhookPayload): {
   valid: boolean;

@@ -9,6 +9,7 @@ import { useConstraintFilters } from "./hooks/useConstraintFilters";
 import ConstraintFilters from "./ConstraintFilters";
 import ConstraintStatsCard from "./ConstraintStatsCard";
 import ConstraintItem from "./ConstraintItem";
+import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 
 interface EnhancedConstraintsDashboardProps {
@@ -33,7 +34,11 @@ export default function EnhancedConstraintsDashboard({
     stats,
     isLoading,
     error,
-    refreshData
+    refreshData,
+    page,
+    pageSize,
+    total,
+    setPage
   } = useConstraintsData({ enableAutoRefresh, refreshInterval });
 
   // Filtering logic hook with validation
@@ -192,6 +197,35 @@ export default function EnhancedConstraintsDashboard({
           )}
         </CardContent>
       </Card>
+      {total > pageSize && (
+        <div className="flex justify-center">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); if (page > 1) setPage(page - 1); }}
+                  aria-disabled={page === 1}
+                  className={page === 1 ? 'pointer-events-none opacity-50' : ''}
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <span className="px-3 py-2 text-sm text-muted-foreground" aria-live="polite">
+                  Page {page} / {Math.ceil(total / pageSize)}
+                </span>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); if (page < Math.ceil(total / pageSize)) setPage(page + 1); }}
+                  aria-disabled={page >= Math.ceil(total / pageSize)}
+                  className={page >= Math.ceil(total / pageSize) ? 'pointer-events-none opacity-50' : ''}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 }

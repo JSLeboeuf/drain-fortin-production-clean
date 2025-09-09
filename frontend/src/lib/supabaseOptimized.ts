@@ -12,7 +12,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://phiduqxcufdmgj
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoaWR1cXhjdWZkbWdqdmRpcHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxODQ5ODEsImV4cCI6MjA2Mjc2MDk4MX0.YyiZxzU6DuZsFwXLebdMqRJHhWlnVYyDgJz1HVsIjvI';
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase configuration missing!');
+  // Supabase configuration validation
 }
 
 // Enhanced client with performance optimizations

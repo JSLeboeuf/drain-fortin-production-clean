@@ -1,7 +1,8 @@
 // Enhanced security middleware for webhook endpoints
 import { logger } from '../utils/logging.ts';
-import { ValidationError, AuthenticationError, ErrorFactory } from '../utils/errors.ts';
-import { validatePayloadSize, validateWebhookPayload, validateBusinessRules, sanitizeForLogging } from '../validation/vapi-schemas.ts';
+import { ValidationError, AuthenticationError, AuthorizationError, ErrorFactory } from '../utils/errors.ts';
+import { validatePayloadSize, validateWebhookPayload, validateBusinessRules, sanitizeForLogging, parseAndValidateWebhookPayload } from '../validation/vapi-schemas.ts';
+import { getCorsHeaders, isOriginAllowed } from '../cors.ts';
 import type { WebhookPayload } from '../validation/vapi-schemas.ts';
 
 // Security configuration constants
@@ -171,7 +172,7 @@ export function validateWebhookRequest(request: Request): {
 }
 
 // Payload security validation
-export async function validateWebhookPayload(
+export async function parseAndValidateWebhookPayload(
   rawPayload: string
 ): Promise<{
   valid: boolean;
@@ -293,12 +294,21 @@ export async function withWebhookSecurity(
   const operationId = logger.startOperation('webhook-security-validation');
 
   try {
-    // Skip security checks for health checks and OPTIONS requests
+    // Strict CORS: deny unknown origins (including preflight)
+    const origin = request.headers.get('origin');
     if (request.method === 'OPTIONS') {
-      return new Response('OK', { 
-        status: 200,
-        headers: { 'Access-Control-Allow-Origin': '*' }
-      });
+      if (!isOriginAllowed(origin)) {
+        return new Response(JSON.stringify({ error: 'CORS origin not allowed' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json', ...getCorsHeaders(null) }
+        });
+      }
+      // Preflight OK for allowed origins only
+      return new Response(null, { status: 204, headers: getCorsHeaders(origin) });
+    }
+
+    if (!isOriginAllowed(origin)) {
+      throw new AuthorizationError('CORS origin not allowed', { origin });
     }
 
     // Request validation
@@ -319,11 +329,15 @@ export async function withWebhookSecurity(
     // Read and validate payload
     const rawPayload = await request.text();
     
-    // For health checks, allow through without full validation
+    // For health checks, allow through without HMAC but still enforce JSON + CORS
     if (rawPayload.includes('"type":"health-check"')) {
       logger.debug('Health check request bypassing full security validation');
       const quickParse = JSON.parse(rawPayload);
-      return await handler(quickParse, request);
+      const response = await handler(quickParse, request);
+      const headers = getCorsHeaders(origin);
+      // Ensure CORS headers present
+      Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
+      return response;
     }
 
     // HMAC signature verification (REQUIRED for all non-health-check events)
@@ -348,7 +362,7 @@ export async function withWebhookSecurity(
     }
 
     // Payload validation
-    const payloadValidation = await validateWebhookPayload(rawPayload);
+    const payloadValidation = await parseAndValidateWebhookPayload(rawPayload);
     if (!payloadValidation.valid) {
       logger.securityEvent('Webhook payload validation failed', 'high', {
         errors: payloadValidation.errors,
@@ -373,11 +387,9 @@ export async function withWebhookSecurity(
         clockSkew: timestampValidation.clockSkew,
         payloadType: payloadValidation.payload!.type
       });
-      
-      // Don't block for timestamp issues, just warn
-      logger.warn('Webhook timestamp validation warning', {
-        error: timestampValidation.error,
-        continuing: true
+      // Enforce anti‑replay: reject when outside acceptable window
+      throw new AuthenticationError('Request timestamp outside acceptable range', {
+        clockSkew: timestampValidation.clockSkew
       });
     }
 
@@ -388,6 +400,12 @@ export async function withWebhookSecurity(
         payloadType: payloadValidation.payload!.type
       });
     }
+
+    // Optional: log sanitized payload in debug mode only
+    try {
+      const sanitized = sanitizeForLogging(payloadValidation.payload!);
+      logger.debug('Webhook payload (sanitized)', { payload: sanitized });
+    } catch {}
 
     // Log successful validation
     const duration = performance.now() - startTime;
@@ -400,7 +418,10 @@ export async function withWebhookSecurity(
 
     // Execute the handler with validated payload
     const response = await handler(payloadValidation.payload!, request);
-    
+    // Attach strict CORS headers for allowed origin
+    const headers = getCorsHeaders(origin);
+    Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
+
     logger.endOperation('webhook-security-validation', operationId, {
       duration: `${duration.toFixed(2)}ms`,
       payloadType: payloadValidation.payload!.type,
@@ -418,21 +439,19 @@ export async function withWebhookSecurity(
       requestUrl: request.url
     });
 
-    if (error instanceof ValidationError || error instanceof AuthenticationError) {
+    if (error instanceof ValidationError || error instanceof AuthenticationError || error instanceof AuthorizationError) {
+      const origin = (error as any)?.context?.origin || undefined;
       return new Response(
         JSON.stringify({
           error: {
-            code: error.code,
-            message: error.message,
-            details: error.details
+            code: (error as any).code,
+            message: (error as any).message,
+            details: (error as any).details
           }
         }),
         {
-          status: error.statusCode,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
+          status: (error as any).statusCode || 400,
+          headers: { 'Content-Type': 'application/json', ...getCorsHeaders(origin || null) }
         }
       );
     }
@@ -452,10 +471,7 @@ export async function withWebhookSecurity(
       }),
       {
         status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
+        headers: { 'Content-Type': 'application/json', ...getCorsHeaders(request.headers.get('origin')) }
       }
     );
   }

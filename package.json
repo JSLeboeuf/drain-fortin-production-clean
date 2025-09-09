@@ -1,4 +1,11 @@
 {
+  "scripts": {
+    "test": "npm --prefix backend test",
+    "test:coverage": "npm --prefix backend run test:coverage",
+    "validate": "npm --prefix backend run test:coverage",
+    "vapi:inspect": "node scripts/vapi-inspect.js",
+    "vapi:assistants": "node scripts/vapi-inspect.js"
+  },
   "dependencies": {
     "node-fetch": "~3.3.2"
   }

@@ -6,10 +6,10 @@ const ENVIRONMENT = Deno.env.get('ENVIRONMENT') || 'development';
 
 // Define allowed origins based on environment
 const PRODUCTION_ORIGINS = [
-  'https://drain-fortin-crm.com',
-  'https://www.drain-fortin.com',
-  'https://phiduqxcufdmgjvdipyu.supabase.co',
-  // Add your production domain here
+  'https://drainfortin.com',
+  'https://www.drainfortin.com',
+  'https://app.drainfortin.com',
+  'https://iheusrchmjsrzjubrdby.supabase.co'
 ];
 
 const DEVELOPMENT_ORIGINS = [
@@ -60,13 +60,15 @@ export function getCorsHeaders(origin: string | null): Record<string, string> {
 
 // Legacy export for backward compatibility (but now secure)
 export const corsHeaders: Record<string, string> = {
-  // This will be overridden by getCorsHeaders() in production
-  "Access-Control-Allow-Origin": ENVIRONMENT === 'production' ? 'null' : '*',
+  // Default to first allowed origin or 'null' for security
+  "Access-Control-Allow-Origin": getAllowedOrigins()[0] || 'null',
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-vapi-signature",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+  "Access-Control-Allow-Credentials": "true",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
-  "X-XSS-Protection": "1; mode=block"
+  "X-XSS-Protection": "1; mode=block",
+  "Referrer-Policy": "strict-origin-when-cross-origin"
 };
 
 // Rate limiting helper
@@ -84,14 +86,9 @@ export function getRateLimitConfig(): RateLimitConfig {
 
 // Security validation helpers
 export function validateContentType(contentType: string | null): boolean {
-  const allowedTypes = [
-    'application/json',
-    'application/x-www-form-urlencoded',
-    'text/plain'
-  ];
-  
+  // Strict JSON-only for webhooks
   if (!contentType) return false;
-  return allowedTypes.some(type => contentType.includes(type));
+  return contentType.includes('application/json');
 }
 
 export function sanitizeHeaders(headers: Headers): Record<string, string> {

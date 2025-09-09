@@ -1,5 +1,7 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { transformConstraintsData, getConstraintsByCategory, getConstraintStats, EnhancedConstraint } from "@/services/constraintService";
+import { useState, useMemo, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchConstraints, getConstraintsByCategory, getConstraintStats, EnhancedConstraint } from "@/services/constraintService";
+import { getApiBaseUrl } from "@/lib/apiClient";
 
 interface UseConstraintsDataOptions {
   enableAutoRefresh?: boolean;
@@ -13,24 +15,39 @@ interface UseConstraintsDataReturn {
   isLoading: boolean;
   error: string | null;
   refreshData: () => Promise<void>;
+  page: number;
+  pageSize: number;
+  total: number;
+  setPage: (n: number) => void;
 }
 
 export function useConstraintsData(options: UseConstraintsDataOptions = {}): UseConstraintsDataReturn {
   const { enableAutoRefresh = false, refreshInterval = 30000 } = options;
-  
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [dataTimestamp, setDataTimestamp] = useState(Date.now());
 
-  const constraints = useMemo(() => {
-    try {
-      setError(null);
-      return transformConstraintsData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load constraints data');
-      return [];
-    }
-  }, [dataTimestamp]);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(50);
+  const [error, setError] = useState<string | null>(null);
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: [getApiBaseUrl(), '/api/constraints', page, pageSize],
+    queryFn: async () => {
+      try {
+        const res = await fetchConstraints({ page, pageSize, sort: 'id:asc' });
+        if (Array.isArray((res as any).items)) {
+          return res as any;
+        }
+        return { items: [] as EnhancedConstraint[], total: 0, page, pageSize } as any;
+      } catch (e: any) {
+        setError(e?.message || 'Impossible de charger les contraintes');
+        return { items: [] as EnhancedConstraint[], total: 0, page, pageSize } as any;
+      }
+    },
+    staleTime: 60_000,
+    refetchInterval: enableAutoRefresh ? refreshInterval : false,
+  });
+
+  const constraints = useMemo(() => (data?.items as EnhancedConstraint[]) ?? [], [data]);
+  const total = useMemo(() => (typeof data?.total === 'number' ? data.total : constraints.length), [data, constraints.length]);
 
   const constraintsByCategory = useMemo(() => {
     try {
@@ -60,35 +77,7 @@ export function useConstraintsData(options: UseConstraintsDataOptions = {}): Use
     }
   }, [constraints]);
 
-  const refreshData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // Simulate async data refresh
-      await new Promise(resolve => setTimeout(resolve, 100));
-      setDataTimestamp(Date.now());
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to refresh data');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Initial load
-  useEffect(() => {
-    refreshData();
-  }, [refreshData]);
-
-  // Auto-refresh setup
-  useEffect(() => {
-    if (!enableAutoRefresh) return;
-
-    const intervalId = setInterval(() => {
-      refreshData();
-    }, refreshInterval);
-
-    return () => clearInterval(intervalId);
-  }, [enableAutoRefresh, refreshInterval, refreshData]);
+  const refreshData = useCallback(async () => { await refetch(); }, [refetch]);
 
   return {
     constraints,
@@ -97,5 +86,9 @@ export function useConstraintsData(options: UseConstraintsDataOptions = {}): Use
     isLoading,
     error,
     refreshData,
+    page,
+    pageSize,
+    total,
+    setPage,
   };
 }

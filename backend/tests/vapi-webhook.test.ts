@@ -236,7 +236,7 @@ describe('VAPI Webhook Handler', () => {
         phone_number: '+15145551234',
         started_at: new Date().toISOString(),
         priority: 'P2',
-        status: 'in_progress'
+        status: 'active'
       };
       
       // Validate data structure for DB

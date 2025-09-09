@@ -72,7 +72,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       }
     };
   } catch (error) {
-    console.error('Error fetching dashboard stats:', error);
+    // Error handled silently in production
     throw error;
   }
 }
@@ -88,7 +88,7 @@ export async function getActiveAlerts() {
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching active alerts:', error);
+    // Error handled silently in production
     return [];
   }
 }
