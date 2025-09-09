@@ -3,7 +3,7 @@
  * End-to-end and integration test utilities
  */
 
-import { logger } from '@/lib/logger';
+import { logger } from '@/utils/logger';
 
 // API testing client
 export class APITester {
@@ -131,10 +131,16 @@ export class TestDatabase {
     }
     
     const id = item.id || String(Date.now());
-    this.data.get(collection)!.set(id, { ...item, id });
+    const collectionData = this.data.get(collection);
+    if (collectionData) {
+      collectionData.set(id, { ...item, id });
+    }
     
     this.transactions.push(() => {
-      this.data.get(collection)?.delete(id);
+      const collectionData = this.data.get(collection);
+      if (collectionData) {
+        collectionData.delete(id);
+      }
     });
   }
 
@@ -229,7 +235,10 @@ export class WebSocketTester {
       this.listeners.set(event, new Set());
     }
     
-    this.listeners.get(event)!.add(handler);
+    const eventListeners = this.listeners.get(event);
+    if (eventListeners) {
+      eventListeners.add(handler);
+    }
     
     return () => {
       this.listeners.get(event)?.delete(handler);
@@ -362,7 +371,7 @@ export class UserFlowTester {
 
 // Environment manager for tests
 export class TestEnvironment {
-  private originalEnv: NodeJS.ProcessEnv = {};
+  private originalEnv: Record<string, string | undefined> = {};
   private mocks = new Map<string, any>();
   private timers: { fake: boolean; time: number } = { fake: false, time: 0 };
 
@@ -376,7 +385,7 @@ export class TestEnvironment {
   }
 
   setEnv(key: string, value: string): void {
-    process.env[key] = value;
+    (process.env as Record<string, string>)[key] = value;
   }
 
   mockGlobal(key: string, value: any): void {
@@ -398,8 +407,11 @@ export class TestEnvironment {
   }
 
   cleanup(): void {
-    // Restore environment
-    process.env = { ...this.originalEnv };
+    // Restore environment  
+    Object.keys(process.env).forEach(key => {
+      delete (process.env as Record<string, any>)[key];
+    });
+    Object.assign(process.env, this.originalEnv);
     
     // Restore mocked globals
     this.mocks.forEach((original, key) => {

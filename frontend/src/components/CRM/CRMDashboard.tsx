@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Users, 
@@ -7,10 +7,8 @@ import {
   DollarSign,
   AlertTriangle,
   TrendingUp,
-  Phone,
   Clock,
-  Activity,
-  CheckCircle
+  Activity
 } from 'lucide-react';
 import { statsService, alertService, interventionService, smsService, realtimeService } from '@/services/crmService';
 import type { CRMStats, InternalAlert, Intervention, SMSMessage } from '@/types/crm';
@@ -20,10 +18,10 @@ import { toast } from 'sonner';
 
 export function CRMDashboard() {
   const [activeView, setActiveView] = useState<'dashboard' | 'clients' | 'sms' | 'interventions' | 'alerts'>('dashboard');
-  const [realtimeAlerts, setRealtimeAlerts] = useState<InternalAlert[]>([]);
+  // const [realtimeAlerts, setRealtimeAlerts] = useState<InternalAlert[]>([]);
 
   // Fetch statistics
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats } = useQuery({
     queryKey: ['crm-stats'],
     queryFn: () => statsService.getStats(),
     refetchInterval: 60000 // Refresh every minute

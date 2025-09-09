@@ -46,15 +46,17 @@ export default function AudioPlayer({ audioUrl, className = "" }: AudioPlayerPro
   };
   
   const handleSeek = (value: number[]) => {
-    if (!audioRef.current) return;
-    audioRef.current.currentTime = value[0];
-    setCurrentTime(value[0]);
+    if (!audioRef.current || value[0] === undefined) return;
+    const seekTime = value[0] ?? 0;
+    audioRef.current.currentTime = seekTime;
+    setCurrentTime(seekTime);
   };
   
   const handleVolumeChange = (value: number[]) => {
-    if (!audioRef.current) return;
-    audioRef.current.volume = value[0];
-    setVolume(value[0]);
+    if (!audioRef.current || value[0] === undefined) return;
+    const newVolume = value[0] ?? 0;
+    audioRef.current.volume = newVolume;
+    setVolume(newVolume);
   };
   
   const formatTime = (time: number) => {

@@ -1,9 +1,67 @@
 /* Import custom animations (must precede other statements) */
 @import './styles/animations.css';
+@import './styles/accessibility.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Skeleton Animations */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* Smooth Transitions */
+@layer utilities {
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .transition-smooth-slow {
+    @apply transition-all duration-500 ease-in-out;
+  }
+  
+  .animate-in {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  .animate-out {
+    animation: slideOut 0.3s ease-in;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
 
 :root {
   /* Premium background avec subtle gradient */
@@ -106,33 +164,61 @@
 }
 
 .dark {
-  --background: hsl(0 0% 0%);
-  --foreground: hsl(200 6.6667% 91.1765%);
-  --card: hsl(228 9.8039% 10%);
-  --card-foreground: hsl(0 0% 85.0980%);
-  --popover: hsl(0 0% 0%);
-  --popover-foreground: hsl(200 6.6667% 91.1765%);
-  --primary: hsl(217 91% 60%);
-  --primary-foreground: hsl(210 40% 98%);
-  --secondary: hsl(195.0000 15.3846% 94.9020%);
-  --secondary-foreground: hsl(222.2 84% 4.9%);
-  --muted: hsl(0 0% 9.4118%);
-  --muted-foreground: hsl(210 3.3898% 46.2745%);
-  --accent: hsl(228 9.8039% 10%);
-  --accent-foreground: hsl(200 6.6667% 91.1765%);
-  --destructive: hsl(0 84.2% 60.2%);
-  --destructive-foreground: hsl(210 40% 98%);
-  --border: hsl(210 5.2632% 14.9020%);
-  --input: hsl(207.6923 27.6596% 18.4314%);
-  --ring: hsl(217 91% 60%);
-  --sidebar: hsl(228 9.8039% 10%);
-  --sidebar-foreground: hsl(0 0% 85.0980%);
-  --sidebar-primary: hsl(217 91% 60%);
-  --sidebar-primary-foreground: hsl(210 40% 98%);
-  --sidebar-accent: hsl(228 9.8039% 10%);
-  --sidebar-accent-foreground: hsl(200 6.6667% 91.1765%);
-  --sidebar-border: hsl(210 5.2632% 14.9020%);
-  --sidebar-ring: hsl(217 91% 60%);
+  /* Dark Mode Premium - Optimisé pour réduire la fatigue oculaire */
+  --background: linear-gradient(135deg, hsl(224 71% 4%) 0%, hsl(223 47% 8%) 100%);
+  --background-solid: hsl(224 71% 4%);
+  --foreground: hsl(210 20% 98%);
+  
+  /* Cards avec profondeur subtile */
+  --card: hsl(224 71% 6%);
+  --card-foreground: hsl(210 20% 98%);
+  --card-shadow: 0 4px 20px hsla(0, 0%, 0%, 0.5);
+  --card-shadow-hover: 0 8px 30px hsla(0, 0%, 0%, 0.7);
+  
+  --popover: hsl(224 71% 6%);
+  --popover-foreground: hsl(210 20% 98%);
+  
+  /* Couleurs Drain Fortin adaptées au dark mode */
+  --primary: hsl(200 95% 55%); /* Bleu plus lumineux */
+  --primary-foreground: hsl(224 71% 4%);
+  --primary-hover: hsl(200 95% 60%);
+  --primary-gradient: linear-gradient(135deg, hsl(200 95% 55%) 0%, hsl(210 100% 60%) 100%);
+  
+  --secondary: hsl(25 95% 63%); /* Orange plus vibrant */
+  --secondary-foreground: hsl(224 71% 4%);
+  --secondary-hover: hsl(25 95% 68%);
+  
+  --muted: hsl(217 33% 17%);
+  --muted-foreground: hsl(215 20% 65%);
+  
+  --accent: hsl(161 84% 40%); /* Vert ajusté */
+  --accent-foreground: hsl(210 20% 98%);
+  --accent-hover: hsl(161 84% 45%);
+  
+  --destructive: hsl(0 72% 51%);
+  --destructive-foreground: hsl(210 20% 98%);
+  
+  /* Borders plus subtils en dark mode */
+  --border: hsl(217 33% 17%);
+  --border-hover: hsl(217 33% 22%);
+  --input: hsl(217 33% 17%);
+  --ring: hsl(200 95% 55%);
+  
+  /* Drain Fortin Dark Palette */
+  --drain-fortin-blue: hsl(200 95% 55%);
+  --drain-fortin-blue-dark: hsl(200 95% 45%);
+  --drain-fortin-orange: hsl(25 95% 63%);
+  --drain-fortin-orange-dark: hsl(25 95% 53%);
+  
+  /* Sidebar dark optimisé */
+  --sidebar: hsl(224 71% 5%);
+  --sidebar-foreground: hsl(210 20% 98%);
+  --sidebar-primary: hsl(200 95% 55%);
+  --sidebar-primary-foreground: hsl(224 71% 4%);
+  --sidebar-accent: hsl(224 71% 8%);
+  --sidebar-accent-foreground: hsl(210 20% 98%);
+  --sidebar-border: hsl(217 33% 17%);
+  --sidebar-ring: hsl(200 95% 55%);
 }
 
 @layer base {

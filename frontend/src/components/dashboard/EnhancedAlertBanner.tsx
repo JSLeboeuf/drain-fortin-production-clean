@@ -18,6 +18,8 @@ export default function EnhancedAlertBanner({
 
   // Show only the most critical alert
   const criticalAlert = alerts.find(alert => alert.severity === 'critical') || alerts[0];
+  
+  if (!criticalAlert) return null;
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {

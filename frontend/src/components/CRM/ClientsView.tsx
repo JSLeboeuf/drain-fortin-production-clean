@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Search, 
   Phone, 
   Mail, 
   MapPin, 
-  DollarSign, 
-  Calendar,
   User,
-  Filter,
   Plus,
   ChevronRight
 } from 'lucide-react';

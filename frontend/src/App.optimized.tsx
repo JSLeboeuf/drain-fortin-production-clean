@@ -46,6 +46,10 @@ const Constraints = lazy(() =>
   import(/* webpackChunkName: "constraints" */ './pages/Constraints')
 );
 
+const Monitoring = lazy(() => 
+  import(/* webpackChunkName: "monitoring" */ './pages/Monitoring')
+);
+
 // Preload critical routes on hover
 const preloadRoute = (routeName: string) => {
   switch(routeName) {
@@ -65,6 +69,9 @@ const preloadRoute = (routeName: string) => {
     case 'constraints':
       import('./pages/Constraints');
       break;
+    case 'monitoring':
+      import('./pages/Monitoring');
+      break;
   }
 };
 
@@ -72,7 +79,7 @@ const preloadRoute = (routeName: string) => {
 const PageLoader = () => (
   <div className="flex h-screen items-center justify-center bg-background">
     <div className="text-center space-y-4">
-      <LoadingSpinner size="large" />
+      <LoadingSpinner size="lg" />
       <p className="text-muted-foreground animate-pulse">Chargement...</p>
     </div>
   </div>
@@ -116,6 +123,13 @@ const Navigation = () => (
     >
       Contraintes
     </Link>
+    <Link 
+      href="/monitoring" 
+      onMouseEnter={() => preloadRoute('monitoring')}
+      className="hover:text-primary transition-colors"
+    >
+      Monitoring
+    </Link>
   </nav>
 );
 
@@ -134,6 +148,7 @@ function App() {
                 <Route path="/calls" component={Calls} />
                 <Route path="/settings" component={Settings} />
                 <Route path="/constraints" component={Constraints} />
+                <Route path="/monitoring" component={Monitoring} />
                 <Route>
                   <div className="flex h-screen items-center justify-center">
                     <div className="text-center">
@@ -149,7 +164,7 @@ function App() {
             </Suspense>
           </div>
           
-          {process.env.NODE_ENV === 'development' && (
+          {process.env['NODE_ENV'] === 'development' && (
             <ReactQueryDevtools initialIsOpen={false} />
           )}
         </ThemeProvider>
@@ -171,7 +186,7 @@ if (typeof window !== 'undefined') {
   // Preconnect to API
   const preconnect = document.createElement('link');
   preconnect.rel = 'preconnect';
-  preconnect.href = process.env.VITE_API_URL || 'http://localhost:8080';
+  preconnect.href = process.env['VITE_API_URL'] || 'http://localhost:8080';
   document.head.appendChild(preconnect);
 
   // Enable resource hints

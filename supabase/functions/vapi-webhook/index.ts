@@ -165,14 +165,197 @@ serve(async (req) => {
   }
 })
 
+// Send SMS via Brevo
+async function sendSMS(phone: string, message: string): Promise<boolean> {
+  if (!BREVO_API_KEY || BREVO_API_KEY === 'YOUR_BREVO_KEY_HERE') {
+    console.log('SMS would be sent to:', phone, message)
+    return true // Simulate success in development
+  }
+
+  try {
+    const response = await fetch('https://api.brevo.com/v3/transactionalSMS/sms', {
+      method: 'POST',
+      headers: {
+        'api-key': BREVO_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: 'DrainFortin',
+        recipient: phone,
+        content: message,
+        type: 'transactional'
+      })
+    })
+
+    return response.ok
+  } catch (error) {
+    console.error('SMS sending failed:', error)
+    return false
+  }
+}
+
 // Process tool calls
 async function processToolCalls(toolCalls: any[]): Promise<any> {
   const results = []
   
   for (const call of toolCalls) {
+    const args = call.function?.arguments || {}
+    
     switch (call.function?.name) {
+      case 'validateServiceRequest': {
+        const serviceType = args.serviceType
+        const acceptedServices = [
+          'debouchage', 'camera_inspection', 'racines_alesage', 
+          'gainage', 'drain_francais', 'installation_cheminee', 'sous_dalle'
+        ]
+        const rejectedServices = [
+          'fosses_septiques', 'piscines', 'goutieres', 
+          'vacuum_aspiration', 'puisard'
+        ]
+        
+        const isAccepted = acceptedServices.includes(serviceType)
+        const isRejected = rejectedServices.includes(serviceType)
+        
+        results.push({
+          toolCallId: call.id,
+          result: {
+            serviceAccepted: isAccepted,
+            serviceRejected: isRejected,
+            message: isAccepted 
+              ? `✅ Nous offrons ce service: ${serviceType}`
+              : isRejected 
+                ? `❌ Désolé, nous ne faisons pas: ${serviceType}`
+                : `❓ Service non reconnu: ${serviceType}`
+          }
+        })
+        break
+      }
+        
+      case 'calculateQuote': {
+        const { serviceType, location, urgency, complexity } = args
+        
+        // Base prices (minimum 350$)
+        const basePrices = {
+          'debouchage': { min: 350, max: 650 },
+          'camera_inspection': { min: 350, max: 350 },
+          'racines_alesage': { min: 450, max: 750 },
+          'gainage': { min: 350, max: 750 }, // First visit only
+          'drain_francais': { min: 500, max: 800 },
+          'installation_cheminee': { min: 2500, max: 2500 },
+          'sous_dalle': { min: 350, max: 1000 }
+        }
+        
+        const basePrice = basePrices[serviceType] || { min: 350, max: 500 }
+        let estimatedPrice = basePrice.min
+        
+        // Location adjustments
+        if (location === 'rive_sud') {
+          estimatedPrice += 100
+        }
+        
+        // Urgency surcharge
+        if (urgency) {
+          estimatedPrice += 75
+        }
+        
+        // Complexity adjustment
+        if (complexity === 'complex') {
+          estimatedPrice = Math.round(estimatedPrice * 1.3)
+        } else if (complexity === 'very_complex') {
+          estimatedPrice = Math.round(estimatedPrice * 1.6)
+        }
+        
+        const priceRange = {
+          min: Math.max(estimatedPrice, 350),
+          max: Math.max(Math.round(estimatedPrice * 1.5), basePrice.max)
+        }
+        
+        results.push({
+          toolCallId: call.id,
+          result: {
+            serviceType,
+            location,
+            basePrice: basePrice.min,
+            adjustments: {
+              riveSud: location === 'rive_sud' ? 100 : 0,
+              urgency: urgency ? 75 : 0,
+              complexity: complexity || 'standard'
+            },
+            estimatedPrice: priceRange,
+            message: `Estimation: ${priceRange.min}$ à ${priceRange.max}$ + taxes`,
+            note: 'Prix minimum 350$ + taxes pour tout déplacement'
+          }
+        })
+        break
+      }
+        
+      case 'sendSMSAlert': {
+        const { priority, customerInfo, recipient } = args
+        
+        // Determine SMS recipients
+        const smsTargets = []
+        if (recipient === 'guillaume' || recipient === 'both') {
+          smsTargets.push({
+            name: 'Guillaume',
+            phone: '+15145296037' // From .env
+          })
+        }
+        if ((recipient === 'maxime' || recipient === 'both') && 
+            customerInfo.serviceType === 'sous_dalle') {
+          smsTargets.push({
+            name: 'Maxime', 
+            phone: '+15146175425' // From .env
+          })
+        }
+        
+        // Format SMS message
+        const urgencyEmoji = { P1: '🚨', P2: '⚡', P3: '📞', P4: '📝' }
+        const smsMessage = `${urgencyEmoji[priority]} ${priority} - Drain Fortin\n` +
+          `Client: ${customerInfo.name}\n` +
+          `Tél: ${customerInfo.phone}\n` +
+          `Service: ${customerInfo.serviceType}\n` +
+          `Adresse: ${customerInfo.address || 'À confirmer'}\n` +
+          `Description: ${customerInfo.description || 'Voir appel'}`
+        
+        // Send SMS to targets
+        const smsResults = []
+        for (const target of smsTargets) {
+          const success = await sendSMS(target.phone, smsMessage)
+          smsResults.push({
+            recipient: target.name,
+            phone: target.phone,
+            success
+          })
+        }
+        
+        // Log to database
+        const { error } = await supabase
+          .from('sms_logs')
+          .insert({
+            priority,
+            customer_name: customerInfo.name,
+            customer_phone: customerInfo.phone,
+            service_type: customerInfo.serviceType,
+            message: smsMessage,
+            recipients: smsResults,
+            sent_at: new Date().toISOString()
+          })
+        
+        results.push({
+          toolCallId: call.id,
+          result: {
+            priority,
+            smsResults,
+            message: `SMS ${priority} envoyé à ${smsResults.length} destinataire(s)`,
+            success: smsResults.some(r => r.success),
+            dbLogged: !error
+          }
+        })
+        break
+      }
+      
+      // Legacy functions for backward compatibility
       case 'checkAvailability':
-        // Check availability in database
         const { data } = await supabase
           .from('availability')
           .select('*')
@@ -186,7 +369,6 @@ async function processToolCalls(toolCalls: any[]): Promise<any> {
         break
         
       case 'bookAppointment':
-        // Book appointment
         const { error } = await supabase
           .from('appointments')
           .insert(call.function.arguments)
@@ -200,7 +382,7 @@ async function processToolCalls(toolCalls: any[]): Promise<any> {
       default:
         results.push({
           toolCallId: call.id,
-          error: 'Unknown function'
+          error: `Unknown function: ${call.function?.name}`
         })
     }
   }

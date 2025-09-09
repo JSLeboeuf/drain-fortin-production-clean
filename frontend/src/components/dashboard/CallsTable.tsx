@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback } from "react";
+import { memo, useMemo, useCallback } from "react";
 import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -151,7 +151,7 @@ const CallsTable = memo<CallsTableProps>(function CallsTable({ calls, showAction
                 {getServiceFromMetadata(call.metadata)}
               </TableCell>
               <TableCell className="text-sm text-foreground" data-testid={`text-tag-${call.id}`}>
-                {call.metadata?.tag ?? call.metadata?.intent ?? "—"}
+                {call.metadata?.['tag'] ?? call.metadata?.['intent'] ?? "—"}
               </TableCell>
               {showActions && (
                 <TableCell>

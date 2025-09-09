@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback } from "react";
+import { memo, useMemo, useCallback } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -176,7 +176,7 @@ const CallsChart = memo<CallsChartProps>(function CallsChart({
         </div>
         
         {/* Performance metrics display in dev mode */}
-        {process.env.NODE_ENV === 'development' && (
+        {process.env['NODE_ENV'] === 'development' && (
           <div className="mt-2 text-xs text-muted-foreground">
             Data points: {processedData.length} | Timeframe: {timeframe}
           </div>

@@ -16,7 +16,6 @@ build/
 .env.*
 !.env.example
 !.env.example.secure
-!.env.test
 frontend/.env
 frontend/.env.*
 backend/.env
@@ -115,6 +114,17 @@ public
 # Temporary folders
 tmp/
 temp/
+scripts/
+reports/
+claudedocs/
+tests/
+.context7rc
+.cursorrules
+.claude-context
+context7-helper.js
+*.ps1
+*.debug
+nul
 
 # Editor directories and files
 !.vscode/extensions.json

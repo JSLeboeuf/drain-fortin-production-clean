@@ -39,16 +39,16 @@ class Logger {
   constructor(config?: Partial<LoggerConfig>) {
     this.config = {
       level: this.getEnvironmentLogLevel(),
-      enableConsole: import.meta.env.DEV || import.meta.env.VITE_ENABLE_DEBUG_MODE === 'true',
-      enableRemote: import.meta.env.PROD,
-      remoteEndpoint: import.meta.env.VITE_LOG_ENDPOINT,
+      enableConsole: import.meta.env['DEV'] || import.meta.env['VITE_ENABLE_DEBUG_MODE'] === 'true',
+      enableRemote: import.meta.env['PROD'],
+      remoteEndpoint: import.meta.env['VITE_LOG_ENDPOINT'],
       ...config
     };
   }
 
   private getEnvironmentLogLevel(): LogLevel {
-    if (import.meta.env.PROD) return LogLevel.WARN;
-    if (import.meta.env.VITE_ENABLE_DEBUG_MODE === 'true') return LogLevel.DEBUG;
+    if (import.meta.env['PROD']) return LogLevel.WARN;
+    if (import.meta.env['VITE_ENABLE_DEBUG_MODE'] === 'true') return LogLevel.DEBUG;
     return LogLevel.INFO;
   }
 
@@ -78,7 +78,7 @@ class Logger {
         message: error.message,
         stack: error.stack,
         name: error.name
-      } : error,
+      } as Record<string, any> : error,
       userId: this.getUserId(),
       sessionId: this.getSessionId(),
       requestId: this.getRequestId()
@@ -88,7 +88,8 @@ class Logger {
   private getUserId(): string | undefined {
     // Get from auth context or localStorage
     try {
-      return localStorage.getItem('userId') || undefined;
+      const userId = localStorage.getItem('userId');
+      return userId ?? undefined;
     } catch {
       return undefined;
     }

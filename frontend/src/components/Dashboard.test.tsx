@@ -314,10 +314,10 @@ describe('Dashboard Stress Tests', () => {
     expect(screen.getByText(/Interventions/i)).toBeInTheDocument();
   });
 
-  it('should handle memory efficiently with large updates', () => {
+  it('should handle memory efficiently with large updates', async () => {
     const initialMemory = performance.memory?.usedJSHeapSize || 0;
     
-    const Dashboard = (await import('@/components/Dashboard')).Dashboard;
+    const { Dashboard } = await import('@/components/Dashboard');
     const { unmount } = render(<Dashboard />, { wrapper: createWrapper() });
     
     unmount();

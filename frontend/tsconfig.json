@@ -51,7 +51,7 @@
     
     /* Type Roots */
     "typeRoots": ["node_modules/@types", "src/types"],
-    "types": ["vite/client", "node", "@testing-library/jest-dom"],
+    "types": ["node", "@testing-library/jest-dom"],
     
     /* Path Mapping */
     "baseUrl": ".",
@@ -77,9 +77,7 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.js",
-    "src/**/*.jsx",
-    "vite.config.ts",
-    "vitest.config.ts"
+    "src/**/*.jsx"
   ],
   
   "exclude": [

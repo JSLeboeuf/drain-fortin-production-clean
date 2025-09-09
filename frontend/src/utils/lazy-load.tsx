@@ -3,7 +3,7 @@
  * Optimize bundle size with intelligent code splitting
  */
 
-import { lazy, ComponentType, LazyExoticComponent } from 'react';
+import React, { lazy, ComponentType, LazyExoticComponent } from 'react';
 import { logger } from '@/lib/logger';
 
 // Retry mechanism for failed chunk loads

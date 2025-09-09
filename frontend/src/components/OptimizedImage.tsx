@@ -1,5 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useIntersectionObserver } from '@/hooks/usePerformance';
+import { useState, useEffect, useRef } from 'react';
+// Simple intersection observer hook
+function useIntersectionObserver(
+  elementRef: React.RefObject<Element>,
+  options?: IntersectionObserverInit
+) {
+  const [hasIntersected, setHasIntersected] = useState(false);
+
+  useEffect(() => {
+    const element = elementRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasIntersected(true);
+        }
+      },
+      options
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [elementRef, options]);
+
+  return { hasIntersected };
+}
 
 interface OptimizedImageProps {
   src: string;
@@ -17,7 +42,7 @@ interface OptimizedImageProps {
 }
 
 // Lazy loading image component with intersection observer
-export const OptimizedImage: React.FC<OptimizedImageProps> = React.memo(({
+export const OptimizedImage = ({
   src,
   alt,
   className = '',
@@ -30,7 +55,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = React.memo(({
   sizes,
   onLoad,
   onError,
-}) => {
+}: OptimizedImageProps) => {
   const [imageSrc, setImageSrc] = useState<string | undefined>(
     priority ? src : undefined
   );
@@ -147,9 +172,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = React.memo(({
       )}
     </div>
   );
-});
-
-OptimizedImage.displayName = 'OptimizedImage';
+};
 
 // Picture component for responsive images
 export const OptimizedPicture: React.FC<{
