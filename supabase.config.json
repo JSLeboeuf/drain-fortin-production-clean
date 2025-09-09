@@ -1,0 +1,36 @@
+{
+  "projectId": "your-project-id",
+  "projectRef": "your-project-ref",
+  "version": "1.0.1",
+  "environments": {
+    "development": {
+      "apiUrl": "http://localhost:54321",
+      "anonKey": "local-anon-key",
+      "serviceRoleKey": "local-service-role-key"
+    },
+    "staging": {
+      "apiUrl": "https://your-staging-project.supabase.co",
+      "anonKey": "staging-anon-key",
+      "serviceRoleKey": "staging-service-role-key"
+    },
+    "production": {
+      "apiUrl": "https://your-production-project.supabase.co",
+      "anonKey": "production-anon-key",
+      "serviceRoleKey": "production-service-role-key"
+    }
+  },
+  "functions": {
+    "vapi-webhook": {
+      "verify_jwt": false,
+      "import_map": "./functions/import_map.json"
+    },
+    "send-sms": {
+      "verify_jwt": false
+    }
+  },
+  "hosting": {
+    "provider": "supabase",
+    "cdn": true,
+    "domains": ["drainfortin.com", "www.drainfortin.com"]
+  }
+}

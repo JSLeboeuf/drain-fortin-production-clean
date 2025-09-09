@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
     // Dev proxy: forwards /api to backend origin to avoid CORS during local dev
     server: {
       headers: {
-        // Headers de sécurité pour le développement
+        // Headers de securite pour le developpement
         'X-Frame-Options': 'DENY',
         'X-Content-Type-Options': 'nosniff',
         'X-XSS-Protection': '1; mode=block',
@@ -59,7 +59,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      // Optimisations de sécurité pour la production
+      // Optimisations de securite pour la production
       sourcemap: mode === 'development', // Source maps uniquement en dev
       minify: 'terser',
       terserOptions: {
@@ -70,7 +70,7 @@ export default defineConfig(({ mode }) => {
           passes: 2, // Multiple compression passes
         },
         mangle: {
-          safari10: true, // Compatibilité Safari
+          safari10: true, // Compatibilite Safari
         },
       },
       rollupOptions: {
@@ -86,7 +86,7 @@ export default defineConfig(({ mode }) => {
             ? 'assets/[name]-[hash].[ext]'
             : 'assets/[name].[ext]'
         },
-        // Optimisations supplémentaires
+        // Optimisations supplementaires
         treeshake: {
           moduleSideEffects: false,
           preset: 'recommended', // Changed from 'smallest' for better balance
