@@ -20,7 +20,7 @@ import { logger } from '@/lib/logger';
 export interface Call {
   id: string;
   call_id: string;
-  phone_number: string;
+  customer_phone: string;
   started_at: string;
   ended_at?: string;
   duration?: number;
@@ -53,7 +53,7 @@ export interface CallFilter {
   dateFrom?: string;
   dateTo?: string;
   customerName?: string;
-  phoneNumber?: string;
+  customerPhone?: string;
 }
 
 // Repository Implementation
@@ -62,7 +62,7 @@ class CallsRepository extends BaseRepository<Call> {
     super('vapi_calls', `
       id,
       call_id,
-      phone_number,
+      customer_phone,
       started_at,
       ended_at,
       duration,
@@ -240,7 +240,7 @@ export class CallsService extends BaseService {
   private getValidationRules() {
     return [
       new RequiredFieldRule<Partial<Call>>('call_id', 'Call ID'),
-      new RequiredFieldRule<Partial<Call>>('phone_number', 'Phone Number'),
+      new RequiredFieldRule<Partial<Call>>('customer_phone', 'Customer Phone'),
       new RequiredFieldRule<Partial<Call>>('started_at', 'Start Time')
     ];
   }
@@ -398,7 +398,7 @@ export class CallsService extends BaseService {
       async () => {
         const filters = {
           ...options.filters,
-          or: `customer_name.ilike.%${query}%,phone_number.ilike.%${query}%,problem_description.ilike.%${query}%`
+          or: `customer_name.ilike.%${query}%,customer_phone.ilike.%${query}%,problem_description.ilike.%${query}%`
         };
 
         return await this.repository.findAll({
@@ -477,7 +477,7 @@ export class CallsService extends BaseService {
     const rows = calls.map(call => [
       call.id,
       call.call_id,
-      call.phone_number,
+      call.customer_phone,
       call.started_at,
       call.duration?.toString() || '',
       call.status,

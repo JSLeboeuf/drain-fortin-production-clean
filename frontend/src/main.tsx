@@ -5,6 +5,7 @@ import { logger } from "@/lib/logger";
 import "./mocks/no-outbound";
 import App from "./App";
 import "./index.css";
+import "./styles/enhanced-ui.css";
 
 // DEV-only preconnect to API origin for faster first call
 if (import.meta.env.DEV) {

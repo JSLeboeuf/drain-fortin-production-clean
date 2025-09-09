@@ -17,11 +17,19 @@
   "voice": {
     "provider": "11labs",
     "voiceId": "pNInz6obpgDQGcFmaJgB",
-    "stability": 0.5,
+    "model": "eleven_multilingual_v2",
+    "language": "fr-CA",
+    "stability": 0.65,
     "similarityBoost": 0.75,
     "useSpeakerBoost": true,
-    "optimizeStreamingLatency": 2,
-    "enableSsmlParsing": false
+    "optimizeStreamingLatency": 3,
+    "enableSsmlParsing": true,
+    "pronunciationRules": {
+      "numbers": "spell-out",
+      "currency": "full",
+      "telephone": "digits",
+      "email": "spell"
+    }
   },
   "firstMessage": "Bonjour! Ici Paul, agent virtuel de Drain Fortin. Comment puis-je vous aider aujourd’hui?",
   "firstMessageMode": "assistant-speaks-first",

@@ -33,7 +33,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 export interface VapiCall {
   id: string;
   call_id: string;
-  phone_number: string;
+  customer_phone: string;
   started_at: string;
   ended_at?: string;
   duration?: number;

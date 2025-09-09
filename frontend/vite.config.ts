@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
           "default-src 'self'",
           "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Dev needs unsafe-eval for HMR
           "style-src 'self' 'unsafe-inline'",
-          "connect-src 'self' ws: wss: http://localhost:* https://localhost:*",
+          "connect-src 'self' ws: wss: http://localhost:* https://localhost:* https://phiduqxcufdmgjvdipyu.supabase.co https://*.supabase.co",
           "img-src 'self' data: https:",
           "font-src 'self'",
           "object-src 'none'",

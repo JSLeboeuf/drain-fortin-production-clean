@@ -1,5 +1,5 @@
 # Supabase Project Configuration
-project_id = "your-project-ref"
+project_id = "phiduqxcufdmgjvdipyu"
 
 [api]
 enabled = true
@@ -59,6 +59,3 @@ port = 54324
 
 [analytics]
 enabled = false
-
-[dashboard]
-enabled = true

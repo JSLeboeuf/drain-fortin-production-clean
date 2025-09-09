@@ -11,6 +11,7 @@ import NetworkStatusBanner from "@/components/NetworkStatusBanner";
 import GlobalShortcuts from "@/components/GlobalShortcuts";
 import GlobalHelpOverlay from "@/components/GlobalHelpOverlay";
 import GlobalFab from "@/components/GlobalFab";
+import { RealtimeConnection } from "@/components/RealtimeConnection";
 
 // Route-based code splitting avec lazy loading
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -81,6 +82,7 @@ function App() {
           <GlobalHelpOverlay />
           <GlobalFab />
           <SkipLink />
+          <RealtimeConnection />
           <Toaster />
           <Suspense fallback={<Fallback />}>
             <Router />
