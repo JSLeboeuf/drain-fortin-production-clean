@@ -1,0 +1,75 @@
+name: Deploy to Production
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci --prefer-offline --no-audit
+        
+    - name: Run tests
+      run: |
+        cd frontend
+        npm run test:run
+        
+    - name: Type check
+      run: |
+        cd frontend
+        npm run type-check
+        
+    - name: Lint check
+      run: |
+        cd frontend
+        npm run lint
+        
+    - name: Build production
+      run: |
+        cd frontend
+        npm run build
+        
+    - name: Deploy to Vercel
+      if: github.event_name == 'release'
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      run: |
+        npm i -g vercel
+        cd frontend
+        vercel --prod --token=$VERCEL_TOKEN
+        
+    - name: Health check
+      if: github.event_name == 'release'
+      run: |
+        sleep 30
+        curl -f https://your-production-url.vercel.app/api/health || exit 1
+        
+    - name: Notify success
+      if: success()
+      run: |
+        echo "✅ Deployment successful for version ${{ github.ref_name }}"
+        
+    - name: Notify failure
+      if: failure()
+      run: |
+        echo "❌ Deployment failed for version ${{ github.ref_name }}"
