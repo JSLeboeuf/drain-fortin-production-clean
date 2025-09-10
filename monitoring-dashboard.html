@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drain Fortin - Tableau de Bord Temps Réel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo h1 {
+            color: var(--dark);
+            font-size: 28px;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: var(--light);
+            border-radius: 20px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.online {
+            background: var(--success);
+        }
+
+        .status-dot.warning {
+            background: var(--warning);
+        }
+
+        .status-dot.offline {
+            background: var(--danger);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-title {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .stat-change.negative {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Main Content Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Call Log */
+        .call-log {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.new {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .call-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: var(--light);
+            transition: all 0.3s;
+        }
+
+        .call-item:hover {
+            background: #e5e7eb;
+            transform: translateX(5px);
+        }
+
+        .call-time {
+            min-width: 60px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .call-info {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .call-name {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .call-details {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .call-status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .call-status.urgent {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .call-status.handled {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .call-status.pending {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        /* Agent Status */
+        .agent-status {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .agent-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: var(--light);
+        }
+
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .agent-info {
+            flex: 1;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .agent-activity {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .agent-badge {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .agent-badge.available {
+            background: var(--success);
+        }
+
+        .agent-badge.busy {
+            background: var(--warning);
+        }
+
+        .agent-badge.offline {
+            background: #9ca3af;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .chart {
+            height: 300px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 20px 0;
+        }
+
+        .chart-bar {
+            width: 40px;
+            background: linear-gradient(to top, #667eea, #764ba2);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+            transform: scaleY(1.05);
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .chart-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .status-bar {
+                width: 100%;
+                justify-content: space-around;
+            }
+        }
+
+        /* Animation for new items */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .new-item {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        /* Dark mode toggle */
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--white);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 24px;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🔧</div>
+                <div>
+                    <h1>Drain Fortin</h1>
+                    <p style="color: #6b7280; font-size: 14px;">Tableau de Bord en Temps Réel</p>
+                </div>
+            </div>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-dot online"></span>
+                    <span>Paul Actif</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-dot online"></span>
+                    <span>SMS OK</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-dot online"></span>
+                    <span>CRM Sync</span>
+                </div>
+                <div class="status-item" id="current-time">
+                    <span>🕐</span>
+                    <span id="time-display">14:32</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Appels Aujourd'hui</span>
+                    <div class="stat-icon" style="background: #dbeafe;">📞</div>
+                </div>
+                <div class="stat-value" id="calls-today">24</div>
+                <span class="stat-change positive">↑ 15% vs hier</span>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Urgences Traitées</span>
+                    <div class="stat-icon" style="background: #fee2e2;">🚨</div>
+                </div>
+                <div class="stat-value" id="emergencies">3</div>
+                <span class="stat-change positive">100% résolues</span>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Temps Réponse Moy.</span>
+                    <div class="stat-icon" style="background: #d1fae5;">⏱️</div>
+                </div>
+                <div class="stat-value" id="response-time">2.5<span style="font-size: 18px;">min</span></div>
+                <span class="stat-change positive">↓ 30% amélioration</span>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Revenus du Jour</span>
+                    <div class="stat-icon" style="background: #fef3c7;">💰</div>
+                </div>
+                <div class="stat-value" id="revenue">$3,450</div>
+                <span class="stat-change positive">↑ $850 vs moy.</span>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Taux Conversion</span>
+                    <div class="stat-icon" style="background: #ede9fe;">📊</div>
+                </div>
+                <div class="stat-value" id="conversion">87<span style="font-size: 18px;">%</span></div>
+                <span class="stat-change positive">Excellent!</span>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Call Log -->
+            <div class="call-log">
+                <div class="section-header">
+                    <h2 class="section-title">📞 Appels Récents</h2>
+                    <span class="badge new">3 nouveaux</span>
+                </div>
+                <div id="call-list">
+                    <div class="call-item new-item">
+                        <span class="call-time">14:32</span>
+                        <div class="call-info">
+                            <div class="call-name">Marie Tremblay</div>
+                            <div class="call-details">Évier bouché - Urgent</div>
+                        </div>
+                        <span class="call-status urgent">URGENT</span>
+                    </div>
+                    <div class="call-item">
+                        <span class="call-time">14:15</span>
+                        <div class="call-info">
+                            <div class="call-name">Jean Dubois</div>
+                            <div class="call-details">Demande estimation - Rénovation salle de bain</div>
+                        </div>
+                        <span class="call-status handled">TRAITÉ</span>
+                    </div>
+                    <div class="call-item">
+                        <span class="call-time">13:45</span>
+                        <div class="call-info">
+                            <div class="call-name">Sophie Martin</div>
+                            <div class="call-details">Inspection préventive - RDV demain 10h</div>
+                        </div>
+                        <span class="call-status handled">PLANIFIÉ</span>
+                    </div>
+                    <div class="call-item">
+                        <span class="call-time">13:20</span>
+                        <div class="call-info">
+                            <div class="call-name">Robert Gagnon</div>
+                            <div class="call-details">Fuite sous-sol - Technicien envoyé</div>
+                        </div>
+                        <span class="call-status handled">EN COURS</span>
+                    </div>
+                    <div class="call-item">
+                        <span class="call-time">12:50</span>
+                        <div class="call-info">
+                            <div class="call-name">Louise Bergeron</div>
+                            <div class="call-details">Question facturation - Résolue</div>
+                        </div>
+                        <span class="call-status handled">COMPLÉTÉ</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Status -->
+            <div class="agent-status">
+                <div class="section-header">
+                    <h2 class="section-title">👥 Statut Équipe</h2>
+                </div>
+                <div class="agent-item">
+                    <div class="agent-avatar">GF</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Guillaume Fortin</div>
+                        <div class="agent-activity">En ligne - Bureau</div>
+                    </div>
+                    <span class="agent-badge available"></span>
+                </div>
+                <div class="agent-item">
+                    <div class="agent-avatar">MT</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Marc (Technicien)</div>
+                        <div class="agent-activity">Sur appel - Mtl Nord</div>
+                    </div>
+                    <span class="agent-badge busy"></span>
+                </div>
+                <div class="agent-item">
+                    <div class="agent-avatar">PL</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Pierre (Technicien)</div>
+                        <div class="agent-activity">Disponible</div>
+                    </div>
+                    <span class="agent-badge available"></span>
+                </div>
+                <div class="agent-item">
+                    <div class="agent-avatar">SB</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Sarah (Bureau)</div>
+                        <div class="agent-activity">En pause</div>
+                    </div>
+                    <span class="agent-badge offline"></span>
+                </div>
+                <div class="agent-item" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="agent-avatar" style="background: white; color: #667eea;">🤖</div>
+                    <div class="agent-info">
+                        <div class="agent-name" style="color: white;">Paul v39</div>
+                        <div class="agent-activity" style="color: rgba(255,255,255,0.8);">24/7 - Toujours actif</div>
+                    </div>
+                    <span class="agent-badge" style="background: #10b981;"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-container">
+            <div class="section-header">
+                <h2 class="section-title">📊 Volume d'Appels - Derniers 7 Jours</h2>
+            </div>
+            <div class="chart">
+                <div class="chart-bar" style="height: 120px;">
+                    <span class="chart-value">18</span>
+                    <span class="chart-label">Lun</span>
+                </div>
+                <div class="chart-bar" style="height: 150px;">
+                    <span class="chart-value">22</span>
+                    <span class="chart-label">Mar</span>
+                </div>
+                <div class="chart-bar" style="height: 180px;">
+                    <span class="chart-value">28</span>
+                    <span class="chart-label">Mer</span>
+                </div>
+                <div class="chart-bar" style="height: 140px;">
+                    <span class="chart-value">20</span>
+                    <span class="chart-label">Jeu</span>
+                </div>
+                <div class="chart-bar" style="height: 200px;">
+                    <span class="chart-value">35</span>
+                    <span class="chart-label">Ven</span>
+                </div>
+                <div class="chart-bar" style="height: 100px;">
+                    <span class="chart-value">12</span>
+                    <span class="chart-label">Sam</span>
+                </div>
+                <div class="chart-bar" style="height: 160px; background: linear-gradient(to top, #10b981, #34d399);">
+                    <span class="chart-value">24</span>
+                    <span class="chart-label">Auj.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="refreshData()">
+                🔄 Rafraîchir
+            </button>
+            <button class="btn btn-primary" onclick="exportReport()">
+                📥 Exporter Rapport
+            </button>
+            <button class="btn btn-secondary" onclick="openSettings()">
+                ⚙️ Paramètres
+            </button>
+            <button class="btn btn-secondary" onclick="viewFullCRM()">
+                👥 Voir CRM Complet
+            </button>
+        </div>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <div class="dark-mode-toggle" onclick="toggleDarkMode()" title="Mode sombre">
+        🌙
+    </div>
+
+    <script>
+        // Update time every second
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('fr-CA', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.getElementById('time-display').textContent = timeString;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Simulate real-time updates
+        function simulateUpdate() {
+            // Update random stats
+            const calls = document.getElementById('calls-today');
+            const currentCalls = parseInt(calls.textContent);
+            if (Math.random() > 0.7) {
+                calls.textContent = currentCalls + 1;
+                addNewCall();
+            }
+
+            // Update response time
+            const responseTime = document.getElementById('response-time');
+            const newTime = (Math.random() * 2 + 1.5).toFixed(1);
+            responseTime.innerHTML = newTime + '<span style="font-size: 18px;">min</span>';
+
+            // Update revenue
+            const revenue = document.getElementById('revenue');
+            const currentRevenue = parseInt(revenue.textContent.replace('$', '').replace(',', ''));
+            if (Math.random() > 0.8) {
+                const newRevenue = currentRevenue + Math.floor(Math.random() * 500 + 100);
+                revenue.textContent = '$' + newRevenue.toLocaleString();
+            }
+        }
+
+        // Add new call to the list
+        function addNewCall() {
+            const names = ['Michel Lavoie', 'Caroline Dubé', 'François Pelletier', 'Diane Roy', 'Patrick Morin'];
+            const issues = ['Toilette bouchée', 'Fuite robinet', 'Drain lent', 'Inspection annuelle', 'Urgence sous-sol'];
+            const statuses = ['URGENT', 'PENDING', 'HANDLED'];
+            
+            const callList = document.getElementById('call-list');
+            const firstCall = callList.firstElementChild;
+            
+            const newCall = document.createElement('div');
+            newCall.className = 'call-item new-item';
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('fr-CA', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            const randomName = names[Math.floor(Math.random() * names.length)];
+            const randomIssue = issues[Math.floor(Math.random() * issues.length)];
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+            
+            newCall.innerHTML = `
+                <span class="call-time">${timeString}</span>
+                <div class="call-info">
+                    <div class="call-name">${randomName}</div>
+                    <div class="call-details">${randomIssue}</div>
+                </div>
+                <span class="call-status ${randomStatus.toLowerCase()}">${randomStatus}</span>
+            `;
+            
+            callList.insertBefore(newCall, firstCall);
+            
+            // Remove last call if too many
+            if (callList.children.length > 5) {
+                callList.removeChild(callList.lastElementChild);
+            }
+        }
+
+        // Auto refresh every 30 seconds
+        setInterval(simulateUpdate, 30000);
+
+        // Button functions
+        function refreshData() {
+            location.reload();
+        }
+
+        function exportReport() {
+            alert('📥 Rapport en cours de génération...\nIl sera envoyé à votre email dans quelques secondes!');
+        }
+
+        function openSettings() {
+            alert('⚙️ Redirection vers les paramètres...');
+            window.open('https://drainfortin.com/settings', '_blank');
+        }
+
+        function viewFullCRM() {
+            window.open('https://drainfortin.com/crm', '_blank');
+        }
+
+        function toggleDarkMode() {
+            alert('🌙 Mode sombre en développement!\nDisponible dans la prochaine mise à jour.');
+        }
+
+        // Add some life to the dashboard
+        setTimeout(() => {
+            simulateUpdate();
+        }, 5000);
+
+        // Show notification for new urgent calls
+        function showNotification() {
+            if (Notification.permission === 'granted') {
+                new Notification('🚨 Appel Urgent - Drain Fortin', {
+                    body: 'Nouveau client avec urgence!',
+                    icon: '🔧'
+                });
+            }
+        }
+
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    </script>
+</body>
+</html>

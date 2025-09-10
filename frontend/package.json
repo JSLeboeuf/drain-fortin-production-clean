@@ -10,10 +10,11 @@
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc -p tsconfig.optimized.json --noEmit",
     "analyze": "vite build --mode analyze"
   },
   "dependencies": {
+    "@sentry/replay": "^10.10.0",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-select": "^2.2.6",
@@ -40,10 +41,17 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "axe-core": "^4.10.0",
+    "web-vitals": "^4.2.4",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-security": "^3.0.1",
+    "eslint-plugin-unicorn": "^54.0.0",
     "@playwright/test": "^1.47.2",
     "@tanstack/react-query-devtools": "^5.87.3",
     "@testing-library/jest-dom": "^6.8.0",
-    "@types/jest": "^30.0.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.15.0",

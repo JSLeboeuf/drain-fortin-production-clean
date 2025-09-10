@@ -175,3 +175,9 @@ public/workbox-*.js
 # Commitlint
 .commitlintrc
 .vercel
+UsersUtilisateurSuperClaude_Framework_GitHub/
+__audit_drain_fortin_repo__/
+docs/reference/openai-*/
+final-repo-v2/
+ultra-repo-v3/
+.cursor/

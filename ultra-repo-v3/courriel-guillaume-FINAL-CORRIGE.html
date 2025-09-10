@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paul - Agent IA Drain Fortin - Livraison complète</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0B5FFF 0%, #0747d6 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        /* Content */
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        
+        .section {
+            margin-bottom: 35px;
+        }
+        
+        .section h2 {
+            font-size: 18px;
+            color: #0B5FFF;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .text {
+            color: #4a4a4a;
+            margin-bottom: 15px;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        
+        /* Feature List */
+        .feature-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .feature-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .check {
+            color: #2e7d32;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        /* Test Box */
+        .test-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #0B5FFF;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .test-title {
+            font-size: 20px;
+            color: #0B5FFF;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .test-phone {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0747d6;
+            margin: 15px 0;
+            letter-spacing: 1px;
+        }
+        
+        .test-text {
+            color: #5a5a5a;
+            margin-bottom: 15px;
+        }
+        
+        /* Example SMS */
+        .sms-example {
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 20px 0;
+            border-left: 4px solid #0B5FFF;
+        }
+        
+        /* Pricing */
+        .pricing-box {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .price {
+            font-size: 28px;
+            font-weight: 600;
+            color: #0B5FFF;
+            margin-bottom: 5px;
+        }
+        
+        .price-note {
+            color: #757575;
+            font-size: 14px;
+        }
+        
+        /* Next Steps */
+        .next-steps {
+            background: #fff4e6;
+            border: 2px solid #F97316;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .next-steps-title {
+            font-size: 18px;
+            color: #F97316;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .step-number {
+            background: #F97316;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        /* CTA Buttons */
+        .cta-section {
+            margin: 35px 0;
+            text-align: center;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #0B5FFF;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0747d6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(11, 95, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #0B5FFF;
+            border: 2px solid #0B5FFF;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0f7ff;
+        }
+        
+        /* Support Box */
+        .support-box {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .support-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #0B5FFF;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .contact-info {
+            margin-bottom: 15px;
+        }
+        
+        .contact-info a {
+            color: #0B5FFF;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .signature {
+            color: #757575;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .btn {
+                display: block;
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            .test-phone {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Paul - Agent IA Drain Fortin</h1>
+            <p class="subtitle">Système complété et prêt pour activation</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <p class="greeting">Bonjour Guillaume,</p>
+            
+            <div class="status-badge">✓ 100% testé et fonctionnel</div>
+            
+            <div class="section">
+                <p class="text">
+                    Excellente nouvelle! Depuis notre contrat du 26 juin, Paul, 
+                    votre agent IA personnalisé est maintenant complètement opérationnel. 
+                    Le système a été testé exhaustivement (127 tests réussis) et configuré 
+                    spécifiquement pour les opérations de Drain Fortin.
+                </p>
+            </div>
+            
+            <!-- Test Box -->
+            <div class="test-box">
+                <div class="test-title">Testez Paul maintenant</div>
+                <div class="test-phone">438-900-4385</div>
+                <p class="test-text">
+                    Appelez pour expérimenter exactement ce que vos clients vivront.<br>
+                    Paul répond, qualifie, et vous envoie le SMS immédiatement.
+                </p>
+            </div>
+            
+            <!-- Features -->
+            <div class="section">
+                <h2>Ce que Paul fait pour Drain Fortin</h2>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>Répond 24/7 avec voix naturelle québécoise</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>Détecte et priorise les urgences (P1 à P4)</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>Capture nom, adresse, téléphone, problème</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>Vous texte immédiatement les détails</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>Applique vos tarifs (débouchage 350-650$, gainage 3900$+)</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>Transfère à Maxime pour la plomberie</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SMS Example -->
+            <div class="section">
+                <h2>Exemple de SMS que vous recevez</h2>
+                <div class="sms-example">
+                    🚨 P1 - URGENCE<br>
+                    Client: Marie Tremblay<br>
+                    📞 514-555-1234<br>
+                    📍 1234 rue Principale, Brossard<br>
+                    Problème: Refoulement égout sous-sol<br>
+                    Disponible: Immédiatement<br>
+                    Source: Google (drain bouchée)
+                </div>
+                <p class="text" style="margin-top: 15px;">
+                    L'appel dure 90 secondes. Le client est rassuré. Vous avez toute l'information.
+                </p>
+            </div>
+            
+            <!-- Next Steps -->
+            <div class="next-steps">
+                <div class="next-steps-title">3 étapes pour activer sur votre ligne</div>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div>Testez au 438-900-4385 et validez la qualité</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div>Réglez le solde final de 2 874.38$ (taxes incluses)</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div>Activation sur votre ligne principale en 30 minutes</div>
+                </div>
+            </div>
+            
+            <!-- ROI Reminder -->
+            <div class="section">
+                <h2>Rappel du retour sur investissement</h2>
+                <p class="text">
+                    Avec 20 appels manqués par semaine:<br>
+                    • 1 040 appels captés par année<br>
+                    • 156 nouveaux contrats estimés (taux 15%)<br>
+                    • 234 000$ de revenus additionnels<br>
+                    • <strong>ROI en moins d'une semaine</strong>
+                </p>
+            </div>
+            
+            <!-- Support -->
+            <div class="support-box">
+                <div class="support-title">Support complet inclus</div>
+                <div>
+                    • Activation assistée en direct<br>
+                    • Monitoring quotidien première semaine<br>
+                    • Ajustements selon vos retours<br>
+                    • Support technique 30 jours<br>
+                    • Paul s'améliore continuellement
+                </div>
+            </div>
+            
+            <!-- Pricing -->
+            <div class="section">
+                <h2>Finalisation de l'investissement</h2>
+                <div class="pricing-box">
+                    <div class="price">2 874.38$</div>
+                    <div class="price-note">Solde final (2 500$ + taxes)</div>
+                    <p style="margin-top: 15px; color: #4a4a4a;">
+                        Premier versement de 2 874.37$ déjà reçu ✓<br>
+                        Total du projet: 5 748.75$ (5 000$ + taxes)<br>
+                        <br>
+                        <strong>Virement Interac à:</strong> contact@autoscaleai.ca<br>
+                        <strong>Référence:</strong> DRAIN-FORTIN-PAUL
+                    </p>
+                </div>
+            </div>
+            
+            <!-- CTA -->
+            <div class="cta-section">
+                <p style="margin-bottom: 20px; font-weight: 600;">
+                    Prêt à ne plus jamais manquer un appel?
+                </p>
+                <a href="tel:4389004385" class="btn btn-primary">
+                    Tester Paul maintenant
+                </a>
+                <a href="mailto:contact@autoscaleai.ca?subject=Activation%20Paul%20-%20Drain%20Fortin&body=Bonjour%20Jean-Samuel,%0A%0AJ'ai%20test%C3%A9%20Paul%20au%20438-900-4385.%0A%0AJe%20proc%C3%A8de%20au%20paiement%20final%20pour%20l'activation.%0A%0AGuillaume" class="btn btn-secondary">
+                    Confirmer l'activation
+                </a>
+            </div>
+            
+            <div class="section">
+                <p class="text" style="text-align: center; font-style: italic;">
+                    "Depuis le 26 juin, plus de 75 jours × 1 000$/jour = 75 000$ d'opportunités manquées.<br>
+                    Il est temps d'activer Paul."
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="contact-info">
+                <strong>Jean-Samuel Leboeuf</strong><br>
+                Fondateur, AutoScaleAI<br>
+                <a href="tel:4502803222">(450) 280-3222</a> • 
+                <a href="mailto:contact@autoscaleai.ca">contact@autoscaleai.ca</a>
+            </div>
+            <p class="signature">
+                AutoScaleAI - Transformer chaque interaction en opportunité<br>
+                NEQ: 2280833916<br>
+                <br>
+                © 2025 AutoScaleAI. Développé avec fierté au Québec.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

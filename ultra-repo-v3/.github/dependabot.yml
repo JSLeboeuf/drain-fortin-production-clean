@@ -1,0 +1,123 @@
+# Dependabot configuration for automated dependency updates
+version: 2
+updates:
+  # Frontend (Node.js/npm) dependencies
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "drain-fortin-team"
+    assignees:
+      - "drain-fortin-maintainer"
+    commit-message:
+      prefix: "chore(frontend)"
+      prefix-development: "chore(frontend-dev)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "automated"
+    milestone: "Dependencies Update"
+    versioning-strategy: increase
+    rebase-strategy: auto
+    # Group related updates together
+    groups:
+      react-ecosystem:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      radix-ui:
+        patterns:
+          - "@radix-ui/*"
+      testing:
+        patterns:
+          - "@testing-library/*"
+          - "vitest*"
+          - "@vitest/*"
+          - "playwright*"
+      build-tools:
+        patterns:
+          - "vite*"
+          - "@vitejs/*"
+          - "typescript*"
+          - "eslint*"
+          - "prettier*"
+      supabase:
+        patterns:
+          - "@supabase/*"
+          - "supabase*"
+    # Ignore specific packages that need manual review
+    ignore:
+      - dependency-name: "react"
+        versions: ["> 18.x"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "10:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "drain-fortin-team"
+    assignees:
+      - "drain-fortin-maintainer"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "ci/cd"
+    # Group GitHub Actions updates
+    groups:
+      actions-core:
+        patterns:
+          - "actions/*"
+      docker-actions:
+        patterns:
+          - "docker/*"
+      security-actions:
+        patterns:
+          - "github/codeql-action"
+          - "aquasecurity/*"
+          - "snyk/*"
+
+  # Docker dependencies
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "11:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 2
+    reviewers:
+      - "drain-fortin-team"
+    assignees:
+      - "drain-fortin-maintainer"
+    commit-message:
+      prefix: "chore(docker)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "infrastructure"
+    # Only patch and minor updates for base images
+    ignore:
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
+
+# Enable Dependabot security updates for all ecosystems
+# This is configured at the repository level through GitHub Settings

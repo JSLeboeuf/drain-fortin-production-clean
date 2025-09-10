@@ -1,0 +1,519 @@
+/* 📱 MOBILE OPTIMIZATION - WCAG AAA COMPLIANT */
+
+/* ============================================
+   TOUCH TARGETS - 48x48px MINIMUM
+   ============================================ */
+
+/* Tous les éléments interactifs */
+button,
+a,
+input[type="checkbox"],
+input[type="radio"],
+select,
+textarea,
+[role="button"],
+[role="link"],
+[tabindex]:not([tabindex="-1"]) {
+  position: relative;
+  min-height: 48px;
+  min-width: 48px;
+  /* Padding pour centrer le contenu */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Zone tactile étendue invisible */
+button::before,
+a::before,
+[role="button"]::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100%, 48px);
+  height: max(100%, 48px);
+  /* Zone tactile invisible mais active */
+  z-index: 1;
+  pointer-events: auto;
+}
+
+/* Espacement entre éléments tactiles */
+.touch-spacing > * + * {
+  margin-top: 8px; /* Minimum 8px entre targets */
+}
+
+/* ============================================
+   MOBILE VIEWPORT OPTIMIZATION
+   ============================================ */
+
+/* Prevent horizontal scroll */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Safe areas for notched devices */
+.safe-area-inset {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ============================================
+   RESPONSIVE TYPOGRAPHY
+   ============================================ */
+
+/* Fluid typography scaling */
+:root {
+  --font-size-xs: clamp(0.75rem, 2vw, 0.875rem);
+  --font-size-sm: clamp(0.875rem, 2.5vw, 1rem);
+  --font-size-base: clamp(1rem, 3vw, 1.125rem);
+  --font-size-lg: clamp(1.125rem, 3.5vw, 1.25rem);
+  --font-size-xl: clamp(1.25rem, 4vw, 1.5rem);
+  --font-size-2xl: clamp(1.5rem, 5vw, 2rem);
+  --font-size-3xl: clamp(1.875rem, 6vw, 2.5rem);
+}
+
+/* Apply fluid typography */
+body {
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+}
+
+h1 { font-size: var(--font-size-3xl); }
+h2 { font-size: var(--font-size-2xl); }
+h3 { font-size: var(--font-size-xl); }
+h4 { font-size: var(--font-size-lg); }
+
+/* ============================================
+   MOBILE NAVIGATION
+   ============================================ */
+
+/* Bottom navigation for thumb reach */
+.mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  z-index: 1000;
+  /* Safe area for iPhone X+ */
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.mobile-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  min-height: 56px; /* Larger touch target */
+  color: #6b7280;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.mobile-nav-item.active {
+  color: #0066cc;
+}
+
+.mobile-nav-item:active {
+  background: rgba(0, 102, 204, 0.1);
+  transform: scale(0.95);
+}
+
+/* ============================================
+   MOBILE FORMS
+   ============================================ */
+
+/* Large, touchable inputs */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="url"],
+textarea,
+select {
+  width: 100%;
+  min-height: 56px;
+  padding: 16px;
+  font-size: 16px; /* Prevents zoom on iOS */
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s;
+  -webkit-appearance: none; /* Remove iOS styling */
+}
+
+/* Focus state with visible outline */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 3px solid #0066cc;
+  outline-offset: 2px;
+  border-color: #0066cc;
+}
+
+/* Checkbox and radio improvements */
+input[type="checkbox"],
+input[type="radio"] {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+/* Label association for larger touch target */
+label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ============================================
+   MOBILE CARDS & LISTS
+   ============================================ */
+
+/* Swipeable cards */
+.swipeable-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.swipeable-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* List items with proper spacing */
+.mobile-list-item {
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.2s;
+}
+
+.mobile-list-item:active {
+  background: #f9fafb;
+}
+
+/* ============================================
+   MOBILE MODALS & SHEETS
+   ============================================ */
+
+/* Bottom sheet (mobile-friendly modal) */
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 24px 24px 0 0;
+  padding: 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 9999;
+}
+
+.bottom-sheet.open {
+  transform: translateY(0);
+}
+
+/* Drag handle */
+.bottom-sheet::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 4px;
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+/* ============================================
+   MOBILE BUTTONS
+   ============================================ */
+
+/* Primary action button */
+.btn-mobile-primary {
+  width: 100%;
+  min-height: 56px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #0066cc, #0052a3);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-mobile-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-mobile-primary::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+}
+
+.btn-mobile-primary:active::after {
+  width: 200px;
+  height: 200px;
+}
+
+/* Floating action button */
+.fab {
+  position: fixed;
+  bottom: 80px; /* Above bottom nav */
+  right: 16px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #0066cc;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 999;
+}
+
+.fab:active {
+  transform: scale(0.9);
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.4);
+}
+
+/* ============================================
+   MOBILE TABLES
+   ============================================ */
+
+/* Responsive table wrapper */
+.mobile-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+
+/* Card-based table for mobile */
+@media (max-width: 768px) {
+  .mobile-table {
+    display: block;
+  }
+  
+  .mobile-table thead {
+    display: none;
+  }
+  
+  .mobile-table tbody {
+    display: block;
+  }
+  
+  .mobile-table tr {
+    display: block;
+    margin-bottom: 16px;
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .mobile-table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .mobile-table td:last-child {
+    border-bottom: none;
+  }
+  
+  .mobile-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #6b7280;
+  }
+}
+
+/* ============================================
+   MOBILE PERFORMANCE
+   ============================================ */
+
+/* Hardware acceleration for smooth scrolling */
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+}
+
+/* Optimize animations for mobile */
+@media (max-width: 768px) {
+  * {
+    /* Reduce animation duration on mobile */
+    animation-duration: 0.2s !important;
+    transition-duration: 0.2s !important;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   MOBILE LOADING STATES
+   ============================================ */
+
+/* Skeleton loading optimized for mobile */
+.skeleton-mobile {
+  background: linear-gradient(
+    90deg,
+    #f3f4f6 25%,
+    #e5e7eb 50%,
+    #f3f4f6 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-mobile 1.5s infinite;
+  border-radius: 8px;
+  min-height: 48px;
+}
+
+@keyframes shimmer-mobile {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Pull to refresh indicator */
+.pull-to-refresh {
+  position: fixed;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: top 0.3s;
+  z-index: 9999;
+}
+
+.pull-to-refresh.visible {
+  top: 20px;
+}
+
+/* ============================================
+   MOBILE UTILITIES
+   ============================================ */
+
+/* Hide on mobile */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Show only on mobile */
+.show-mobile {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .show-mobile {
+    display: block !important;
+  }
+}
+
+/* Thumb-friendly spacing */
+.thumb-zone {
+  padding-bottom: 100px; /* Space for thumb reach */
+}
+
+/* Disable text selection on interactive elements */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================
+   DARK MODE MOBILE OPTIMIZATIONS
+   ============================================ */
+
+@media (prefers-color-scheme: dark) {
+  .mobile-nav {
+    background: #1f2937;
+    border-top-color: #374151;
+  }
+  
+  .mobile-nav-item {
+    color: #9ca3af;
+  }
+  
+  .mobile-nav-item.active {
+    color: #60a5fa;
+  }
+  
+  .swipeable-card,
+  .bottom-sheet {
+    background: #1f2937;
+    color: #f3f4f6;
+  }
+  
+  input,
+  textarea,
+  select {
+    background: #111827;
+    border-color: #374151;
+    color: #f3f4f6;
+  }
+}

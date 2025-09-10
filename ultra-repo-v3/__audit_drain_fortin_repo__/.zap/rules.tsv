@@ -1,0 +1,66 @@
+# ZAP Security Scan Rules for Drain Fortin Production
+# Format: IGNORE|FAIL|WARN|INFO	<rule_id>	<url_pattern>	<param>	<other>
+
+# Ignore rules for specific false positives
+IGNORE	10021	*	# X-Content-Type-Options Header Missing (handled by Vercel)
+IGNORE	10020	*	# X-Frame-Options Header Scanner (handled by Vercel)
+IGNORE	10016	*	# Web Browser XSS Protection Not Enabled (handled by CSP)
+
+# Information disclosure rules
+WARN	10010	*	# Cookie No HttpOnly Flag
+WARN	10011	*	# Cookie Without Secure Flag
+INFO	10015	*	# Incomplete or No Cache-control Header Set
+INFO	10017	*	# Cross-Domain JavaScript Source File Inclusion
+
+# Security headers
+FAIL	10035	*	# Strict-Transport-Security Header Missing
+FAIL	10038	*	# Content Security Policy (CSP) Header Missing
+WARN	10020	*	# X-Frame-Options Header Missing
+
+# Application specific rules
+IGNORE	40012	*/health	# Cross Domain Script Inclusion (health check endpoint)
+IGNORE	40014	*/api/*	# HTTP Parameter Override (API endpoints)
+IGNORE	10054	*/static/*	# Cookie without SameSite Attribute (static assets)
+
+# SQL Injection rules
+FAIL	40018	*	# SQL Injection
+FAIL	40019	*	# SQL Injection - MySQL
+FAIL	40020	*	# SQL Injection - Hypersonic SQL
+FAIL	40021	*	# SQL Injection - Oracle
+FAIL	40022	*	# SQL Injection - PostgreSQL
+
+# XSS rules
+FAIL	40012	*	# Cross Site Scripting (Reflected)
+FAIL	40014	*	# Cross Site Scripting (Persistent)
+FAIL	40016	*	# Cross Site Scripting (DOM Based)
+FAIL	40017	*	# Cross Site Scripting (Persistent) - Prime
+
+# Authentication and session management
+WARN	10040	*	# Secure Pages Include Mixed Content
+WARN	10041	*	# HTTP to HTTPS Insecure Transition in Form Post
+WARN	10042	*	# HTTPS to HTTP Insecure Transition in Form Post
+FAIL	10043	*	# User Controllable HTML Element Attribute (Potential XSS)
+
+# Directory traversal and file inclusion
+FAIL	6	*	# Path Traversal
+FAIL	7	*	# Remote File Inclusion
+
+# Information leakage
+INFO	10025	*	# Information Disclosure - Debug Error Messages
+INFO	10023	*	# Information Disclosure - Database Error Messages
+WARN	10024	*	# Information Disclosure - Sensitive Information in URL
+
+# Server configuration
+WARN	10049	*	# Non-Storable Content
+INFO	10108	*	# Reverse Tabnabbing
+WARN	90020	*	# Missing Anti-clickjacking Header
+
+# API specific rules
+IGNORE	90033	*/api/health	# Loosely Scoped Cookie (health endpoint)
+WARN	90034	*/api/*	# Cloud Metadata Attack
+FAIL	90035	*/api/*	# Server Side Template Injection
+
+# Third-party integrations
+IGNORE	10202	*vapi.ai*	# Absence of Anti-CSRF Tokens (external service)
+IGNORE	10202	*supabase.co*	# Absence of Anti-CSRF Tokens (external service)
+IGNORE	10202	*vercel.app*	# Absence of Anti-CSRF Tokens (external service)

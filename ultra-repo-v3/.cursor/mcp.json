@@ -1,0 +1,65 @@
+{
+  "mcpServers": {
+    "fs": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
+      "env": {
+        "ROOT": "."
+      }
+    },
+    "context7": {
+      "command": "node",
+      "args": ["servers/context7/server.mjs"],
+      "env": {
+        "CONTEXT7_DIR": "docs"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-github@latest"],
+      "env": {
+        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}",
+        "GITHUB_API_URL": "https://api.github.com"
+      }
+    },
+    "database": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-database@latest"],
+      "env": {
+        "DATABASE_URL": "${env:DATABASE_URL}",
+        "DB_SSL": "true"
+      }
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-slack@latest"],
+      "env": {
+        "SLACK_BOT_TOKEN": "${env:SLACK_BOT_TOKEN}",
+        "SLACK_APP_TOKEN": "${env:SLACK_APP_TOKEN}"
+      }
+    },
+    "docker": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-docker@latest"]
+    },
+    "brightdata": {
+      "command": "node",
+      "args": ["servers/brightdata/server.mjs"],
+      "env": {
+        "BRIGHTDATA_API_TOKEN": "${env:BRIGHTDATA_API_TOKEN}"
+      }
+    },
+    "zencoder": {
+      "command": "node",
+      "args": ["servers/zencoder/server.mjs"],
+      "env": {
+        "ZENCODER_API_KEY": "${env:ZENCODER_API_KEY}",
+        "ZENCODER_BASE_URL": "https://app.zencoder.com/api/v2"
+      }
+    }
+  }
+}

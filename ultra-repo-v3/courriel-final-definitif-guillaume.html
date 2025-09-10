@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paul v39 - Système amélioré prêt pour Drain Fortin</title>
+    <style>
+        body {
+            font-family: -apple-system, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            line-height: 1.7;
+            color: #2c3e50;
+        }
+        .email {
+            max-width: 650px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .subtitle {
+            margin-top: 10px;
+            opacity: 0.95;
+            font-size: 15px;
+        }
+        .content {
+            padding: 35px 30px;
+        }
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .acknowledgment-box {
+            background: #f8f9fa;
+            border-left: 4px solid #6c757d;
+            padding: 18px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        .bonus-section {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .bonus-section h3 {
+            margin-top: 0;
+            color: #2e7d32;
+            font-size: 18px;
+        }
+        .bonus-item {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(76,175,80,0.2);
+            font-size: 15px;
+        }
+        .bonus-item:last-child {
+            border: none;
+        }
+        .bonus-item strong {
+            color: #1b5e20;
+        }
+        .test-cta {
+            background: #e3f2fd;
+            border: 2px solid #1976d2;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .phone-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1565c0;
+            margin: 15px 0;
+            letter-spacing: 1px;
+        }
+        .test-instruction {
+            font-size: 14px;
+            color: #424242;
+        }
+        .roi-box {
+            background: #fff8e1;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .roi-box h3 {
+            margin-top: 0;
+            color: #f57c00;
+            font-size: 18px;
+        }
+        .roi-calculation {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+        .roi-result {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e65100;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .included-features {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 25px 0;
+        }
+        .included-features h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        .feature-check {
+            padding: 8px 0;
+            font-size: 15px;
+        }
+        .feature-check::before {
+            content: "✓";
+            color: #4caf50;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .activation-steps {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 25px 0;
+        }
+        .activation-steps h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        .step-item {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            font-size: 15px;
+        }
+        .step-item::before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            color: #1976d2;
+            font-weight: bold;
+        }
+        .compensation-box {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 6px;
+        }
+        .compensation-box h3 {
+            margin-top: 0;
+            color: #2e7d32;
+            font-size: 16px;
+        }
+        .payment-section {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .payment-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        .price {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 15px 0;
+        }
+        .payment-terms {
+            font-size: 14px;
+            color: #616161;
+            margin-top: 10px;
+        }
+        .guarantee {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 25px 0;
+            transition: background 0.3s;
+        }
+        .cta-button:hover {
+            background: #45a049;
+        }
+        .ps-section {
+            background: #f1f8ff;
+            border-left: 4px solid #1976d2;
+            padding: 20px;
+            margin: 30px 0;
+            font-style: italic;
+            color: #1565c0;
+        }
+        .footer {
+            background: #fafafa;
+            padding: 25px 30px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            color: #616161;
+            font-size: 14px;
+        }
+        .contact-info {
+            margin-top: 15px;
+            line-height: 1.8;
+        }
+        .contact-info a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="email">
+        <div class="header">
+            <h1>Paul v39 - Système amélioré et prêt</h1>
+            <div class="subtitle">Plus puissant que prévu grâce aux 8 semaines de développement</div>
+        </div>
+
+        <div class="content">
+            <p class="greeting">Guillaume,</p>
+            
+            <div class="acknowledgment-box">
+                <strong>Oui, ça a pris 8 semaines au lieu de 3.</strong><br>
+                Mais ces 5 semaines supplémentaires ont permis d'ajouter des améliorations majeures qui n'étaient pas dans le plan initial. Vous allez voir que l'attente en valait la peine.
+            </div>
+
+            <div class="bonus-section">
+                <h3>🎁 Bonus ajoutés pendant les 8 semaines (valeur 4,500$) :</h3>
+                <div class="bonus-item">
+                    <strong>Voice AI Multilingual V2</strong><br>
+                    Technologie vocale dernière génération (sortie en août) vs version basique prévue
+                </div>
+                <div class="bonus-item">
+                    <strong>Dashboard analytique complet</strong><br>
+                    Tableaux de bord temps réel avec métriques avancées (non prévu initialement)
+                </div>
+                <div class="bonus-item">
+                    <strong>Système SMS intelligent P1-P4</strong><br>
+                    Priorisation automatique et dispatch aux bons techniciens
+                </div>
+                <div class="bonus-item">
+                    <strong>Base de données clients complète</strong><br>
+                    Historique, préférences et suivi automatique des interventions
+                </div>
+                <div class="bonus-item">
+                    <strong>156 règles métier Drain Fortin</strong><br>
+                    Paul connaît TOUS vos services, prix et processus par cœur
+                </div>
+                <div class="bonus-item">
+                    <strong>Infrastructure Supabase Pro</strong><br>
+                    Hébergement professionnel haute disponibilité (vs basique)
+                </div>
+            </div>
+
+            <div class="test-cta">
+                <strong>Testez Paul maintenant - Il est opérationnel :</strong>
+                <div class="phone-number">438-900-4385</div>
+                <p class="test-instruction">
+                    Appelez comme un client. Mentionnez n'importe quel problème de drain.<br>
+                    Paul gère tout : urgence, prix, rendez-vous, SMS aux techniciens.
+                </p>
+            </div>
+
+            <div class="roi-box">
+                <h3>💰 Pourquoi c'est un NO-BRAINER comme investissement :</h3>
+                <div class="roi-calculation">
+                    <strong>Vos chiffres actuels :</strong><br>
+                    • 20 appels manqués par semaine (minimum)<br>
+                    • Valeur moyenne par job : 650$<br>
+                    • Taux de conversion conservateur : 10%<br>
+                    <br>
+                    <strong>Calcul simple :</strong><br>
+                    20 appels × 52 semaines × 650$ × 10% = <strong>67,600$/année</strong><br>
+                    <br>
+                    <strong>Réalité terrain (nos autres clients) :</strong><br>
+                    Taux de conversion réel : 20-25% = <strong>135,000-170,000$/année</strong>
+                </div>
+                <div class="roi-result">
+                    Paul se paie en 2 SEMAINES<br>
+                    puis génère 67,000$+ par année
+                </div>
+            </div>
+
+            <div class="included-features">
+                <h3>Ce qui est 100% fonctionnel maintenant :</h3>
+                <div class="feature-check">Répond 24/7/365 (jamais malade, jamais en vacances)</div>
+                <div class="feature-check">Voix québécoise indistinguable d'un humain</div>
+                <div class="feature-check">Qualifie les urgences et dispatch automatiquement</div>
+                <div class="feature-check">Prend les infos clients complètes</div>
+                <div class="feature-check">Envoie SMS aux techniciens selon priorité</div>
+                <div class="feature-check">Dashboard pour voir tous les appels/leads</div>
+                <div class="feature-check">Zéro formation nécessaire - Paul sait déjà tout</div>
+            </div>
+
+            <div class="activation-steps">
+                <h3>Activation sur vos lignes (15 minutes chrono) :</h3>
+                <div class="step-item" data-step="1.">Vous testez le 438-900-4385 maintenant</div>
+                <div class="step-item" data-step="2.">Vous me confirmez "C'est bon, on y va"</div>
+                <div class="step-item" data-step="3.">Je route vos numéros vers Paul</div>
+                <div class="step-item" data-step="4.">On teste ensemble en direct</div>
+                <div class="step-item" data-step="5.">Paul commence à convertir vos appels manqués en $$</div>
+            </div>
+
+            <div class="compensation-box">
+                <h3>Pour compenser les 5 semaines de délai :</h3>
+                • <strong>3 mois de support Premium gratuit</strong> (valeur 750$)<br>
+                • <strong>Ajustements illimités</strong> pendant 60 jours<br>
+                • <strong>Formation complète de votre équipe</strong> incluse<br>
+                • <strong>Priorité absolue</strong> pour toute demande
+            </div>
+
+            <div class="payment-section">
+                <h3>Investment final :</h3>
+                <div class="price">2,874.38$</div>
+                <div class="payment-terms">
+                    <strong>Options de paiement :</strong><br>
+                    • Virement Interac : contact@autoscaleai.ca<br>
+                    • Paiement après validation que Paul fonctionne<br>
+                    • Possibilité 2 versements si préféré
+                </div>
+                <div class="guarantee">
+                    <strong>🛡️ Garantie 30 jours :</strong> Si Paul ne performe pas comme promis, remboursement complet. Aucun risque pour vous.
+                </div>
+            </div>
+
+            <center>
+                <a href="mailto:contact@autoscaleai.ca?subject=Go%20-%20Activez%20Paul&body=Jean-Samuel,%0A%0AJ'ai%20testé%20Paul.%20C'est%20bon,%20on%20active.%0A%0AMes%20numéros%20:%0A1.%20514-XXX-XXXX%0A2.%20514-XXX-XXXX%0A%0AJe%20procède%20au%20paiement.%0A%0AGuillaume" class="cta-button">
+                    ACTIVER PAUL MAINTENANT →
+                </a>
+            </center>
+
+            <div class="ps-section">
+                <strong>P.S. Important :</strong> Pendant que vous lisez ce message, vos compétiteurs répondent à des clients que vous pourriez servir. Depuis juin, c'est environ 1,600 appels manqués × 650$ × 10% = 104,000$ d'opportunités perdues. Chaque jour compte. Testez Paul maintenant au 438-900-4385, et si vous êtes satisfait, on l'active aujourd'hui même.
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>
+                <strong>Jean-Samuel Leboeuf</strong><br>
+                Fondateur, AutoScaleAI
+            </div>
+            <div class="contact-info">
+                📞 Direct : <a href="tel:4502803222">(450) 280-3222</a><br>
+                ✉️ Email : <a href="mailto:contact@autoscaleai.ca">contact@autoscaleai.ca</a><br>
+                💬 Texto : 450-280-3222 (réponse en 5 min)
+            </div>
+        </div>
+    </div>
+</body>
+</html>

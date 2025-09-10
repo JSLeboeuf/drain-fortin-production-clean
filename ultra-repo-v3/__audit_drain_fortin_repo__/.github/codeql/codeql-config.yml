@@ -1,0 +1,67 @@
+# CodeQL configuration for Drain Fortin Production
+name: "CodeQL Config for Drain Fortin"
+
+# Disable default queries and use custom query suites
+disable-default-queries: false
+
+# Additional query suites to run
+queries:
+  - name: security-extended
+    uses: security-extended
+  - name: security-and-quality
+    uses: security-and-quality
+
+# Custom queries for specific technologies
+query-filters:
+  - exclude:
+      id: js/angular/disabling-sce
+  - include:
+      id: js/sql-injection
+  - include:
+      id: js/xss
+  - include:
+      id: js/prototype-pollution
+  - include:
+      id: js/zip-bomb
+
+# Path filtering
+paths:
+  - "frontend/src"
+  - "backend/supabase/functions"
+
+paths-ignore:
+  - "node_modules"
+  - "dist"
+  - "build"
+  - "coverage"
+  - "*.test.ts"
+  - "*.test.tsx"
+  - "*.spec.ts"
+  - "*.spec.tsx"
+  - "test-utils"
+  - "__tests__"
+  - "__mocks__"
+
+# Build configuration for JavaScript/TypeScript
+build:
+  commands:
+    - "cd frontend && npm ci && npm run build"
+
+# Database configuration (if needed)
+database:
+  # Use default database location
+  location: "databases"
+
+# Analysis configuration
+analysis:
+  # Languages to analyze
+  languages:
+    - javascript
+    - typescript
+  
+  # Exclude certain patterns
+  exclude:
+    - "**/*.min.js"
+    - "**/*.bundle.js"
+    - "**/vendor/**"
+    - "**/third-party/**"

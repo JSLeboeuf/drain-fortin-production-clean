@@ -5,9 +5,15 @@
     "test:coverage": "npm --prefix backend run test:coverage",
     "validate": "npm --prefix backend run test:coverage",
     "vapi:inspect": "node scripts/vapi-inspect.js",
-    "vapi:assistants": "node scripts/vapi-inspect.js"
+    "vapi:assistants": "node scripts/vapi-inspect.js",
+    "outlook:deploy": "node scripts/deploy-outlook.js",
+    "outlook:test": "node scripts/test-outlook.js",
+    "outlook:auth": "node scripts/outlook-auth.js",
+    "outlook:sync": "node scripts/outlook-sync.js",
+    "outlook:monitor": "node scripts/outlook-monitor.js"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.5",
     "@supabase/supabase-js": "^2.57.2",
     "axios": "^1.11.0",
     "colors": "^1.4.0",

@@ -1,0 +1,736 @@
+﻿{
+  "root": "C:\\Users\\Utilisateur\\AI-Projects\\nexus\\drain-fortin-production-clean\\docs",
+  "query": "Guillaume",
+  "results": [
+    {
+      "file": "reports\\AGENTS.md",
+      "line": 3,
+      "text": "This repository powers ÔÇ£Paul v39ÔÇØ, the voice AI receptionist for Drain Fortin, built on a SuperClaudeÔÇæstyle multiÔÇæagent architecture. Keep changes minimal, tested, and compliant with GuillaumeÔÇÖs 156 real constraints."
+    },
+    {
+      "file": "reports\\AGENTS.md",
+      "line": 9,
+      "text": "- `04-DOCUMENTATION/` Contraintes (lire `GUILLAUME-CONSTRAINTS-COMPLETE-REFERENCE.md`)."
+    },
+    {
+      "file": "reports\\PR.md",
+      "line": 4,
+      "text": "Renforcement complet du backend VAPI (webhook, services, DB, s├®curit├®, DevOps) pour atteindre la conformit├® avec les 156 contraintes Guillaume et lÔÇÖarchitecture multiÔÇæagents. Corrections critiques: s├®curit├® HMAC + antiÔÇæreplay, CORS strict, JSONÔÇæonly, alignement DB (call_duration, tool_calls), routage SLA par env, SMS dans `sms_messages`, rate limiting durable (PostgreSQL), nettoyage Docker/monitor"
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 1,
+      "text": "# ­ƒô× Simulation d'Appel - Guillaume (450-280-3222)"
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 3,
+      "text": "## ­ƒÄ¡ Sc├®nario: Guillaume appelle pour une urgence"
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 5,
+      "text": "### 1´©ÅÔâú Guillaume compose le +1 (514) 529-6037"
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 9,
+      "text": "**Guillaume**: \"Oui bonjour, j'ai de l'eau qui remonte dans mon sous-sol!\""
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 15,
+      "text": "**Guillaume**: \"Je suis au 123 rue Principale ├á Brossard\""
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 32,
+      "text": "### 4´©ÅÔâú SMS automatique envoy├® ├á Guillaume"
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 46,
+      "text": "**Paul**: \"Parfait M. Guillaume! J'ai dispatch├® notre technicien Marc Tremblay. Il sera chez vous dans maximum 30 minutes. Vous allez recevoir un SMS de confirmation au 450-280-3222. Le prix pour un d├®bouchage d'urgence est entre 350$ et 650$ plus taxes, avec un suppl├®ment de 100$ pour la Rive-Sud.\""
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 54,
+      "text": "- ­ƒô▒ Client: Guillaume (450-280-3222)"
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 76,
+      "text": "Merci Guillaume!"
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 103,
+      "text": "## ­ƒôè Ce que Guillaume voit/re├ºoit"
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 113,
+      "text": "**Pour activer les SMS r├®els ├á Guillaume (450-280-3222)**:"
+    },
+    {
+      "file": "reports\\VALIDATION-ULTRATHINK-GUILLAUME.md",
+      "line": 157,
+      "text": "## ­ƒÄ» POINTS D'ATTENTION POUR GUILLAUME"
+    }
+  ]
+}
+{
+  "root": "C:\\Users\\Utilisateur\\AI-Projects\\nexus\\drain-fortin-production-clean\\docs",
+  "query": "exigences",
+  "results": []
+}
+{
+  "root": "C:\\Users\\Utilisateur\\AI-Projects\\nexus\\drain-fortin-production-clean\\docs",
+  "query": "promesse",
+  "results": []
+}
+{
+  "root": "C:\\Users\\Utilisateur\\AI-Projects\\nexus\\drain-fortin-production-clean\\docs",
+  "query": "conditions",
+  "results": [
+    {
+      "file": "reference\\openai-codex\\.github\\codex\\labels\\codex-rust-review.md",
+      "line": 127,
+      "text": "- Do not use `unsafe` (unless you have a really, really good reason like using an operating system API directly and no safe wrapper exists). For example, there are cases where it is tempting to use `unsafe` in order to use `std::env::set_var()`, but this indeed `unsafe` and has led to race conditions on multiple occasions. (When this happens, find a mechanism other than environment variables to us"
+    },
+    {
+      "file": "reference\\openai-openapi-manual_spec\\openapi.yaml",
+      "line": 8258,
+      "text": "          description: Error response for various conditions."
+    },
+    {
+      "file": "reference\\openai-openapi-manual_spec\\openapi.yaml",
+      "line": 8646,
+      "text": "          description: Error response for various conditions."
+    },
+    {
+      "file": "reference\\openai-openapi-manual_spec\\openapi.yaml",
+      "line": 9005,
+      "text": "          description: Error response for various conditions."
+    },
+    {
+      "file": "reference\\openai-openapi-manual_spec\\openapi.yaml",
+      "line": 9113,
+      "text": "          description: Error response for various conditions."
+    },
+    {
+      "file": "reference\\openai-openapi-manual_spec\\openapi.yaml",
+      "line": 9167,
+      "text": "          description: Error response for various conditions."
+    },
+    {
+      "file": "reports\\PRODUCTION_AUDIT_REPORT.md",
+      "line": 261,
+      "text": "### Conditions pour GO:"
+    },
+    {
+      "file": "reports\\TEST-QUALITY-REPORT-ULTRATHINK.md",
+      "line": 200,
+      "text": "#### Conditions pour Production"
+    }
+  ]
+}
+{
+  "root": "C:\\Users\\Utilisateur\\AI-Projects\\nexus\\drain-fortin-production-clean\\docs",
+  "query": "paiement",
+  "results": [
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 284,
+      "text": "| PCI DSS | ÔØî Non applicable | Si paiements |"
+    },
+    {
+      "file": "reports\\EXEMPLE-SMS.md",
+      "line": 71,
+      "text": "Paiement: Interac/Carte/Ch├¿que"
+    },
+    {
+      "file": "reports\\TEST-GUILLAUME-SIMULATION.md",
+      "line": 75,
+      "text": "Paiement: Interac/Carte"
+    }
+  ]
+}
+{
+  "root": "C:\\Users\\Utilisateur\\AI-Projects\\nexus\\drain-fortin-production-clean\\docs",
+  "query": "livraison",
+  "results": []
+}
+{
+  "root": "C:\\Users\\Utilisateur\\AI-Projects\\nexus\\drain-fortin-production-clean\\docs",
+  "query": "├®tat actuel",
+  "results": [
+    {
+      "file": "reports\\BRANCH_ANALYSIS_REPORT.md",
+      "line": 54,
+      "text": "# Sauvegarder l'├®tat actuel"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 388,
+      "text": "Le syst├¿me **n'est pas pr├¬t pour la production** dans son ├®tat actuel. Les risques de s├®curit├® et l'absence de tests repr├®sentent des dangers critiques. "
+    },
+    {
+      "file": "reports\\DEPLOYMENT.md",
+      "line": 12,
+      "text": "## ­ƒÄ» ├ëtat Actuel"
+    },
+    {
+      "file": "reports\\GITHUB-ULTRATHINK-ANALYSIS.md",
+      "line": 245,
+      "text": "#### ├ëtat Actuel"
+    },
+    {
+      "file": "reports\\PRODUCTION_AUDIT_REPORT.md",
+      "line": 259,
+      "text": "**Le syst├¿me N'EST PAS pr├¬t pour la production dans l'├®tat actuel.**"
+    },
+    {
+      "file": "reports\\RAPPORT-COMPLET-AMELIORATIONS.md",
+      "line": 12,
+      "text": "### ├ëtat Actuel"
+    },
+    {
+      "file": "reports\\RAPPORT-COMPLET-AMELIORATIONS.md",
+      "line": 140,
+      "text": "**├ëtat actuel**: Monolithique avec couplage fort"
+    },
+    {
+      "file": "reports\\SECURITY_AUDIT.md",
+      "line": 483,
+      "text": "**├ëtat actuel**: CRITIQUE - Non s├®curis├® pour la production"
+    }
+  ]
+}
+{
+  "root": "C:\\Users\\Utilisateur\\AI-Projects\\nexus\\drain-fortin-production-clean\\docs",
+  "query": "etat actuel",
+  "results": []
+}
+{
+  "root": "C:\\Users\\Utilisateur\\AI-Projects\\nexus\\drain-fortin-production-clean\\docs",
+  "query": "compensation",
+  "results": []
+}
+{
+  "root": "C:\\Users\\Utilisateur\\AI-Projects\\nexus\\drain-fortin-production-clean\\docs",
+  "query": "tests",
+  "results": [
+    {
+      "file": "reference\\cookbook\\EXTRAIT-PROJET-DRAIN-FORTIN.md",
+      "line": 19,
+      "text": "- D├®terminisme relatif: lorsque pertinent, fixer `seed` (si API supporte) pour tests; sinon snapshots/goldens."
+    },
+    {
+      "file": "reference\\cookbook\\EXTRAIT-PROJET-DRAIN-FORTIN.md",
+      "line": 20,
+      "text": "  - Lier ├á: tests Vitest (frontend/backend) et rapports de v├®rification."
+    },
+    {
+      "file": "reference\\cookbook\\EXTRAIT-PROJET-DRAIN-FORTIN.md",
+      "line": 49,
+      "text": "## ├ëvaluation & Tests"
+    },
+    {
+      "file": "reference\\cookbook\\EXTRAIT-PROJET-DRAIN-FORTIN.md",
+      "line": 51,
+      "text": "- Tests de bout en bout (latences, erreurs r├®seau, reconnections WebSocket)."
+    },
+    {
+      "file": "reference\\cookbook\\EXTRAIT-PROJET-DRAIN-FORTIN.md",
+      "line": 52,
+      "text": "  - Lier ├á: `backend` Vitest (83 tests ok), `frontend` Vitest/E2E (├á r├®parer), scripts `test-e2e-production.js`."
+    },
+    {
+      "file": "reference\\cookbook\\EXTRAIT-PROJET-DRAIN-FORTIN.md",
+      "line": 80,
+      "text": "- [ ] D├®gradation propre si WS indisponible (├á valider via tests)"
+    },
+    {
+      "file": "reference\\cookbook\\EXTRAIT-PROJET-DRAIN-FORTIN.md",
+      "line": 85,
+      "text": "- [ ] Tests frontend passent (corriger imports manquants, Sentry imports)"
+    },
+    {
+      "file": "reference\\cookbook\\EXTRAIT-PROJET-DRAIN-FORTIN.md",
+      "line": 97,
+      "text": "- [ ] Tests goldens prompts/r├®ponses critiques (├á mettre en place)"
+    },
+    {
+      "file": "reference\\openai-codex\\.github\\codex\\labels\\codex-rust-review.md",
+      "line": 23,
+      "text": "## Assertions in Tests"
+    },
+    {
+      "file": "reference\\openai-codex\\.github\\codex\\labels\\codex-rust-review.md",
+      "line": 27,
+      "text": "Note that unit tests also function as \"executable documentation.\" As shown in the following example, \"piecemeal comparisons\" are often more verbose, provide less coverage, and are not as useful as executable documentation."
+    },
+    {
+      "file": "reference\\openai-codex\\.github\\workflows\\rust-ci.yml",
+      "line": 166,
+      "text": "        run: cargo clippy --target ${{ matrix.target }} --all-features --tests --profile ${{ matrix.profile }} -- -D warnings"
+    },
+    {
+      "file": "reference\\openai-codex\\.github\\workflows\\rust-ci.yml",
+      "line": 186,
+      "text": "      - name: tests"
+    },
+    {
+      "file": "reference\\openai-codex\\.github\\workflows\\rust-ci.yml",
+      "line": 188,
+      "text": "        # Tests take too long for release builds to run them on every PR."
+    },
+    {
+      "file": "reference\\openai-codex\\AGENTS.md",
+      "line": 8,
+      "text": "  - You operate in a sandbox where `CODEX_SANDBOX_NETWORK_DISABLED=1` will be set whenever you use the `shell` tool. Any existing code that uses `CODEX_SANDBOX_NETWORK_DISABLED_ENV_VAR` was authored with this fact in mind. It is often used to early exit out of tests that the author knew you would not be able to run given your sandbox limitations."
+    },
+    {
+      "file": "reference\\openai-codex\\AGENTS.md",
+      "line": 9,
+      "text": "  - Similarly, when you spawn a process using Seatbelt (`/usr/bin/sandbox-exec`), `CODEX_SANDBOX=seatbelt` will be set on the child process. Integration tests that want to run Seatbelt themselves cannot be run under Seatbelt, so checks for `CODEX_SANDBOX=seatbelt` are also often used to early exit out of tests, as appropriate."
+    },
+    {
+      "file": "reference\\openai-codex\\AGENTS.md",
+      "line": 11,
+      "text": "Run `just fmt` (in `codex-rs` directory) automatically after making Rust code changes; do not ask for approval to run it. Before finalizing a change to `codex-rs`, run `just fix -p <project>` (in `codex-rs` directory) to fix any linter issues in the code. Prefer scoping with `-p` to avoid slow workspaceÔÇæwide Clippy builds; only run `just fix` without `-p` if you changed shared crates. Additionally"
+    },
+    {
+      "file": "reference\\openai-codex\\AGENTS.md",
+      "line": 14,
+      "text": "When running interactively, ask the user before running `just fix` to finalize. `just fmt` does not require approval. project-specific or individual tests can be run without asking the user, but do ask the user before running the complete test suite."
+    },
+    {
+      "file": "reference\\openai-codex\\AGENTS.md",
+      "line": 46,
+      "text": "## Tests"
+    },
+    {
+      "file": "reference\\openai-codex\\AGENTS.md",
+      "line": 48,
+      "text": "### Snapshot tests"
+    },
+    {
+      "file": "reference\\openai-codex\\AGENTS.md",
+      "line": 50,
+      "text": "This repo uses snapshot tests (via `insta`), especially in `codex-rs/tui`, to validate rendered output. When UI or text output changes intentionally, update the snapshots as follows:"
+    },
+    {
+      "file": "reference\\openai-codex\\AGENTS.md",
+      "line": 52,
+      "text": "- Run tests to generate any updated snapshots:"
+    },
+    {
+      "file": "reference\\openai-codex\\AGENTS.md",
+      "line": 66,
+      "text": "- Tests should use pretty_assertions::assert_eq for clearer diffs. Import this at the top of the test module if it isn't already."
+    },
+    {
+      "file": "reference\\openai-codex\\codex-cli\\README.md",
+      "line": 276,
+      "text": "| 3   | `codex \"Write unit tests for utils/date.ts\"`                                    | Generates tests, executes them, and iterates until they pass.              |"
+    },
+    {
+      "file": "reference\\openai-codex\\codex-cli\\README.md",
+      "line": 556,
+      "text": "- We use **Vitest** for unit tests, **ESLint** + **Prettier** for style, and **TypeScript** for type-checking."
+    },
+    {
+      "file": "reference\\openai-codex\\codex-cli\\README.md",
+      "line": 564,
+      "text": "- **Pre-push hook**: Runs tests and type checking before pushing to the remote"
+    },
+    {
+      "file": "reference\\openai-codex\\codex-cli\\README.md",
+      "line": 566,
+      "text": "These hooks help maintain code quality and prevent pushing code with failing tests. For more details, see [HUSKY.md](./HUSKY.md)."
+    },
+    {
+      "file": "reference\\openai-codex\\codex-cli\\README.md",
+      "line": 581,
+      "text": "# Watch mode (tests rerun on change)"
+    },
+    {
+      "file": "reference\\openai-codex\\codex-cli\\README.md",
+      "line": 604,
+      "text": "2. **Add or update tests.** Every new feature or bug-fix should come with test coverage that fails before your change and passes afterwards. 100% coverage is not required, but aim for meaningful assertions."
+    },
+    {
+      "file": "reference\\openai-codex\\codex-cli\\README.md",
+      "line": 606,
+      "text": "4. **Keep commits atomic.** Each commit should compile and the tests should pass. This makes reviews and potential rollbacks easier."
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\core\\prompt.md",
+      "line": 44,
+      "text": "- ÔÇ£Next, IÔÇÖll patch the config and update the related tests.ÔÇØ"
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\core\\prompt.md",
+      "line": 138,
+      "text": "- Do not attempt to fix unrelated bugs or broken tests. It is not your responsibility to fix them. (You may mention them to the user in your final message though.)"
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\core\\prompt.md",
+      "line": 169,
+      "text": "- **never**: This is a non-interactive mode where you may NEVER ask the user for approval to run commands. Instead, you must always persist and work around constraints to solve the task for the user. You MUST do your utmost best to finish the task and validate your work before yielding. If this mode is pared with `danger-full-access`, take advantage of it to deliver the best outcome for the user. "
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\core\\prompt.md",
+      "line": 173,
+      "text": "- You need to run a command that writes to a directory that requires it (e.g. running tests that write to /tmp)"
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\core\\prompt.md",
+      "line": 186,
+      "text": "If the codebase has tests or the ability to build or run, consider using them to verify that your work is complete. "
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\core\\prompt.md",
+      "line": 188,
+      "text": "When testing, your philosophy should be to start as specific as possible to the code you changed so that you can catch issues efficiently, then make your way to broader tests as you build confidence. If there's no test for the code you changed, and if the adjacent patterns in the codebases show that there's a logical place for you to add a test, you may do so. However, do not add tests to codebase"
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\core\\prompt.md",
+      "line": 196,
+      "text": "- When running in non-interactive approval modes like **never** or **on-failure**, proactively run tests, lint and do whatever you need to ensure you've completed the task."
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\core\\prompt.md",
+      "line": 197,
+      "text": "- When working in interactive approval modes like **untrusted**, or **on-request**, hold off on running tests or lint commands until the user is ready for you to finalize your output, because these commands take time to run and slow down iteration. Instead suggest what you want to do next, and let the user confirm first."
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\core\\prompt.md",
+      "line": 198,
+      "text": "- When working on test-related tasks, such as adding tests, fixing tests, or reproducing a bug to verify behavior, you may proactively run tests regardless of approval mode. Use your judgement to decide whether this is a test-related task."
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\core\\prompt.md",
+      "line": 224,
+      "text": "If there's something that you think you could help with as a logical next step, concisely ask the user if they want you to do so. Good examples of this are running tests, committing changes, or building out the next logical component. If thereÔÇÖs something that you couldn't do (even with approval) but that the user might want to do (such as verifying changes by running the app), include those instr"
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\core\\prompt.md",
+      "line": 267,
+      "text": "- Use present tense and active voice (e.g., ÔÇ£Runs testsÔÇØ not ÔÇ£This will run testsÔÇØ)."
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\execpolicy\\README.md",
+      "line": 87,
+      "text": "The integrity of `default.policy` is verified [via unit tests](./tests)."
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\tui\\prompt_for_init_command.md",
+      "line": 18,
+      "text": "- Outline the project structure, including where the source code, tests, and assets are located."
+    },
+    {
+      "file": "reference\\openai-codex\\codex-rs\\tui\\prompt_for_init_command.md",
+      "line": 33,
+      "text": "- State test naming conventions and how to run tests."
+    },
+    {
+      "file": "reference\\openai-codex\\docs\\contributing.md",
+      "line": 20,
+      "text": "2. **Add or update tests.** Every new feature or bug-fix should come with test coverage that fails before your change and passes afterwards. 100% coverage is not required, but aim for meaningful assertions."
+    },
+    {
+      "file": "reference\\openai-codex\\docs\\contributing.md",
+      "line": 22,
+      "text": "4. **Keep commits atomic.** Each commit should compile and the tests should pass. This makes reviews and potential rollbacks easier."
+    },
+    {
+      "file": "reference\\openai-codex\\docs\\contributing.md",
+      "line": 27,
+      "text": "- Run **all** checks locally (`cargo test && cargo clippy --tests && cargo fmt -- --config imports_granularity=Item`). CI failures that could have been caught locally slow down the process."
+    },
+    {
+      "file": "reference\\openai-codex\\docs\\getting-started.md",
+      "line": 51,
+      "text": "| 3   | `codex \"Write unit tests for utils/date.ts\"`                                    | Generates tests, executes them, and iterates until they pass.              |"
+    },
+    {
+      "file": "reference\\openai-codex\\docs\\install.md",
+      "line": 36,
+      "text": "cargo clippy --tests"
+    },
+    {
+      "file": "reference\\openai-codex\\docs\\install.md",
+      "line": 38,
+      "text": "# Run the tests."
+    },
+    {
+      "file": "reference\\openai-openapi-manual_spec\\openapi.yaml",
+      "line": 23986,
+      "text": "                description: Number of tests passed for this criteria."
+    },
+    {
+      "file": "reference\\openai-openapi-manual_spec\\openapi.yaml",
+      "line": 23989,
+      "text": "                description: Number of tests failed for this criteria."
+    },
+    {
+      "file": "reports\\AGENTS.md",
+      "line": 10,
+      "text": "- `05-TESTS/` Sc├®narios + E2E (Playwright/Node)."
+    },
+    {
+      "file": "reports\\AGENTS.md",
+      "line": 17,
+      "text": "- Unit/Integration tests: `make test`."
+    },
+    {
+      "file": "reports\\AGENTS.md",
+      "line": 19,
+      "text": "- Constraints validators: `node 05-TESTS/validate-210-constraints.js`."
+    },
+    {
+      "file": "reports\\AGENTS.md",
+      "line": 20,
+      "text": "- E2E complete: `node 05-TESTS/test-paul-v39-complete.js`."
+    },
+    {
+      "file": "reports\\AGENTS.md",
+      "line": 31,
+      "text": "- Frameworks: Node tests + Playwright E2E."
+    },
+    {
+      "file": "reports\\AGENTS.md",
+      "line": 33,
+      "text": "- Fichiers de test: `05-TESTS/*.spec.ts|js` (ex.: `test-paul-v39-complete.js`)."
+    },
+    {
+      "file": "reports\\AGENTS.md",
+      "line": 39,
+      "text": "- NÔÇÖouvrez pas de PR sans tests/validators passants et docs mises ├á jour si n├®cessaire."
+    },
+    {
+      "file": "reports\\AGENTS.md",
+      "line": 48,
+      "text": "- Validez localement: `node 05-TESTS/validate-210-constraints.js` et E2E avant changements majeurs."
+    },
+    {
+      "file": "reports\\BRANCH-SYNC-REPORT.md",
+      "line": 61,
+      "text": "- Tests et s├®curit├® (migrations SQL, validations)"
+    },
+    {
+      "file": "reports\\BRANCH-SYNC-REPORT.md",
+      "line": 85,
+      "text": "### Tests Effectu├®s:"
+    },
+    {
+      "file": "reports\\BRANCH_ANALYSIS_REPORT.md",
+      "line": 182,
+      "text": "run_tests() {"
+    },
+    {
+      "file": "reports\\BRANCH_ANALYSIS_REPORT.md",
+      "line": 183,
+      "text": "    log \"­ƒº¬ Running tests...\""
+    },
+    {
+      "file": "reports\\BRANCH_ANALYSIS_REPORT.md",
+      "line": 184,
+      "text": "    npm run test || { log \"ÔØî Tests failed\"; return 1; }"
+    },
+    {
+      "file": "reports\\BRANCH_ANALYSIS_REPORT.md",
+      "line": 186,
+      "text": "    log \"Ô£à All tests passed\""
+    },
+    {
+      "file": "reports\\BRANCH_ANALYSIS_REPORT.md",
+      "line": 198,
+      "text": "    run_tests || exit 1"
+    },
+    {
+      "file": "reports\\BRANCH_ANALYSIS_REPORT.md",
+      "line": 203,
+      "text": "    run_tests || exit 1"
+    },
+    {
+      "file": "reports\\BRANCH_ANALYSIS_REPORT.md",
+      "line": 290,
+      "text": "# V├®rifier les tests"
+    },
+    {
+      "file": "reports\\BRANCH_ANALYSIS_REPORT.md",
+      "line": 306,
+      "text": "- [ ] Tests passent sur main"
+    },
+    {
+      "file": "reports\\BRANCH_ANALYSIS_REPORT.md",
+      "line": 338,
+      "text": "- Ô£à Tests 100% passants"
+    },
+    {
+      "file": "reports\\CHANGELOG.md",
+      "line": 12,
+      "text": "- Tests: UTFÔÇæ8 fixes in sample tests; status naming aligned."
+    },
+    {
+      "file": "reports\\CI-CD-README.md",
+      "line": 52,
+      "text": "   - Frontend unit tests (Node 18, 20, 22)"
+    },
+    {
+      "file": "reports\\CI-CD-README.md",
+      "line": 53,
+      "text": "   - Backend Deno tests"
+    },
+    {
+      "file": "reports\\CI-CD-README.md",
+      "line": 54,
+      "text": "   - E2E tests with Playwright (3 browsers)"
+    },
+    {
+      "file": "reports\\CI-CD-README.md",
+      "line": 66,
+      "text": "   - Health checks and smoke tests"
+    },
+    {
+      "file": "reports\\CI-CD-README.md",
+      "line": 158,
+      "text": "    - \"Frontend Tests\""
+    },
+    {
+      "file": "reports\\CI-CD-README.md",
+      "line": 159,
+      "text": "    - \"Backend Tests\" "
+    },
+    {
+      "file": "reports\\CI-CD-README.md",
+      "line": 160,
+      "text": "    - \"E2E Tests\""
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 19,
+      "text": "| Tests & Couverture | 30/100 | ­ƒö┤ INSUFFISANT |"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 36,
+      "text": "  - Tokens dans les tests"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 40,
+      "text": "### 2. **­ƒö┤ Absence de tests backend** (S├®v├®rit├®: CRITIQUE)"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 81,
+      "text": "- **Probl├¿mes**: Pas de tests a11y, ARIA manquants"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 106,
+      "text": "3. **Tests critiques** (8h)"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 107,
+      "text": "   - Tests webhook avec HMAC"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 108,
+      "text": "   - Tests auth/permissions"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 109,
+      "text": "   - Tests migrations"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 117,
+      "text": "   - Tests rollback"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 124,
+      "text": "3. **Tests complets** (12h)"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 126,
+      "text": "   - Tests E2E critiques"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 127,
+      "text": "   - Tests de charge"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 140,
+      "text": "   - Tests clavier"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 157,
+      "text": "- VAPI_WEBHOOK_SECRET en clair dans tests"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 195,
+      "text": "ÔööÔöÇÔöÇ tests/            # 3 tests seulement"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 235,
+      "text": "### TESTS (30/100)"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 245,
+      "text": "- Tests d'authentification"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 246,
+      "text": "- Tests de permissions"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 247,
+      "text": "- Tests de webhooks"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 248,
+      "text": "- Tests de migrations"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 249,
+      "text": "- Tests de performance"
+    },
+    {
+      "file": "reports\\CODEBASE_AUDIT.md",
+      "line": 250,
+      "text": "- Tests d'accessibilit├®"
+    }
+  ]
+}
+{
+  "root": "C:\\Users\\Utilisateur\\AI-Projects\\nexus\\drain-fortin-production-clean\\docs",
+  "query": "garantie",
+  "results": [
+    {
+      "file": "reports\\PR_FINAL_PRODUCTION.md",
+      "line": 231,
+      "text": "- Ô£à Performance optimale garantie"
+    }
+  ]
+}

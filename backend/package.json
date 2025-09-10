@@ -1,18 +1,74 @@
 {
   "name": "drain-fortin-backend",
-  "version": "1.0.0",
-  "description": "Backend services for Drain Fortin Production System",
+  "version": "2.0.0",
+  "description": "Backend services for Drain Fortin Production System with Outlook Integration",
   "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest watch"
+    "test:watch": "vitest watch",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "lint": "eslint src --ext .ts,.js",
+    "lint:fix": "eslint src --ext .ts,.js --fix",
+    "typecheck": "tsc --noEmit"
   },
+  "main": "dist/server.js",
+  "types": "dist/index.d.ts",
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/bcrypt": "^5.0.2",
+    "@types/uuid": "^9.0.7",
     "@vitest/coverage-v8": "^1.6.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.3",
     "vitest": "^1.6.0"
   },
   "dependencies": {
+    "@azure/msal-node": "^2.6.4",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "@microsoft/microsoft-graph-types": "^2.40.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "bcrypt": "^5.1.1",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4",
+    "winston": "^3.11.0",
+    "redis": "^4.6.11",
+    "node-cron": "^3.0.3",
+    "express-rate-limit": "^7.1.5",
+    "compression": "^1.7.4",
+    "twilio": "^4.19.0",
+    "axios": "^1.6.2",
     "crypto": "^1.0.1"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drain-fortin/production-clean.git"
+  },
+  "keywords": [
+    "drain-fortin",
+    "outlook",
+    "microsoft-graph",
+    "voice-ai",
+    "telephony",
+    "crm",
+    "business-automation"
+  ],
+  "author": "Drain Fortin Development Team",
+  "license": "MIT"
 }

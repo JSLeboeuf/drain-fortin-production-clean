@@ -1,0 +1,110 @@
+# Container Structure Test configuration for Drain Fortin Production
+schemaVersion: 2.0.0
+
+# Test that specific commands work as expected
+commandTests:
+  - name: "Node.js version check"
+    command: ["node", "--version"]
+    expectedOutput: ["v20.*"]
+    
+  - name: "NPM is available"
+    command: ["npm", "--version"]
+    expectedOutput: [".*"]
+    
+  - name: "Serve command is available"
+    command: ["which", "serve"]
+    expectedOutput: ["/usr/local/bin/serve"]
+    
+  - name: "Application can start (dry run)"
+    command: ["serve", "--help"]
+    expectedOutput: [".*Usage.*"]
+    exitCode: 0
+
+# Test file existence and properties
+fileExistenceTests:
+  - name: "Application directory exists"
+    path: "/app"
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    uid: 1001
+    gid: 1001
+    
+  - name: "Frontend build directory exists"
+    path: "/app/frontend/dist"
+    shouldExist: true
+    
+  - name: "Package.json not in final image"
+    path: "/app/frontend/package.json"
+    shouldExist: false
+    
+  - name: "Node modules not in final image"
+    path: "/app/frontend/node_modules"
+    shouldExist: false
+    
+  - name: "Source files not in final image"
+    path: "/app/frontend/src"
+    shouldExist: false
+    
+  - name: "Config directory exists"
+    path: "/app/config"
+    shouldExist: true
+    
+  - name: "Scripts directory exists"
+    path: "/app/scripts"
+    shouldExist: true
+    
+  - name: "Non-root user exists"
+    path: "/etc/passwd"
+    shouldExist: true
+    expectedContents: ["drainfortin.*"]
+    
+  - name: "Dumb-init is available"
+    path: "/usr/bin/dumb-init"
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+
+# Test file contents
+fileContentTests:
+  - name: "Non-root user configured correctly"
+    path: "/etc/passwd"
+    expectedContents: ["drainfortin:x:1001:1001::/home/drainfortin:/bin/sh"]
+    
+  - name: "Group configuration"
+    path: "/etc/group"
+    expectedContents: ["nodejs:x:1001:"]
+
+# Test image metadata
+metadataTest:
+  # Test exposed ports
+  exposedPorts: ["3000"]
+  
+  # Test working directory
+  workdir: "/app"
+  
+  # Test entry point
+  entrypoint: ["/usr/bin/dumb-init", "--"]
+  
+  # Test default command
+  cmd: ["serve", "-s", "frontend/dist", "-l", "3000"]
+  
+  # Test user
+  user: "1001"
+  
+  # Test environment variables
+  env:
+    - key: "NODE_ENV"
+      value: "production"
+      
+  # Test labels
+  labels:
+    - key: "maintainer"
+      value: "Jean-Samuel Leboeuf <support@drainfortin.com>"
+    - key: "version"
+      value: "1.0.0"
+    - key: "description"
+      value: "Drain Fortin Production System - AI Voice Assistant"
+
+# Test license files and compliance
+licenseTests:
+  - debian: true
+    files: ["/usr/share/doc/*/copyright"]
