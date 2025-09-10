@@ -65,8 +65,8 @@ Votre système **Paul v39** est maintenant **COMPLÈTEMENT INSTALLÉ** et prêt 
 
 ### 7. 📞 **SYSTÈME DE ROUTAGE ACTIF**
 ✅ **Configuré et fonctionnel**:
-- Ligne principale: **+1 (514) 529-6037**
-- Ligne support: **+1 (438) 900-4385**
+- Ligne principale: **+1 (438) 900-4385**
+- Ligne support: **+1 (514) 529-6037**
 - Détection urgences 24/7
 - Distribution intelligente
 - **Paul répond**: TOUJOURS!
@@ -182,7 +182,7 @@ Avec ce système, vous allez voir:
 
 ### Aujourd'hui (30 minutes):
 1. ✅ Lisez `START-HERE-GUILLAUME.md`
-2. ✅ Testez Paul: appelez 514-529-6037
+2. ✅ Testez Paul: appelez 438-900-4385
 3. ✅ Vérifiez que vous recevez le SMS
 4. ✅ Connectez-vous au dashboard
 

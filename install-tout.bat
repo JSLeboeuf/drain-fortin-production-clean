@@ -142,7 +142,7 @@ echo 📝 Configuration rapide (appuyez Entrée pour garder les valeurs par déf
 echo.
 
 :: Numéro de téléphone principal
-set "default_phone=+15145296037"
+set "default_phone=+14389004385"
 echo Numéro de téléphone principal [%default_phone%]:
 set /p phone_number=
 if "!phone_number!"=="" set phone_number=%default_phone%
@@ -184,7 +184,7 @@ if %ERRORLEVEL% NEQ 0 (
 if exist .env (
     echo.
     echo Test de la base de données...
-    node -e "console.log('✅ Base de données accessible')" 2>nul || echo ⚠️  Base de données non configurée (configurez plus tard)
+    echo ✅ Configuration Supabase détectée - vérifiez la connexion après installation
 )
 
 timeout /t 2 >nul

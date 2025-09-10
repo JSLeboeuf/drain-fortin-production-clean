@@ -16,8 +16,8 @@ Cette checklist vous permet de vérifier que tout est prêt pour lancer votre sy
 - [ ] **J'ai le numéro de support** enregistré dans mon téléphone
 
 ### 📞 Lignes Téléphoniques (5 points)
-- [ ] **Ligne principale** (+1 514 529-6037) est active
-- [ ] **Ligne support** (+1 438 900-4385) est fonctionnelle
+- [ ] **Ligne principale** (+1 438 900-4385) est active
+- [ ] **Ligne support** (+1 514 529-6037) est fonctionnelle
 - [ ] **J'ai informé mes clients** du nouveau numéro si nécessaire
 - [ ] **Les anciens numéros** redirigent vers le nouveau (si applicable)
 - [ ] **J'ai mis à jour** mon site web avec les bons numéros
