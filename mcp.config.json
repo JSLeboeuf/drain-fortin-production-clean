@@ -1,5 +1,13 @@
 {
   "servers": {
+    "codex-core": {
+      "command": "node",
+      "args": ["servers/codex/server.mjs"],
+      "env": {
+        "CODEX_PROJECT_ROOT": ".",
+        "CODEX_MODE": "production"
+      }
+    },
     "fs": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
@@ -14,9 +22,28 @@
         "CONTEXT7_DIR": "docs"
       }
     },
-    "playwright": {
+    "puppeteer": {
       "command": "npx",
-      "args": ["@playwright/mcp@latest"]
+      "args": ["@modelcontextprotocol/server-puppeteer@latest"]
+    },
+    "sequential": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-sequential-thinking@latest"]
+    },
+    "everything": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-everything@latest"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-memory@latest"]
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-brave-search@latest"],
+      "env": {
+        "BRAVE_API_KEY": "${env:BRAVE_API_KEY}"
+      }
     },
     "github": {
       "command": "npx",

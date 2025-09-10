@@ -1,0 +1,85 @@
+{
+  // 🚀 CONFIGURATION OPTIMALE CODEX OPENAI - ProductionCodex Agent
+  // Collez ce contenu dans votre settings.json Cursor (~/.cursor/settings.json)
+
+  // === OPENAI CODEX CONFIGURATION ===
+  "openai.codex.enabled": true,
+  "openai.codex.model": "gpt-4-turbo-preview",
+  "openai.codex.temperature": 0.1,
+  "openai.codex.maxTokens": 4096,
+  "openai.codex.contextWindow": 128000,
+  "openai.codex.streaming": true,
+  "openai.codex.autoSave": true,
+  "openai.codex.showDiffs": true,
+  "openai.codex.panelPosition": "right",
+
+  // === PERFORMANCE OPTIMIZATIONS ===
+  "editor.largeFileOptimizations": false,
+  "files.maxMemoryForLargeFilesMB": 4096,
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.showTabs": "single",
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.value": 10,
+
+  // === CODEX FEATURES ===
+  "openai.codex.contextLines": 50,
+  "openai.codex.autoComplete": true,
+  "openai.codex.inlineSuggestions": true,
+  "openai.codex.codeActions": true,
+  "openai.codex.hover": true,
+  "openai.codex.quickFixes": true,
+  "openai.codex.refactor": true,
+  "openai.codex.explain": true,
+
+  // === NETWORK & TIMEOUTS ===
+  "openai.codex.timeout": 60000,
+  "openai.codex.retryAttempts": 3,
+  "openai.codex.retryDelay": 2000,
+
+  // === UI & UX ===
+  "openai.codex.fontSize": 13,
+  "openai.codex.lineHeight": 1.4,
+  "openai.codex.wordWrap": "on",
+  "openai.codex.minimap": true,
+  "openai.codex.scrollBeyondLastLine": false,
+
+  // === DEBUG & LOGGING ===
+  "openai.codex.debug": false,
+  "openai.codex.telemetry": false,
+  "openai.codex.performanceTracking": true,
+
+  // === SHORTCUTS PERSONNALISES ===
+  "key": "ctrl+shift+c",
+  "command": "codex.openPanel"
+},
+{
+  "key": "ctrl+shift+enter",
+  "command": "codex.acceptSuggestion"
+},
+{
+  "key": "ctrl+shift+z",
+  "command": "codex.rejectSuggestion"
+},
+{
+  "key": "ctrl+shift+r",
+  "command": "codex.regenerate"
+},
+
+  // === WORKSPACE SPECIFIC ===
+  "codex.projectType": "web-development",
+  "codex.autoAnalyze": true,
+  "codex.contextAware": true,
+
+  // === ERROR HANDLING ===
+  "openai.codex.errorHandling": "graceful",
+  "openai.codex.offlineMode": false,
+
+  // === ADVANCED FEATURES ===
+  "openai.codex.experimental": false,
+  "openai.codex.betaFeatures": false,
+
+  // === INTEGRATIONS ===
+  "codex.integrations.git": true,
+  "codex.integrations.terminal": true,
+  "codex.integrations.fileSystem": true
+}

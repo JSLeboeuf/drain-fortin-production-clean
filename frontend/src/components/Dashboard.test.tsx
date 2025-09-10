@@ -51,7 +51,7 @@ describe('Dashboard Component Tests', () => {
 
   describe('Metrics Display', () => {
     it('should display all key metrics correctly', async () => {
-      const Dashboard = (await import('@/components/Dashboard')).Dashboard;
+      const Dashboard = (await import('@/pages/Dashboard')).default;
       render(<Dashboard />, { wrapper: createWrapper() });
 
       await waitFor(() => {

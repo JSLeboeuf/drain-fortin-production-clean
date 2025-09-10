@@ -14,7 +14,7 @@ build/
 # Environment files - CRITICAL SECURITY
 .env
 .env.*
-!.env.example.secure
+!.env.example
 *.env
 *.env.*
 **/.env
@@ -26,6 +26,7 @@ build/
 .env.development
 .env.test
 *.env.backup
+*.env.SENSITIVE_BACKUP
 
 # Security - NEVER commit these
 **/secrets/
@@ -36,6 +37,13 @@ build/
 **/*apikey*
 **/*token*
 _SECURE_BACKUP/
+
+# Backup files with potential sensitive data
+*.backup
+*.bak
+*~
+*.orig
+*.tmp
 
 # Scripts with potential secrets
 check-*.js
@@ -50,7 +58,6 @@ test-*.js
 .idea/
 *.swp
 *.swo
-*~
 
 # OS files
 .DS_Store
@@ -81,9 +88,6 @@ coverage/
 *.lcov
 .nyc_output
 
-# nyc test coverage
-.nyc_output
-
 # ESLint cache
 .eslintcache
 
@@ -92,9 +96,6 @@ coverage/
 
 # Optional npm cache directory
 .npm
-
-# Optional eslint cache
-.eslintcache
 
 # Microbundle cache
 .rpt2_cache/
@@ -152,6 +153,9 @@ nul
 # Local Netlify folder
 .netlify
 
+# Vercel
+.vercel
+
 # Sentry Config File
 .sentryclirc
 
@@ -174,7 +178,8 @@ public/workbox-*.js
 
 # Commitlint
 .commitlintrc
-.vercel
+
+# Project-specific exclusions
 UsersUtilisateurSuperClaude_Framework_GitHub/
 __audit_drain_fortin_repo__/
 docs/reference/openai-*/

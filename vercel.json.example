@@ -1,10 +1,23 @@
 {
-  "name": "drain-fortin-dashboard",
+  "name": "your-project-name",
   "version": 2,
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
   "installCommand": "cd frontend && npm install",
   "framework": "vite",
+  "env": {
+    "VITE_SUPABASE_URL": "@supabase_url",
+    "VITE_SUPABASE_ANON_KEY": "@supabase_anon_key",
+    "VAPI_PUBLIC_KEY": "@vapi_public_key",
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "VITE_SUPABASE_URL": "@supabase_url",
+      "VITE_SUPABASE_ANON_KEY": "@supabase_anon_key",
+      "VAPI_PUBLIC_KEY": "@vapi_public_key"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
@@ -35,7 +48,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.vapi.ai https://*.sentry.io; img-src 'self' data: https:; font-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.vapi.ai; img-src 'self' data: https:; font-src 'self' data:;"
         }
       ]
     }
@@ -45,11 +58,5 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "functions": {
-    "frontend/api/*.js": {
-      "maxDuration": 10
-    }
-  },
-  "regions": ["iad1"]
+  ]
 }
