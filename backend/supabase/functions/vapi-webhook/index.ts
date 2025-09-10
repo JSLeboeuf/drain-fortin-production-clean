@@ -28,9 +28,11 @@ interface EnvironmentConfig {
 }
 
 function getEnvironmentConfig(): EnvironmentConfig {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') || Deno.env.get('PUBLIC_SUPABASE_URL');
+  const supabaseServiceKey = Deno.env.get('SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
   const config = {
-    supabaseUrl: Deno.env.get('SUPABASE_URL')!,
-    supabaseServiceKey: Deno.env.get('SERVICE_ROLE_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    supabaseUrl: supabaseUrl as string,
+    supabaseServiceKey: supabaseServiceKey as string,
     vapiWebhookSecret: Deno.env.get('VAPI_WEBHOOK_SECRET')!,
     twilioAccountSid: Deno.env.get('TWILIO_ACCOUNT_SID') || '',
     twilioAuthToken: Deno.env.get('TWILIO_AUTH_TOKEN') || '',
@@ -288,43 +290,45 @@ function classifyPriority(description: string, value?: number): ClassifyPriority
   };
 }
 
-// Enhanced service request validation
+// Enhanced service request validation (no client refusal)
 async function validateServiceRequest(args: { service: string }): Promise<ValidateServiceRequestResult> {
   const service = (args.service || '').toLowerCase();
-  
-  // Services we refuse
-  const refusedServices = ['fosse', 'piscine', 'goutti', 'puisard', 'septic', 'pool'];
-  const hasRefusedService = refusedServices.some(refused => service.includes(refused));
-  
-  if (hasRefusedService) {
-    console.log('Service request refused:', {
-      service: args.service,
-      reason: 'service_not_offered'
-    });
-    
+
+  // Historically refused services → now accepted + oriented with internal alert
+  const orientedServices = ['fosse', 'piscine', 'goutti', 'puisard', 'septic', 'pool'];
+  const requiresOrientation = orientedServices.some(ref => service.includes(ref));
+
+  if (requiresOrientation) {
+    try {
+      const internalMessage = `[ORIENTATION] Demande pour service hors offre: ${args.service || 'n/a'}`;
+      await notifyInternalTeam(internalMessage, 'P2', null);
+    } catch (_) {
+      // best‑effort internal notification
+    }
+
     return {
-      accepted: false,
-      reason: 'service_not_offered',
-      message: "Désolé, ce service n'est pas dans notre offre. Nous nous spécialisons dans les drains et égouts résidentiels et commerciaux.",
-      restrictions: refusedServices
+      accepted: true,
+      reason: 'service_oriente',
+      message: "Merci! Ce service sera orienté correctement. Un membre de l'équipe vous recontactera rapidement.",
+      restrictions: orientedServices
     };
   }
-  
+
   // Services requiring special assessment
   const assessmentRequired = ['gainage', 'relining', 'drain français complet'];
   const requiresAssessment = assessmentRequired.some(special => service.includes(special));
-  
+
   console.log('Service request accepted:', {
     service: args.service,
     requiresAssessment
   });
-  
+
   return {
     accepted: true,
     reason: 'service_available',
-    message: requiresAssessment 
-      ? "Parfait! Ce service nécessite une évaluation sur place. Nous pouvons planifier une inspection."
-      : "Parfait! On peut certainement vous aider avec ça."
+    message: requiresAssessment
+      ? 'Parfait! Ce service nécessite une évaluation sur place. Nous pouvons planifier une inspection.'
+      : 'Parfait! On peut certainement vous aider avec ça.'
   };
 }
 

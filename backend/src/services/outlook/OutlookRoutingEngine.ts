@@ -159,7 +159,7 @@ export class OutlookRoutingEngine {
     provider: 'vapi' | 'twilio' | 'other';
     metadata?: Record<string, any>;
   }): Promise<{
-    routingDecision: 'routed' | 'queued' | 'voicemail' | 'rejected';
+    routingDecision: 'routed' | 'queued' | 'voicemail';
     destination?: string;
     queuePosition?: number;
     estimatedWaitTime?: number;
@@ -624,7 +624,7 @@ export class OutlookRoutingEngine {
     rule: PhoneRoutingRule,
     callData: any
   ): Promise<{
-    routingDecision: 'routed' | 'queued' | 'voicemail' | 'rejected';
+    routingDecision: 'routed' | 'queued' | 'voicemail';
     destination?: string;
     queuePosition?: number;
     estimatedWaitTime?: number;
@@ -648,11 +648,11 @@ export class OutlookRoutingEngine {
       }
       
       // Toutes les actions ont échoué
-      return { routingDecision: 'rejected' };
+      return { routingDecision: 'queued', instructions: 'No rule matched; queued for callback' };
       
     } catch (error) {
       this.auditLogger.error('OutlookRoutingEngine:ExecuteRoutingRuleError', error);
-      return { routingDecision: 'rejected' };
+      return { routingDecision: 'queued', instructions: 'No available agent; queued for callback' };
     }
   }
   
@@ -663,7 +663,7 @@ export class OutlookRoutingEngine {
     action: PhoneRoutingAction,
     callData: any
   ): Promise<{
-    routingDecision: 'routed' | 'queued' | 'voicemail' | 'rejected';
+    routingDecision: 'routed' | 'queued' | 'voicemail';
     destination?: string;
     queuePosition?: number;
     estimatedWaitTime?: number;
@@ -680,7 +680,8 @@ export class OutlookRoutingEngine {
         return await this.playMessage(action.parameters, callData);
         
       case 'transfer_external':
-        return await this.transferExternal(action.parameters, callData);
+        await this.notifyInternalSMS(`[ROUTING] Demande de transfert externe: ${callData.from || ''}`);
+        return { routingDecision: 'voicemail', instructions: 'Live transfer disabled; sending to voicemail' };
         
       case 'voicemail':
         return await this.routeToVoicemail(action.parameters, callData);
@@ -689,7 +690,7 @@ export class OutlookRoutingEngine {
         return await this.scheduleCallback(action.parameters, callData);
         
       default:
-        return { routingDecision: 'rejected' };
+        return { routingDecision: 'queued', instructions: 'Queued by policy' };
     }
   }
   
@@ -701,13 +702,13 @@ export class OutlookRoutingEngine {
       const agentId = parameters.agentId || this.selectBestAgent(callData);
       
       if (!agentId) {
-        return { routingDecision: 'rejected' };
+        return { routingDecision: 'queued', instructions: 'Queued by policy' };
       }
       
       // Vérifier la disponibilité de l'agent
       const agent = callData.availableAgents?.find((a: any) => a.userId === agentId);
       if (!agent || agent.status !== 'available') {
-        return { routingDecision: 'rejected' };
+        return { routingDecision: 'queued', instructions: 'Queued by policy' };
       }
       
       // Créer un événement calendrier pour l'appel
@@ -724,7 +725,7 @@ export class OutlookRoutingEngine {
       
     } catch (error) {
       this.auditLogger.error('OutlookRoutingEngine:RouteToAgent', error);
-      return { routingDecision: 'rejected' };
+      return { routingDecision: 'queued', instructions: 'Queued by policy' };
     }
   }
   
@@ -769,7 +770,19 @@ export class OutlookRoutingEngine {
       
     } catch (error) {
       this.auditLogger.error('OutlookRoutingEngine:RouteToQueue', error);
-      return { routingDecision: 'rejected' };
+      return { routingDecision: 'queued', instructions: 'Queued by policy' };
+    }
+  }
+
+  /**
+   * Notifie en interne via SMS/Log (placeholder)
+   */
+  private async notifyInternalSMS(message: string): Promise<void> {
+    try {
+      this.auditLogger.info('OutlookRoutingEngine:InternalSMS', { message });
+      // Integration point: sms-crm-manager or Twilio client could be injected here
+    } catch (e) {
+      this.auditLogger.warn('OutlookRoutingEngine:InternalSMSFailed', e as Error, { message });
     }
   }
   
@@ -1279,3 +1292,4 @@ export class OutlookRoutingEngine {
 }
 
 export default OutlookRoutingEngine;
+

@@ -1,0 +1,35 @@
+# ===========================================
+# TEMPLATE DES CLÉS API - DRAIN FORTIN
+# ===========================================
+# COPIEZ CE CONTENU VERS .env ET REMPLACEZ LES VALEURS
+
+# === SUPABASE (OBLIGATOIRE) ===
+SUPABASE_URL=https://phiduqxcufdmgjvdipyu.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoaWR1cXhjdWZkbWdqdmRpcHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxODQ5ODEsImV4cCI6MjA2Mjc2MDk4MX0.YyiZxzU6DuZsFwXLebdMqRJHhWlnVYyDgJz1HVsIjvI
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoaWR1cXhjdWZkbWdqdmRpcHl1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzE4NDk4MSwiZXhwIjoyMDYyNzYwOTgxfQ.hq9GjhaoeJm5YtJPvfXhTC4CWaW-bEG6ESFr5J-8Y1U
+
+# === VAPI (OBLIGATOIRE POUR LES APPELS) ===
+VAPI_API_KEY=VOTRE_CLE_VAPI_ICI
+VAPI_ASSISTANT_ID=VOTRE_ASSISTANT_ID_ICI
+VAPI_WEBHOOK_SECRET=VOTRE_WEBHOOK_SECRET_ICI
+
+# === TWILIO (OPTIONNEL - POUR SMS) ===
+TWILIO_ACCOUNT_SID=VOTRE_TWILIO_SID_ICI
+TWILIO_AUTH_TOKEN=VOTRE_TWILIO_TOKEN_ICI
+TWILIO_FROM=+14389004385
+
+# === CONFIGURATION APPLICATION ===
+VITE_APP_ENV=development
+VITE_APP_NAME=CRM Drain Fortin
+VITE_LOG_LEVEL=debug
+
+# === URLS ===
+VITE_WS_URL=ws://localhost:3001
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+
+# ===========================================
+# INSTRUCTIONS:
+# 1. Copiez ce contenu vers un nouveau fichier .env
+# 2. Remplacez VOTRE_CLE_VAPI_ICI par votre vraie clé VAPI
+# 3. NE COMMITTEZ JAMAIS .env SUR GITHUB
+# ===========================================

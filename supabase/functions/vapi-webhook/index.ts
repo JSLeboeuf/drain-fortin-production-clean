@@ -3,38 +3,54 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { corsHeaders } from '../_shared/cors.ts'
 
-const VAPI_SERVER_SECRET = Deno.env.get('VAPI_SERVER_SECRET')!
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY')!
+// Environment variables (with fallbacks and safe defaults)
+// VAPI server secret can be provided under either name
+const VAPI_SERVER_SECRET: string =
+  Deno.env.get('VAPI_SERVER_SECRET') ??
+  Deno.env.get('VAPI_WEBHOOK_SECRET') ??
+  ''
 
-// Create Supabase client
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY') ?? ''
 
 // Rate limiting storage
 const rateLimitMap = new Map<string, number[]>()
 
 // Validate HMAC signature
-async function validateHMAC(payload: string, signature: string): Promise<boolean> {
-  const encoder = new TextEncoder()
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(VAPI_SERVER_SECRET),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['verify']
-  )
-  
-  const signatureBuffer = Uint8Array.from(
-    signature.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
-  )
-  
-  return await crypto.subtle.verify(
-    'HMAC',
-    key,
-    signatureBuffer,
-    encoder.encode(payload)
-  )
+async function validateHMAC(payload: string, signatureHeader: string): Promise<boolean> {
+  try {
+    const encoder = new TextEncoder()
+
+    // Support both raw hex and prefixes like "sha256=<hex>"
+    const hex = (signatureHeader || '').toLowerCase().replace(/^sha256=/, '')
+
+    // Validate hex format (64 hex chars for sha256)
+    if (!/^[0-9a-f]{64}$/.test(hex)) return false
+
+    if (!VAPI_SERVER_SECRET) return false
+
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(VAPI_SERVER_SECRET),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    )
+
+    // Convert hex string to bytes
+    const sigBytes = new Uint8Array(hex.match(/.{1,2}/g)!.map((b) => parseInt(b, 16)))
+
+    return await crypto.subtle.verify(
+      'HMAC',
+      key,
+      sigBytes,
+      encoder.encode(payload)
+    )
+  } catch (_err) {
+    // On any error, treat as invalid rather than crashing
+    return false
+  }
 }
 
 // Check rate limit
@@ -63,6 +79,21 @@ serve(async (req) => {
   }
 
   try {
+    // Validate required environment variables early
+    const missing: string[] = []
+    if (!VAPI_SERVER_SECRET) missing.push('VAPI_SERVER_SECRET or VAPI_WEBHOOK_SECRET')
+    if (!SUPABASE_URL) missing.push('SUPABASE_URL')
+    if (!SUPABASE_SERVICE_ROLE_KEY) missing.push('SUPABASE_SERVICE_ROLE_KEY')
+    if (missing.length) {
+      console.error('Missing required environment variables:', missing.join(', '))
+      return new Response(
+        JSON.stringify({ error: 'Missing required environment variables', missing }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Create Supabase client lazily after env validation
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
     // Get client IP
     const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown'
     
@@ -84,7 +115,7 @@ serve(async (req) => {
     }
 
     const payload = await req.text()
-    const isValid = await validateHMAC(payload, signature.replace('sha256=', ''))
+    const isValid = await validateHMAC(payload, signature)
     
     if (!isValid) {
       return new Response(
@@ -93,25 +124,44 @@ serve(async (req) => {
       )
     }
 
-    const data = JSON.parse(payload)
-    const { message } = data
+    // Parse JSON safely
+    let data: any
+    try {
+      data = JSON.parse(payload || '{}')
+    } catch (_e) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON payload' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Normalize message shape (support both top-level {type} and {message:{type}})
+    const message = (data && data.message) ? data.message : { type: data?.type }
+
+    // Health-check fast path
+    if (message?.type === 'health-check') {
+      return new Response(
+        JSON.stringify({ status: 'healthy', timestamp: new Date().toISOString() }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     // Process different message types
-    switch (message.type) {
+    switch (message?.type) {
       case 'end-of-call-report': {
         // Save to database
         const { error } = await supabase
           .from('call_logs')
           .insert({
-            call_id: message.call?.id,
-            phone_number: message.call?.customer?.number,
+            call_id: message.call?.id ?? null,
+            phone_number: message.call?.customer?.number ?? null,
             duration: message.call?.endedAt && message.call?.startedAt
               ? Math.floor((new Date(message.call.endedAt).getTime() - new Date(message.call.startedAt).getTime()) / 1000)
               : 0,
             status: message.endedReason || 'completed',
-            transcript: message.transcript,
-            summary: message.summary,
-            analysis: message.analysis,
+            transcript: message.transcript ?? null,
+            summary: message.summary ?? null,
+            analysis: message.analysis ?? null,
             tool_calls: message.toolCalls || [],
             created_at: new Date().toISOString()
           })
@@ -134,7 +184,7 @@ serve(async (req) => {
 
       case 'tool-calls': {
         // Handle tool calls
-        const toolResponse = await processToolCalls(message.toolCalls)
+        const toolResponse = await processToolCalls(message.toolCalls || [])
         return new Response(
           JSON.stringify(toolResponse),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -144,11 +194,11 @@ serve(async (req) => {
       case 'status-update':
       case 'transcript':
         // Log these for monitoring
-        console.log(`Received ${message.type}:`, message)
+        console.log(`Received ${message?.type}:`, message)
         break
 
       default:
-        console.log('Unknown message type:', message.type)
+        console.log('Unknown message type:', message?.type)
     }
 
     return new Response(

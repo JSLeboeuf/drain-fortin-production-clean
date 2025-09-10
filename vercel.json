@@ -46,10 +46,5 @@
       "destination": "/index.html"
     }
   ],
-  "functions": {
-    "frontend/api/*.js": {
-      "maxDuration": 10
-    }
-  },
   "regions": ["iad1"]
 }

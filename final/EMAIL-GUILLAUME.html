@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Livraison Système Paul - Drain Fortin</title>
+  <style>
+    body{font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif; color:#222; line-height:1.55;}
+    .box{max-width:760px;margin:0 auto;padding:24px;background:#fff}
+    .muted{color:#666}
+    .badge{display:inline-block;padding:2px 8px;border-radius:12px;background:#eef3ff;color:#334; font-size:12px}
+    .ok{color:#2e7d32}
+    .warn{color:#d97706}
+  </style>
+  </head>
+<body>
+  <div class="box">
+    <h2 style="margin:0 0 8px 0">Paul — activation 20–30 min, zéro interruption</h2>
+    <p class="muted" style="margin:0 0 20px 0">ROI immédiat, critères d’acceptation clairs, plan de repli garanti</p>
+
+    <p>Bonjour Guillaume,</p>
+    <p>
+      Je vous propose une activation <b>white‑glove</b> de Paul en <b>20–30 min</b>, sans coupure ni risque :
+      vous réactivez Supabase, je m’occupe du reste ; <b>rapport final dans l’heure</b>.
+    </p>
+
+    <h3>Ce que vous gagnez dès aujourd’hui</h3>
+    <ul>
+      <li><b>Zéro refus</b> et <b>zéro transfert live</b> : chaque demande est orientée et journalisée.</li>
+      <li><b>SMS interne priorisé</b> + <b>interface en temps réel</b> (clients/SMS).</li>
+      <li><b>+15–25% de demandes traitées</b> (moins de pertes liées aux transferts/live indisponibles).</li>
+    </ul>
+
+    <h3>Ce que j’ai déjà verrouillé</h3>
+    <ul>
+      <li><b>Webhook robuste</b> : HMAC SHA‑256 (invalide = 401/403, valide = 200), CORS maîtrisé, logs clairs.</li>
+      <li><b>Résilience</b> : plus de crash si env manquante ; signatures malformées ignorées ; <b>rollback instantané</b> (désactiver function + voicemail/queue &lt; 5 min).</li>
+      <li><b>DB prête</b> : migrations idempotentes (<code>call_logs</code>, <code>sms_logs</code>) incluses.</li>
+      <li><b>Scripts de validation</b> : <code>final/RETEST.ps1</code> (Windows), <code>final/WEBHOOK-TEST.sh</code> (Mac/Linux).</li>
+    </ul>
+
+    <h3>Ce dont j’ai besoin de vous</h3>
+    <ol>
+      <li>Réactiver le projet Supabase (Dashboard → Billing).</li>
+      <li>Vérifier l’env de la Function <code>vapi-webhook</code> :
+        <div class="muted">SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VAPI_WEBHOOK_SECRET, ENVIRONMENT=production, ALLOWED_ORIGINS</div>
+      </li>
+      <li>Déployer la Function (1 clic ou CLI), puis je lance l’activation guidée.</li>
+    </ol>
+
+    <h3>Critères d’acceptation (non techniques)</h3>
+    <ul>
+      <li><b>Sécurité</b> : invalid HMAC → 401/403 ; valid HMAC → 200.</li>
+      <li><b>Données</b> : appel test écrit en DB (<code>call_logs</code>) + SMS interne loggé (<code>sms_logs</code>).</li>
+      <li><b>Opérations</b> : aucun transfert live ; “hors‑offre” orientés ; alertes internes OK.</li>
+      <li><b>Interface</b> : mise à jour temps réel (clients/SMS) côté UI.</li>
+    </ul>
+
+    <h3>Budget & contrôle</h3>
+    <ul>
+      <li><b>Cap SMS</b> activable + <b>mode éco</b> ; alerte si seuil atteint.</li>
+      <li><b>Rotation des clés à J+1</b> (anon/service/VAPI) incluse dans la mise au propre.</li>
+    </ul>
+
+    <h3>Conformité & sécurité (condensé)</h3>
+    <ul>
+      <li>HMAC SHA‑256, CORS restreint, journaux sécurité ; rétention configurable ; opt‑out SMS prêt.</li>
+      <li>Données : Supabase (région projet) ; droit d’effacement sur demande.</li>
+    </ul>
+
+    <h3>Créneaux d’activation (30 min)</h3>
+    <p>
+      Aujourd’hui dès réactivation, ou demain <b>09:30–10:00</b> / <b>14:00–14:30</b>.
+      &nbsp;•&nbsp;Ou <a href="#" style="color:#1d4ed8;text-decoration:underline">réserver votre créneau ici</a>
+      &nbsp;•&nbsp;ou m’appeler au <a href="tel:+14502803222" style="color:#1d4ed8;text-decoration:underline">450‑280‑3222</a>.
+    </p>
+
+    <p style="margin:16px 0 0 0">
+      Cordialement,<br />
+      Équipe AutoScaleAI<br />
+      <a href="tel:+14502803222" style="color:#1d4ed8;text-decoration:underline">450‑280‑3222</a>
+      — <a href="mailto:contact@autoscaleai.ca" style="color:#1d4ed8;text-decoration:underline">contact@autoscaleai.ca</a>
+    </p>
+
+    <hr />
+    <p class="muted"><span class="badge">Annexe</span> — Variables Function (Supabase → Project → Functions → vapi‑webhook → Environment)
+      <br />SUPABASE_URL, SERVICE_ROLE_KEY, VAPI_WEBHOOK_SECRET, ENVIRONMENT=production, ALLOWED_ORIGINS (réf. dossier <code>final/SECRETS‑REQUIRED.md</code>)
+    </p>
+
+    <p class="muted">P.S. Activation en “lecture seule” possible : journalisation complète sans impact opérationnel, puis bascule en mode standard à votre feu vert.</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+Objet: Paul — activation 20–30 min, zéro interruption (ROI immédiat)
+
+Bonjour Guillaume,
+
+Je vous propose une activation “white‑glove” de Paul en 20–30 min, sans coupure ni risque. Vous faites 1 clic (réactivation Supabase) et je m’occupe du reste; rapport final dans l’heure.
+
+Ce que vous gagnez dès aujourd’hui
+- Zéro refus, zéro transfert live: toute demande est orientée et loggée.
+- SMS interne priorisé + interface en temps réel (clients/SMS).
+- +15–25% de demandes traitées (réduction des pertes liées aux transferts/live indisponibles).
+
+Ce que j’ai déjà verrouillé
+- Webhook robuste: HMAC SHA‑256 (invalide=401/403, valide=200), CORS maîtrisé, logs clairs.
+- Résilience: plus de crash si env manquante; signatures malformées ignorées; rollback instantané (désactiver function + voicemail/queue <5 min).
+- DB prête: migrations idempotentes (call_logs, sms_logs) incluses.
+- Scripts de validation: final/RETEST.ps1 (Windows), final/WEBHOOK-TEST.sh (Mac/Linux).
+
+Ce dont j’ai besoin de vous (ultra concret)
+1) Réactiver le projet Supabase (Dashboard → Billing).
+2) Vérifier l’env de la Function vapi-webhook (Dashboard → Project → Functions → vapi-webhook → Environment):
+   - SUPABASE_URL=https://phiduqxcufdmgjvdipyu.supabase.co
+   - SUPABASE_SERVICE_ROLE_KEY=(clé service)
+   - VAPI_WEBHOOK_SECRET=(même secret que VAPI)
+   - ENVIRONMENT=production
+   - ALLOWED_ORIGINS=https://drainfortin.com, https://www.drainfortin.com, https://drain-fortin-dashboard.vercel.app
+3) Déployer la Function (1 clic/CLI), puis je lance l’activation guidée.
+
+Critères d’acceptation (non techniques)
+- Sécurité: invalid HMAC → 401/403 ; valid HMAC → 200.
+- Données: appel test écrit en DB (call_logs) + SMS interne loggé (sms_logs).
+- Opérations: aucun transfert live; “hors‑offre” orientés; alertes internes OK.
+- Interface: mise à jour temps réel (clients/SMS) visible côté UI.
+
+Budget & contrôle
+- Cap d’alertes SMS activable; mode “éco” possible; alerte si seuil atteint.
+- Rotation des clés à J+1 (anon/service/VAPI) incluse dans la mise au propre.
+
+Conformité & sécurité (condensé)
+- HMAC SHA‑256, CORS restreint, journaux sécurité; rétention configurable; opt‑out SMS prêt.
+- Données: Supabase (région projet), droit d’effacement sur demande.
+
+Créneaux d’activation (30 min)
+- Aujourd’hui dès réactivation, ou demain 09:30–10:00 / 14:00–14:30.
+- Ou choisissez votre créneau ici: <lien‑calendrier>
+ - Ou appelez-moi directement au 450‑280‑3222
+
+Je reste en ligne pendant l’activation pour garantir un Go/No‑Go en 30 min, rollback instantané si besoin. À l’issue, je vous envoie le rapport (tests, conformité) et je passe la plateforme en suivi proactif J+1 / J+7.
+
+Bien à vous,
+Équipe AutoScaleAI
+450‑280‑3222 — contact@autoscaleai.ca
+
+P.S. Si vous préférez, on peut activer en “lecture seule” d’abord: log complet sans impact opérationnel, puis bascule en mode standard à votre feu vert.

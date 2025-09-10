@@ -108,7 +108,7 @@ export const supabaseServices = {
   // Récupérer les logs SMS
   async getSMSLogs(limit = 20): Promise<SMSLog[]> {
     const { data, error } = await supabase
-      .from('sms_logs')
+      .from('sms_messages')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -181,3 +181,28 @@ export const supabaseServices = {
 };
 
 export default supabase;
+
+// Realtime helpers (optional) for instant UI updates
+export function subscribeToNewClients(callback: (client: any) => void) {
+  return supabase
+    .channel('new-clients')
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'clients' },
+      (payload) => {
+        callback(payload.new as any);
+      }
+    )
+    .subscribe();
+}
+
+export function subscribeToSMSMessages(callback: (sms: any) => void) {
+  return supabase
+    .channel('new-sms-messages')
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'sms_messages' },
+      (payload) => {
+        callback(payload.new as any);
+      }
+    )
+    .subscribe();
+}
