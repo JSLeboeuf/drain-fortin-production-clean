@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-09-10T18:59:57.461Z",
+  "summary": {
+    "passed": 2,
+    "failed": 5,
+    "total": 7
+  },
+  "results": [
+    {
+      "test": "Supabase Connection",
+      "status": "PASS"
+    },
+    {
+      "test": "Table vapi_calls",
+      "status": "FAIL",
+      "error": ""
+    },
+    {
+      "test": "Table leads",
+      "status": "FAIL",
+      "error": ""
+    },
+    {
+      "test": "Table sms_logs",
+      "status": "FAIL",
+      "error": ""
+    },
+    {
+      "test": "Admin Authentication",
+      "status": "FAIL",
+      "error": "Invalid login credentials"
+    },
+    {
+      "test": "VAPI Configuration",
+      "status": "PASS"
+    },
+    {
+      "test": "Database Operations",
+      "status": "FAIL",
+      "error": "Invalid API key"
+    }
+  ]
+}

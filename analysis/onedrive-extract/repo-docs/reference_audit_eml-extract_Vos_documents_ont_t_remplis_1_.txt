@@ -1,0 +1,78 @@
+﻿
+--_=_swift_1751020992_8f243082cd70a200150a8541ce8a7efa_=_
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Tous les invitÃ©s ont signÃ© les documents joints "documents joints":
+https://app.signnow.com/webapp/documentgroup/signing?access_token=e3503b3a3b2bf4190f4d67e0be2462d97082fd9e3617bd19bb3bd05bb246cd33&amp;document_group_id=cfb85dbe2b1c40879d66d998141bbff51eb279e9&amp;unwrap.
+
+Utiliser signNow sur
+iOS:
+https://link.signnow.com/r?u=333671205&amp;m=5096463111&amp;t=2498&amp;o=gz-CYb7gX-vshqSF8Q_2QolON4lOgVVRAaVhZeZS1Ct5tO0IO8JctIZo7-r0BRym5IIbKzHr1oVGJdqOnxfZVpkQZFrnF5pnuLZfZVBql_oqfzl3900uXs2twFqLB0O7YSZucxGnA5UzVB4%3D&amp;s=direct_push,
+Android:
+https://link.signnow.com/r?u=333671205&amp;m=5096463111&amp;t=2498&amp;o=ixoXYWNqQN_lJapOh1B4hUcnSdrBxB5QyOJnvL2uP9nm5sKky7OA8q7HokvDmLehqvKKI5MIunsEUlN4gS51HhNacGXaSON5yjTs4IrCIOXnmNCCrHq2n18Vpe4ZCCjhynEdH9J33NuEZd-5Njq2YX1Cyf7wX-yBgA2xsg%3D%3D&amp;s=direct_push,
+et le
+la toile:
+https://link.signnow.com/r?u=333671205&amp;m=5096463111&amp;t=2498&amp;o=a9l8HaPpfXzAZSfnR2VK0aE2aS3tNB5U_9O3Eqk6UmIWc_XQXwgrJhizONGB&amp;s=direct_push.
+
+--_=_swift_1751020992_8f243082cd70a200150a8541ce8a7efa_=_
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body bgcolor="#FFFFFF" align="center" style="height: 100%; width: 100%; margin: 0; padding: 0;">
+<style type="text/css">
+    @media only screen and (max-device-width: 480px) {
+        .SNOpenDocumentButton {
+            width: 240px;
+        }
+        .SNOpenDocumentLink {
+            font-size: 0.8em;
+        }
+    }
+</style>
+<table bgcolor="#ffffff" cellpadding="0" cellspacing="0" height="100%" width="100%">
+    <tr>
+    <td height="59" align="center">
+                    <a href="https://link.signnow.com/r?u=333671205&amp;m=5096463111&amp;t=2498&amp;o=93zJMtW0Z2zIJf-TeZ2NKe9iyjsWiBciDGrWA9y_k3kf1VeDqi4S4NI%3D&amp;s=direct_push" style="outline: 0; border: 0; text-decoration: none;">
+                <img src="https://static.pdffiller.com/mail-templates/img/marketing/mails2020/signnow-healthcare-promo/sign-now-logo-blue@2x.png" alt="signNow logo" width="133" height="29" style="color: #414141; display: block; height: auto; max-width: 100%;">
+            </a>
+            </td>
+</tr>
+    <tr valign="top">
+        <td>
+            <table class="SNEmailBody" align="center">
+                    <tr>
+        <td class="SNEmailText" align="left">
+            <font face="helvetica,arial">
+                                    <p>Tous les invitÃ©s ont signÃ© les documents joints <b><a href="https://app.signnow.com/webapp/documentgroup/signing?access_token=e3503b3a3b2bf4190f4d67e0be2462d97082fd9e3617bd19bb3bd05bb246cd33&amp;document_group_id=cfb85dbe2b1c40879d66d998141bbff51eb279e9&amp;unwrap">"documents joints"</a></b>.</p>
+                
+                            </font>
+        </td>
+    </tr>
+                                                                <tr>
+    <td style="text-align: center; padding-top: 30px; color: #D3D9D9;">
+        <font face="helvetica,arial">
+            Utiliser signNow sur
+            <a style="color:#0077ce82" href="https://link.signnow.com/r?u=333671205&amp;m=5096463111&amp;t=2498&amp;o=gz-CYb7gX-vshqSF8Q_2QolON4lOgVVRAaVhZeZS1Ct5tO0IO8JctIZo7-r0BRym5IIbKzHr1oVGJdqOnxfZVpkQZFrnF5pnuLZfZVBql_oqfzl3900uXs2twFqLB0O7YSZucxGnA5UzVB4%3D&amp;s=direct_push">iOS</a>,
+            <a style="color:#0077ce82" href="https://link.signnow.com/r?u=333671205&amp;m=5096463111&amp;t=2498&amp;o=ixoXYWNqQN_lJapOh1B4hUcnSdrBxB5QyOJnvL2uP9nm5sKky7OA8q7HokvDmLehqvKKI5MIunsEUlN4gS51HhNacGXaSON5yjTs4IrCIOXnmNCCrHq2n18Vpe4ZCCjhynEdH9J33NuEZd-5Njq2YX1Cyf7wX-yBgA2xsg%3D%3D&amp;s=direct_push">Android</a>,
+            et le
+            <a style="color:#0077ce82" href="https://link.signnow.com/r?u=333671205&amp;m=5096463111&amp;t=2498&amp;o=a9l8HaPpfXzAZSfnR2VK0aE2aS3tNB5U_9O3Eqk6UmIWc_XQXwgrJhizONGB&amp;s=direct_push">la toile</a>.
+        </font>
+    </td>
+</tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<img alt="required text" height="1" src="https://link.signnow.com/border/5096463111-98-2498-333671205.gif" width="1" />
+</body>
+</html>
+
+
+--_=_swift_1751020992_8f243082cd70a200150a8541ce8a7efa_=_--
+
+
+
+

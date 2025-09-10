@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent IA Drain Fortin - Prêt à activer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0B5FFF 0%, #0747d6 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        /* Content */
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        
+        .section {
+            margin-bottom: 35px;
+        }
+        
+        .section h2 {
+            font-size: 18px;
+            color: #0B5FFF;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .text {
+            color: #4a4a4a;
+            margin-bottom: 15px;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        
+        /* Feature List */
+        .feature-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .feature-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .check {
+            color: #2e7d32;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        /* Offer Box */
+        .offer-box {
+            background: linear-gradient(135deg, #fff4e6 0%, #ffe0b2 100%);
+            border: 2px solid #F97316;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .offer-title {
+            font-size: 20px;
+            color: #F97316;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .offer-text {
+            color: #5a5a5a;
+            margin-bottom: 15px;
+        }
+        
+        .offer-details {
+            text-align: left;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ffcc80;
+        }
+        
+        /* Example SMS */
+        .sms-example {
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 20px 0;
+            border-left: 4px solid #0B5FFF;
+        }
+        
+        /* Pricing */
+        .pricing-box {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .price {
+            font-size: 28px;
+            font-weight: 600;
+            color: #0B5FFF;
+            margin-bottom: 5px;
+        }
+        
+        .price-note {
+            color: #757575;
+            font-size: 14px;
+        }
+        
+        /* CTA Buttons */
+        .cta-section {
+            margin: 35px 0;
+            text-align: center;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #0B5FFF;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0747d6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(11, 95, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #0B5FFF;
+            border: 2px solid #0B5FFF;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0f7ff;
+        }
+        
+        /* Support Box */
+        .support-box {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .support-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #0B5FFF;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .contact-info {
+            margin-bottom: 15px;
+        }
+        
+        .contact-info a {
+            color: #0B5FFF;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .signature {
+            color: #757575;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .btn {
+                display: block;
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Agent IA Drain Fortin</h1>
+            <p class="subtitle">Système complété et prêt à activer</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <p class="greeting">Bonjour Guillaume,</p>
+            
+            <div class="status-badge">✓ Système testé et fonctionnel</div>
+            
+            <div class="section">
+                <p class="text">
+                    Après 14 mois de développement (je sais, c'était long), ton agent IA est finalement prêt. 
+                    Le système est solide, testé avec d'autres entreprises de plomberie au Québec, et configuré 
+                    spécifiquement pour Drain Fortin.
+                </p>
+            </div>
+            
+            <!-- Offer Box -->
+            <div class="offer-box">
+                <div class="offer-title">Test gratuit 48 heures</div>
+                <p class="offer-text">
+                    Essaie l'agent ce weekend sans risque.<br>
+                    Si ça fonctionne, tu paies. Sinon, on arrête là.
+                </p>
+                <div class="offer-details">
+                    <strong>Comment ça marche:</strong><br>
+                    • Je branche tes lignes vendredi soir<br>
+                    • Tu testes samedi-dimanche<br>
+                    • Lundi on fait le bilan ensemble<br>
+                    • Tu décides: on continue ou on arrête
+                </div>
+            </div>
+            
+            <!-- Features -->
+            <div class="section">
+                <h2>Ce que l'agent fait pour toi</h2>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>Répond 24/7 avec l'accent québécois naturel</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>Détecte les urgences (inondation, refoulement)</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>Priorise par valeur (municipal 150k$ avant débouchage 400$)</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>T'envoie un SMS détaillé immédiatement</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>Demande comment le client vous a trouvés</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="check">✓</span>
+                        <span>Applique tes tarifs (350$ minimum, surcharge Rive-Sud)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SMS Example -->
+            <div class="section">
+                <h2>Exemple de SMS que tu reçois</h2>
+                <div class="sms-example">
+                    URGENT - Refoulement égout<br>
+                    Mme Tremblay - Brossard<br>
+                    514-555-1234<br>
+                    Eau qui remonte dans sous-sol<br>
+                    Référé par: Voisin (M. Côté)<br>
+                    Prêt pour urgence weekend
+                </div>
+                <p class="text" style="margin-top: 15px;">
+                    L'appel dure 90 secondes. Le client est rassuré. Tu as toute l'info.
+                </p>
+            </div>
+            
+            <!-- Support -->
+            <div class="support-box">
+                <div class="support-title">Mon engagement après l'activation</div>
+                <div>
+                    • Monitoring quotidien les 2 premières semaines<br>
+                    • Ajustements selon tes besoins<br>
+                    • Rapport hebdomadaire des appels captés<br>
+                    • Support technique 3 mois inclus<br>
+                    • L'agent s'améliore chaque semaine
+                </div>
+            </div>
+            
+            <!-- Pricing -->
+            <div class="section">
+                <h2>Investment unique</h2>
+                <div class="pricing-box">
+                    <div class="price">2 875$</div>
+                    <div class="price-note">2 500$ + taxes (facture QTHMKFQ4-0001)</div>
+                    <p style="margin-top: 15px; color: #4a4a4a;">
+                        Comparé à une réceptionniste: 50 000$/année<br>
+                        ROI estimé: 2 semaines (basé sur 20 appels manqués/semaine)
+                    </p>
+                </div>
+            </div>
+            
+            <!-- CTA -->
+            <div class="cta-section">
+                <p style="margin-bottom: 20px; font-weight: 600;">
+                    Prêt à récupérer tes appels manqués?
+                </p>
+                <a href="mailto:contact@autoscaleai.ca?subject=OK%20pour%20test%20gratuit" class="btn btn-primary">
+                    Essayer gratuitement 48h
+                </a>
+                <a href="tel:4502803222" class="btn btn-secondary">
+                    Appeler pour discuter
+                </a>
+            </div>
+            
+            <div class="section">
+                <p class="text">
+                    <strong>Paiement direct?</strong> Si tu préfères activer immédiatement:<br>
+                    Virement Interac à contact@autoscaleai.ca → Activation dans 24h
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="contact-info">
+                <strong>Jean-Samuel Leboeuf</strong><br>
+                <a href="tel:4502803222">450-280-3222</a> • 
+                <a href="mailto:contact@autoscaleai.ca">contact@autoscaleai.ca</a>
+            </div>
+            <p class="signature">
+                AutoScale AI - Solutions IA pour entreprises québécoises<br>
+                <br>
+                P.S.: Le document visuel drain-fortinxautoscaleai.html est en pièce jointe.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

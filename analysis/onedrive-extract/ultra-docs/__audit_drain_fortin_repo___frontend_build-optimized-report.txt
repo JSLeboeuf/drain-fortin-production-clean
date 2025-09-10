@@ -1,0 +1,64 @@
+
+> paul-web-frontend@0.1.0 build
+> vite build
+
+[36mvite v5.4.19 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 1700 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                              [39m[1m[2m  2.29 kB[22m[1m[22m[2m │ gzip:  0.90 kB[22m
+[2mdist/[22m[35massets/index-DjBNdYtM.css               [39m[1m[2m 77.79 kB[22m[1m[22m[2m │ gzip: 13.36 kB[22m
+[2mdist/[22m[36massets/index-BdQq_4o_.js                [39m[1m[2m  0.06 kB[22m[1m[22m[2m │ gzip:  0.08 kB[22m
+[2mdist/[22m[36massets/index-NyXL9C6A.js                [39m[1m[2m  0.14 kB[22m[1m[22m[2m │ gzip:  0.14 kB[22m
+[2mdist/[22m[36massets/index-BAJt5ehd.js                [39m[1m[2m  0.23 kB[22m[1m[22m[2m │ gzip:  0.17 kB[22m
+[2mdist/[22m[36massets/useCalls-HZzkQ8Kf.js             [39m[1m[2m  0.24 kB[22m[1m[22m[2m │ gzip:  0.19 kB[22m
+[2mdist/[22m[36massets/index-DgbtIGTn.js                [39m[1m[2m  0.26 kB[22m[1m[22m[2m │ gzip:  0.22 kB[22m
+[2mdist/[22m[36massets/play-BZH_hRKy.js                 [39m[1m[2m  0.30 kB[22m[1m[22m[2m │ gzip:  0.25 kB[22m
+[2mdist/[22m[36massets/loader-circle-DOftAHBU.js        [39m[1m[2m  0.31 kB[22m[1m[22m[2m │ gzip:  0.26 kB[22m
+[2mdist/[22m[36massets/LoadingSpinner-BKByuZXh.js       [39m[1m[2m  0.32 kB[22m[1m[22m[2m │ gzip:  0.25 kB[22m
+[2mdist/[22m[36massets/arrow-left-85YVT13c.js           [39m[1m[2m  0.33 kB[22m[1m[22m[2m │ gzip:  0.27 kB[22m
+[2mdist/[22m[36massets/search-CBp_-sQ1.js               [39m[1m[2m  0.34 kB[22m[1m[22m[2m │ gzip:  0.27 kB[22m
+[2mdist/[22m[36massets/message-square-BCGfDWvv.js       [39m[1m[2m  0.35 kB[22m[1m[22m[2m │ gzip:  0.27 kB[22m
+[2mdist/[22m[36massets/clock-Br_esw4N.js                [39m[1m[2m  0.35 kB[22m[1m[22m[2m │ gzip:  0.27 kB[22m
+[2mdist/[22m[36massets/useConstraints-DjSh566z.js       [39m[1m[2m  0.35 kB[22m[1m[22m[2m │ gzip:  0.25 kB[22m
+[2mdist/[22m[36massets/eye-gJ6OFlCT.js                  [39m[1m[2m  0.36 kB[22m[1m[22m[2m │ gzip:  0.28 kB[22m
+[2mdist/[22m[36massets/circle-check-big-BbitrTnm.js     [39m[1m[2m  0.36 kB[22m[1m[22m[2m │ gzip:  0.29 kB[22m
+[2mdist/[22m[36massets/circle-x-DDNlnhjx.js             [39m[1m[2m  0.37 kB[22m[1m[22m[2m │ gzip:  0.28 kB[22m
+[2mdist/[22m[36massets/trending-up-DQbw_fcT.js          [39m[1m[2m  0.37 kB[22m[1m[22m[2m │ gzip:  0.29 kB[22m
+[2mdist/[22m[36massets/dollar-sign-31sCZiYi.js          [39m[1m[2m  0.39 kB[22m[1m[22m[2m │ gzip:  0.30 kB[22m
+[2mdist/[22m[36massets/circle-alert-DdkzhBHs.js         [39m[1m[2m  0.42 kB[22m[1m[22m[2m │ gzip:  0.29 kB[22m
+[2mdist/[22m[36massets/useSettings-_3ePWM9s.js          [39m[1m[2m  0.43 kB[22m[1m[22m[2m │ gzip:  0.28 kB[22m
+[2mdist/[22m[36massets/download-B0uXJk6E.js             [39m[1m[2m  0.43 kB[22m[1m[22m[2m │ gzip:  0.32 kB[22m
+[2mdist/[22m[36massets/triangle-alert-CXhhe98G.js       [39m[1m[2m  0.43 kB[22m[1m[22m[2m │ gzip:  0.31 kB[22m
+[2mdist/[22m[36massets/save-D-FtRuw3.js                 [39m[1m[2m  0.50 kB[22m[1m[22m[2m │ gzip:  0.33 kB[22m
+[2mdist/[22m[36massets/textarea-D3UYdrp1.js             [39m[1m[2m  0.53 kB[22m[1m[22m[2m │ gzip:  0.34 kB[22m
+[2mdist/[22m[36massets/label-Ins7n1k5.js                [39m[1m[2m  0.59 kB[22m[1m[22m[2m │ gzip:  0.39 kB[22m
+[2mdist/[22m[36massets/input-CWTGAoS0.js                [39m[1m[2m  0.61 kB[22m[1m[22m[2m │ gzip:  0.37 kB[22m
+[2mdist/[22m[36massets/separator-CZ0pz5Wc.js            [39m[1m[2m  0.70 kB[22m[1m[22m[2m │ gzip:  0.42 kB[22m
+[2mdist/[22m[36massets/not-found-B88R8mzP.js            [39m[1m[2m  0.79 kB[22m[1m[22m[2m │ gzip:  0.41 kB[22m
+[2mdist/[22m[36massets/user-DH0SUmDL.js                 [39m[1m[2m  0.82 kB[22m[1m[22m[2m │ gzip:  0.40 kB[22m
+[2mdist/[22m[36massets/card-C8Hqeo80.js                 [39m[1m[2m  1.02 kB[22m[1m[22m[2m │ gzip:  0.38 kB[22m
+[2mdist/[22m[36massets/table-CK3qIgja.js                [39m[1m[2m  1.52 kB[22m[1m[22m[2m │ gzip:  0.53 kB[22m
+[2mdist/[22m[36massets/MetricsCard-MVKLjDTG.js          [39m[1m[2m  2.49 kB[22m[1m[22m[2m │ gzip:  0.99 kB[22m
+[2mdist/[22m[36massets/services-coz2gV4Z.js             [39m[1m[2m  3.25 kB[22m[1m[22m[2m │ gzip:  1.17 kB[22m
+[2mdist/[22m[36massets/CallsTable--CEmWaCr.js           [39m[1m[2m  4.51 kB[22m[1m[22m[2m │ gzip:  1.38 kB[22m
+[2mdist/[22m[36massets/Settings-BgJFcvXL.js             [39m[1m[2m  5.72 kB[22m[1m[22m[2m │ gzip:  1.82 kB[22m
+[2mdist/[22m[36massets/SettingsPrompts-CctK_8JH.js      [39m[1m[2m  5.78 kB[22m[1m[22m[2m │ gzip:  1.88 kB[22m
+[2mdist/[22m[36massets/SettingsPricing-B3X-xYtb.js      [39m[1m[2m  5.96 kB[22m[1m[22m[2m │ gzip:  2.24 kB[22m
+[2mdist/[22m[36massets/Calls-D4BUYnRA.js                [39m[1m[2m  6.50 kB[22m[1m[22m[2m │ gzip:  2.53 kB[22m
+[2mdist/[22m[36massets/tabs-CLmHR1kb.js                 [39m[1m[2m  6.65 kB[22m[1m[22m[2m │ gzip:  2.64 kB[22m
+[2mdist/[22m[36massets/TestConnections-BArtaxag.js      [39m[1m[2m  7.86 kB[22m[1m[22m[2m │ gzip:  2.63 kB[22m
+[2mdist/[22m[36massets/Analytics-BWylJfn2.js            [39m[1m[2m  8.22 kB[22m[1m[22m[2m │ gzip:  2.23 kB[22m
+[2mdist/[22m[36massets/Test-C8UmTcew.js                 [39m[1m[2m  8.88 kB[22m[1m[22m[2m │ gzip:  3.14 kB[22m
+[2mdist/[22m[36massets/DrainFortinServices-Dk18dmnG.js  [39m[1m[2m  9.68 kB[22m[1m[22m[2m │ gzip:  2.98 kB[22m
+[2mdist/[22m[36massets/SettingsConstraints-DvrQWMS4.js  [39m[1m[2m 10.05 kB[22m[1m[22m[2m │ gzip:  3.49 kB[22m
+[2mdist/[22m[36massets/GuillaumeSettings-rezAcftM.js    [39m[1m[2m 10.36 kB[22m[1m[22m[2m │ gzip:  2.98 kB[22m
+[2mdist/[22m[36massets/Header-CvI8nKVR.js               [39m[1m[2m 11.96 kB[22m[1m[22m[2m │ gzip:  3.45 kB[22m
+[2mdist/[22m[36massets/RealTimeMonitoring-C-TvObof.js   [39m[1m[2m 12.61 kB[22m[1m[22m[2m │ gzip:  3.15 kB[22m
+[2mdist/[22m[36massets/Dashboard-QaXlnfxR.js            [39m[1m[2m 17.54 kB[22m[1m[22m[2m │ gzip:  5.62 kB[22m
+[2mdist/[22m[36massets/CallDetail-CBP6ii39.js           [39m[1m[2m 18.96 kB[22m[1m[22m[2m │ gzip:  6.37 kB[22m
+[2mdist/[22m[36massets/select-Du3Bmk_2.js               [39m[1m[2m 38.40 kB[22m[1m[22m[2m │ gzip: 13.31 kB[22m
+[2mdist/[22m[36massets/index-DQYyqhaP.js                [39m[1m[2m 91.02 kB[22m[1m[22m[2m │ gzip: 31.94 kB[22m
+[2mdist/[22m[36massets/vendor-qfmrNjMO.js               [39m[1m[2m187.08 kB[22m[1m[22m[2m │ gzip: 59.53 kB[22m
+[32m✓ built in 7.01s[39m

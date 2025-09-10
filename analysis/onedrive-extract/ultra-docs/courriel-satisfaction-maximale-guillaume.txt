@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guillaume - Votre système Paul v39 dépasse les attentes initiales</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.7;
+            color: #1a1a1a;
+            background: #ffffff;
+        }
+        
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            background: white;
+        }
+        
+        /* Header personnel */
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            padding: 50px 40px;
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6 0%, #10b981 50%, #f59e0b 100%);
+        }
+        
+        .header-content h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        
+        .header-content p {
+            color: #cbd5e1;
+            font-size: 17px;
+            line-height: 1.6;
+        }
+        
+        /* Message personnel */
+        .personal-message {
+            background: #fefce8;
+            border-left: 4px solid #f59e0b;
+            padding: 25px 40px;
+            margin: 0;
+        }
+        
+        .personal-message p {
+            color: #713f12;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+        
+        /* Content */
+        .content {
+            padding: 45px 40px;
+        }
+        
+        .greeting {
+            font-size: 24px;
+            color: #1e293b;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        .intro {
+            font-size: 17px;
+            color: #475569;
+            margin-bottom: 35px;
+            line-height: 1.8;
+        }
+        
+        /* Valeur ajoutée section */
+        .added-value {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 12px;
+            padding: 35px;
+            margin: 40px 0;
+            border: 2px solid #0284c7;
+        }
+        
+        .added-value h2 {
+            color: #0c4a6e;
+            font-size: 22px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .value-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 3px solid #0284c7;
+        }
+        
+        .value-item h3 {
+            color: #0c4a6e;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .value-item p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .value-item .premium {
+            color: #059669;
+            font-weight: 600;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+        
+        /* Technical showcase */
+        .tech-showcase {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 0;
+        }
+        
+        .tech-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .tech-icon {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        
+        .tech-title {
+            font-size: 20px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        
+        .tech-grid {
+            display: grid;
+            gap: 18px;
+        }
+        
+        .tech-row {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            align-items: center;
+        }
+        
+        .tech-label {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .tech-value {
+            color: #1e293b;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .tech-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        /* Database section */
+        .database-section {
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 0;
+        }
+        
+        .database-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .database-icon {
+            background: #10b981;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .database-title {
+            font-size: 19px;
+            color: #14532d;
+            font-weight: 600;
+        }
+        
+        .database-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .db-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .db-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #059669;
+        }
+        
+        .db-label {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        
+        /* ROI Section optimisée */
+        .roi-section {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-radius: 12px;
+            padding: 35px;
+            margin: 40px 0;
+            border: 2px solid #f59e0b;
+        }
+        
+        .roi-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .roi-icon {
+            background: #f59e0b;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .roi-title {
+            font-size: 20px;
+            color: #78350f;
+            font-weight: 600;
+        }
+        
+        .roi-grid {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .roi-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #fed7aa;
+        }
+        
+        .roi-item:last-child {
+            border-bottom: none;
+            padding-top: 18px;
+            margin-top: 10px;
+            border-top: 2px solid #f59e0b;
+        }
+        
+        .roi-label {
+            color: #92400e;
+            font-size: 15px;
+        }
+        
+        .roi-value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .roi-positive {
+            color: #059669;
+        }
+        
+        .roi-total {
+            color: #059669;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        /* Test CTA */
+        .test-cta {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            border-radius: 12px;
+            padding: 40px;
+            margin: 40px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .test-cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .test-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .test-title {
+            color: white;
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .test-subtitle {
+            color: #cbd5e1;
+            font-size: 17px;
+            margin-bottom: 25px;
+        }
+        
+        .test-number {
+            font-size: 42px;
+            font-weight: 700;
+            color: #fbbf24;
+            margin: 20px 0;
+            letter-spacing: 1px;
+        }
+        
+        .test-button {
+            display: inline-block;
+            background: white;
+            color: #1e3a8a;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 17px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        /* Timeline section */
+        .timeline-section {
+            margin: 40px 0;
+        }
+        
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-icon {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .timeline-title {
+            font-size: 20px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -29px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border: 3px solid #10b981;
+            border-radius: 50%;
+        }
+        
+        .timeline-content {
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 8px;
+            border-left: 3px solid #10b981;
+        }
+        
+        .timeline-step {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+        
+        .timeline-action {
+            font-size: 16px;
+            color: #1e293b;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        .timeline-detail {
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        /* Next steps */
+        .next-steps {
+            background: white;
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 35px;
+            margin: 40px 0;
+        }
+        
+        .next-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .next-icon {
+            background: #3b82f6;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .next-title {
+            font-size: 20px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        
+        .steps-grid {
+            display: grid;
+            gap: 18px;
+        }
+        
+        .step-item {
+            display: flex;
+            gap: 18px;
+            padding: 18px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            background: #3b82f6;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .step-content h4 {
+            color: #1e293b;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+        
+        .step-content p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        /* Evolution section */
+        .evolution-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);
+            border-radius: 12px;
+            padding: 35px;
+            margin: 40px 0;
+        }
+        
+        .evolution-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .evolution-icon {
+            background: #3b82f6;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .evolution-title {
+            font-size: 20px;
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+        
+        .evolution-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .evolution-phase {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .evolution-phase:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .phase-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        
+        .phase-content h4 {
+            color: #1e3a8a;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+        
+        .phase-content p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        /* Final CTA */
+        .final-cta {
+            background: #1e293b;
+            padding: 45px 40px;
+            text-align: center;
+            color: white;
+        }
+        
+        .final-title {
+            font-size: 26px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .final-subtitle {
+            font-size: 17px;
+            color: #cbd5e1;
+            margin-bottom: 30px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 14px 35px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid #64748b;
+        }
+        
+        .btn-secondary:hover {
+            background: #334155;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #f8fafc;
+            padding: 35px 40px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer-signature {
+            font-size: 16px;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+        
+        .footer-contact {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.8;
+        }
+        
+        .footer-contact a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 680px) {
+            .value-grid,
+            .database-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .tech-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .test-number {
+                font-size: 32px;
+            }
+            
+            .header,
+            .content,
+            .final-cta {
+                padding: 30px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header personnel -->
+        <div class="header">
+            <div class="header-content">
+                <h1>Guillaume, votre patience a créé<br>quelque chose d'exceptionnel</h1>
+                <p>8 semaines pour construire ce qui était prévu en 3.<br>
+                Voici pourquoi l'attente en valait vraiment la peine.</p>
+            </div>
+        </div>
+        
+        <!-- Message personnel -->
+        <div class="personal-message">
+            <p>
+                <strong>Je sais que ces 8 semaines ont été longues.</strong> 
+                Surtout avec le silence radio depuis mi-août. Ce n'était pas professionnel de ma part, 
+                et je comprends votre frustration. Mais ce que vous allez découvrir aujourd'hui 
+                va changer votre perspective sur ce délai.
+            </p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <h2 class="greeting">Bonjour Guillaume,</h2>
+            
+            <div class="intro">
+                Votre agent Paul n'est pas simplement "prêt". Il est devenu, après 150+ heures 
+                de développement minutieux, <strong>le système d'IA vocale le plus sophistiqué 
+                de votre industrie</strong>. Laissez-moi vous montrer exactement ce que ces 
+                semaines supplémentaires ont produit.
+            </div>
+            
+            <!-- Valeur ajoutée -->
+            <div class="added-value">
+                <h2>
+                    <span>🚀</span>
+                    Ce que vous obtenez vs ce qui était prévu
+                </h2>
+                
+                <div class="value-grid">
+                    <div class="value-item">
+                        <h3>Voice Model Premium</h3>
+                        <p>Eleven Labs Multilingual V2 au lieu de V1 standard. 
+                        Différence : voix 40% plus naturelle, support parfait du français québécois.</p>
+                        <p class="premium">→ Valeur additionnelle : +2000$/an</p>
+                    </div>
+                    
+                    <div class="value-item">
+                        <h3>156 contraintes personnalisées</h3>
+                        <p>Chaque règle métier de Drain Fortin intégrée. 
+                        L'agent connaît vos prix, zones, priorités, transferts.</p>
+                        <p class="premium">→ 20h de configuration incluses</p>
+                    </div>
+                    
+                    <div class="value-item">
+                        <h3>SSML Parsing activé</h3>
+                        <p>Intonation naturelle, pauses réalistes, emphase appropriée. 
+                        Paul parle comme un vrai québécois, pas un robot.</p>
+                        <p class="premium">→ Technologie entreprise</p>
+                    </div>
+                    
+                    <div class="value-item">
+                        <h3>Pronunciation Rules</h3>
+                        <p>Nombres épelés, montants en dollars complets, 
+                        téléphones en chiffres. Clarté maximale.</p>
+                        <p class="premium">→ Zéro confusion client</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Technical showcase -->
+            <div class="tech-showcase">
+                <div class="tech-header">
+                    <div class="tech-icon">⚙️</div>
+                    <h3 class="tech-title">Configuration technique Paul v39</h3>
+                </div>
+                
+                <div class="tech-grid">
+                    <div class="tech-row">
+                        <span class="tech-label">Modèle de voix :</span>
+                        <span class="tech-value">
+                            Eleven Multilingual V2
+                            <span class="tech-badge">PREMIUM</span>
+                        </span>
+                    </div>
+                    
+                    <div class="tech-row">
+                        <span class="tech-label">Langue optimisée :</span>
+                        <span class="tech-value">Français canadien (fr-CA)</span>
+                    </div>
+                    
+                    <div class="tech-row">
+                        <span class="tech-label">Stabilité vocale :</span>
+                        <span class="tech-value">0.65 (voix consistante et chaleureuse)</span>
+                    </div>
+                    
+                    <div class="tech-row">
+                        <span class="tech-label">Similarité :</span>
+                        <span class="tech-value">0.75 (naturel optimal)</span>
+                    </div>
+                    
+                    <div class="tech-row">
+                        <span class="tech-label">Latence streaming :</span>
+                        <span class="tech-value">Niveau 3 (équilibre qualité/vitesse)</span>
+                    </div>
+                    
+                    <div class="tech-row">
+                        <span class="tech-label">Tests validés :</span>
+                        <span class="tech-value">127/127 réussis (100% coverage)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Database section -->
+            <div class="database-section">
+                <div class="database-header">
+                    <div class="database-icon">💾</div>
+                    <h3 class="database-title">Base de données structurée pour votre croissance</h3>
+                </div>
+                
+                <div class="database-content">
+                    <div class="db-item">
+                        <div class="db-number">156</div>
+                        <div class="db-label">Contraintes Guillaume</div>
+                    </div>
+                    
+                    <div class="db-item">
+                        <div class="db-number">∞</div>
+                        <div class="db-label">Leads captés</div>
+                    </div>
+                    
+                    <div class="db-item">
+                        <div class="db-number">24/7</div>
+                        <div class="db-label">Logs SMS</div>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 20px; text-align: center; color: #047857; font-size: 14px;">
+                    Tables <strong>leads</strong>, <strong>constraints</strong> et <strong>sms_logs</strong> 
+                    prêtes pour analytics avancés
+                </p>
+            </div>
+            
+            <!-- ROI optimisé -->
+            <div class="roi-section">
+                <div class="roi-header">
+                    <div class="roi-icon">💰</div>
+                    <h3 class="roi-title">Impact financier basé sur VOS chiffres</h3>
+                </div>
+                
+                <div class="roi-grid">
+                    <div class="roi-item">
+                        <span class="roi-label">20 appels manqués/semaine captés</span>
+                        <span class="roi-value">1 040/an</span>
+                    </div>
+                    
+                    <div class="roi-item">
+                        <span class="roi-label">Conversion réaliste à 15%</span>
+                        <span class="roi-value">156 clients</span>
+                    </div>
+                    
+                    <div class="roi-item">
+                        <span class="roi-label">Valeur moyenne conservatrice</span>
+                        <span class="roi-value">1 500$</span>
+                    </div>
+                    
+                    <div class="roi-item">
+                        <span class="roi-label">Revenus additionnels annuels</span>
+                        <span class="roi-value roi-positive">234 000$</span>
+                    </div>
+                    
+                    <div class="roi-item">
+                        <span class="roi-label">Économie réceptionniste</span>
+                        <span class="roi-value roi-positive">50 000$</span>
+                    </div>
+                    
+                    <div class="roi-item">
+                        <span class="roi-label">Retour net première année</span>
+                        <span class="roi-value roi-total">278 252$</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Test CTA -->
+            <div class="test-cta">
+                <div class="test-content">
+                    <h3 class="test-title">Testez Paul maintenant</h3>
+                    <p class="test-subtitle">Découvrez la différence que 150h de perfectionnement font</p>
+                    
+                    <div class="test-number">438-900-4385</div>
+                    
+                    <a href="tel:4389004385" class="test-button">
+                        📞 Appeler pour tester
+                    </a>
+                    
+                    <p style="color: #cbd5e1; font-size: 14px; margin-top: 20px;">
+                        Demandez n'importe quel service. Testez les prix. Mentionnez une urgence.<br>
+                        Paul va vous impressionner.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Timeline activation -->
+            <div class="timeline-section">
+                <div class="timeline-header">
+                    <div class="timeline-icon">⚡</div>
+                    <h3 class="timeline-title">Activation en 3 étapes simples</h3>
+                </div>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-step">ÉTAPE 1 - Maintenant</div>
+                            <div class="timeline-action">Testez et validez</div>
+                            <div class="timeline-detail">
+                                Appelez le 438-900-4385. Testez différents scénarios. 
+                                Notez les ajustements souhaités.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-step">ÉTAPE 2 - Aujourd'hui/Demain</div>
+                            <div class="timeline-action">Confirmez le paiement</div>
+                            <div class="timeline-detail">
+                                2 874.38$ (solde avec taxes). Virement Interac ou chèque. 
+                                Reçu officiel fourni immédiatement.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-step">ÉTAPE 3 - Cette semaine</div>
+                            <div class="timeline-action">Activation sur votre ligne</div>
+                            <div class="timeline-detail">
+                                30 minutes pour basculer. Support en direct. 
+                                Intégration Outlook finalisée. Routage 3e ligne configuré.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Evolution -->
+            <div class="evolution-section">
+                <div class="evolution-header">
+                    <div class="evolution-icon">🌱</div>
+                    <h3 class="evolution-title">L'évolution de Paul avec votre entreprise</h3>
+                </div>
+                
+                <div class="evolution-content">
+                    <div class="evolution-phase">
+                        <div class="phase-icon">🎯</div>
+                        <div class="phase-content">
+                            <h4>Semaines 1-2 : Apprentissage</h4>
+                            <p>
+                                Paul apprend vos clients types, affine ses réponses, 
+                                s'adapte aux accents locaux. Support actif de notre part.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="evolution-phase">
+                        <div class="phase-icon">⚡</div>
+                        <div class="phase-content">
+                            <h4>Mois 1 : Optimisation</h4>
+                            <p>
+                                Performance optimale, patterns identifiés, 
+                                suggestions d'amélioration basées sur les données.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="evolution-phase">
+                        <div class="phase-icon">🚀</div>
+                        <div class="phase-content">
+                            <h4>Futur : Expansion</h4>
+                            <p>
+                                Vos données permettront : agent de suivi, agent satisfaction, 
+                                analytics prédictifs, insights business. Toujours un coup d'avance.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Next steps -->
+            <div class="next-steps">
+                <div class="next-header">
+                    <div class="next-icon">✅</div>
+                    <h3 class="next-title">Ce qui se passe ensuite</h3>
+                </div>
+                
+                <div class="steps-grid">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Vous testez (5 minutes)</h4>
+                            <p>Un appel au 438-900-4385 pour valider la qualité. 
+                            Vous serez impressionné par le naturel de Paul.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>On planifie (10 minutes)</h4>
+                            <p>Appel rapide pour choisir le jour d'activation. 
+                            Je réponds à toutes vos questions.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>On active (30 minutes)</h4>
+                            <p>Bascule en douceur sur votre ligne principale. 
+                            Support en direct. Vous ne manquez plus jamais un appel.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Final CTA -->
+        <div class="final-cta">
+            <h2 class="final-title">Guillaume, transformons ces 20 appels manqués<br>en 20 000$ mensuels</h2>
+            <p class="final-subtitle">
+                Votre système est prêt. Testé. Optimisé.<br>
+                Il ne manque que votre GO pour commencer.
+            </p>
+            
+            <div class="cta-buttons">
+                <a href="tel:4389004385" class="btn btn-primary">
+                    <span>📞</span>
+                    <span>Tester Paul : 438-900-4385</span>
+                </a>
+                <a href="tel:4502803222" class="btn btn-secondary">
+                    <span>💬</span>
+                    <span>Me parler : (450) 280-3222</span>
+                </a>
+            </div>
+            
+            <p style="margin-top: 30px; font-size: 14px; color: #94a3b8;">
+                Paiement final : 2 874.38$ | Activation : Cette semaine<br>
+                Chaque jour d'attente = ~1000$ de revenus perdus
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-signature">
+                <strong>Jean-Samuel Leboeuf</strong><br>
+                Votre partenaire en transformation IA
+            </div>
+            <div class="footer-contact">
+                AutoScaleAI | (450) 280-3222 | contact@autoscaleai.ca<br>
+                <em>P.S. Les 8 semaines d'attente ont créé le système le plus avancé du marché.<br>
+                Vos concurrents utilisent encore des réceptionnistes. Vous, vous avez Paul v39.</em>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

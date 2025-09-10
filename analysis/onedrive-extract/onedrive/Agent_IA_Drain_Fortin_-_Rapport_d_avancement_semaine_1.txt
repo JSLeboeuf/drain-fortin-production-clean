@@ -1,0 +1,476 @@
+Agent IA Drain Fortin - Rapport d'avancement semaine 1
+
+External
+
+Inbox
+
+
+
+
+
+Jean-Samuel Leboeuf <contact@autoscaleai.ca>
+
+
+
+
+
+6:47 AM (3 hours ago)
+
+
+
+
+
+
+
+to Guillaume
+
+
+
+Salut Guillaume,
+
+
+
+Voici ton rapport hebdomadaire après notre première semaine de développement.
+
+
+
+ÉTAT DU PROJET
+
+─────────────
+
+✓ Phase 1: Infrastructure complétée
+
+▸ Phase 2: Personnalisation (7-11 juillet)  
+
+▸ Phase 3: Tests et déploiement (14-17 juillet)
+
+
+
+Livraison prévue: 17 juillet 2025 - dans les délais.
+
+
+
+INFRASTRUCTURE EN PLACE - CE QUE TU AS DÉJÀ
+
+──────────────────────────────────────────
+
+
+
+Système haute disponibilité
+
+- Redondance multi-serveurs (jamais de panne)
+
+- Capacité 1000+ appels/jour sans ralentissement
+
+- Enregistrement automatique de tous les appels
+
+- Backup en temps réel (aucune perte de données)
+
+
+
+Intelligence artificielle avancée
+
+- Reconnaissance vocale optimisée pour l'accent québécois
+
+- Compréhension du contexte (pas juste des mots-clés)
+
+- Auto-évaluation et amélioration continue
+
+- Détection d'intention multi-niveaux
+
+
+
+Capture de données structurée
+
+- Chaque appel génère une fiche client complète
+
+- Transcription automatique intégrale
+
+- Catégorisation du type de problème
+
+- Évaluation automatique du potentiel commercial
+
+
+
+Base de connaissances spécialisée
+
+- 150+ termes techniques de plomberie/drainage
+
+- Reconnaissance des vrais symptômes d'urgence
+
+- Différenciation automatique des types de clients
+
+- Compréhension des expressions locales
+
+
+
+Bénéfices immédiats pour toi:
+
+→ Plus jamais un appel manqué
+
+→ Documentation automatique de chaque interaction
+
+→ Données pour analyser les tendances
+
+→ Base pour optimiser tes opérations
+
+
+
+MÉTRIQUES ACTUELLES
+
+─────────────────
+
+Appels testés: 48
+
+Taux de succès: 100%
+
+Durée moyenne: 2 min 17 sec
+
+Données capturées: 100%
+
+Urgences détectées: 100%
+
+
+
+PHASE 2 - PERSONNALISATION DRAIN FORTIN
+
+──────────────────────────────────────
+
+
+
+Ce que ça va t'apporter concrètement:
+
+
+
+Qualification automatique des leads
+
+- L'agent donnera des ranges basés sur TES prix
+
+- Filtrage intelligent selon TES critères
+
+- Priorisation selon TA logique d'affaires
+
+- Questions de qualification personnalisées
+
+
+
+Conversion améliorée
+
+- Scripts basés sur ce qui fonctionne pour TOI
+
+- Réponses à TES objections les plus fréquentes
+
+- Présentation de tes services avec TES arguments
+
+- Ton de voix aligné avec ton image de marque
+
+
+
+Efficacité opérationnelle
+
+- SMS formatés selon TES besoins exacts
+
+- Dispatch automatique par zone géographique
+
+- Temps de réponse communiqués automatiquement
+
+- Technicien suggéré selon la nature du problème
+
+
+
+Intelligence d'affaires
+
+- Détection automatique des gros contrats
+
+- Identification des clients récurrents
+
+- Alertes pour projets municipaux/commerciaux
+
+- Analyse des patterns d'appels
+
+
+
+Pour activer tout ça, j'ai besoin de ton expertise
+
+via le questionnaire joint (10 minutes max).
+
+
+
+PHASE 3 - DÉPLOIEMENT INTELLIGENT
+
+─────────────────────────────────
+
+
+
+Mode 3e ligne automatique
+
+- Quand tu gères déjà 2 appels simultanés
+
+- L'agent prend automatiquement le 3e, 4e, 5e...
+
+- Plus jamais de signal occupé pour tes clients
+
+- Capture complète même pendant les heures de pointe
+
+- Notification prioritaire si urgence détectée
+
+
+
+Scénario réel:
+
+→ 8h30: Tu parles avec M. Tremblay (drain bouché)
+
+→ 8h31: Mme Gagnon appelle, tu prends ligne 2
+
+→ 8h32: Ville de Montréal appelle = Ton agent répond!
+
+→ 8h35: SMS urgent sur ton cell avec tous les détails
+
+
+
+Résultat: 100% des appels traités, même dans le rush
+
+
+
+Apprentissage par performance
+
+- L'agent s'évalue automatiquement sur:
+
+  - Taux de capture d'information
+
+  - Durée optimale des appels
+
+  - Conversion en rendez-vous
+
+  - Détection correcte des urgences
+
+- Ajustements automatiques selon les résultats
+
+- Amélioration continue mesurable
+
+
+
+Google Sheets CRM en temps réel
+
+- Tableau de bord avec toutes tes métriques
+
+- Historique complet consultable
+
+- Analyse des tendances automatique
+
+- Export facile vers d'autres systèmes
+
+
+
+Multi-scénarios intelligents
+
+- Transfert selon disponibilité
+
+- Prise de rendez-vous dans ton calendrier
+
+- Rappels automatiques programmés
+
+- Gestion des suivis
+
+
+
+RETOUR SUR INVESTISSEMENT - RAPPEL DE NOTRE OBJECTIF
+
+───────────────────────────────────────────
+
+Investissement: 5 000$ (paiement unique)
+
+
+
+Comme on l'avait calculé ensemble sur ta landing page: -
+
+Appels récupérés: 96 000$/an
+
+(20 appels manqués/mois × 20% conversion × 2000$)
+
+- Salaire réceptionniste évité: 50 000$/an
+
+- Potentiel total: 146 000$/an
+
+
+
+Notre objectif: Récupérer ton investissement en 1 semaine
+
+ROI visé première année: 2 820%
+
+
+
+Frais récurrents: 0$ (tout inclus à vie)
+
+
+
+PROCHAINES ÉTAPES CONCRÈTES
+
+──────────────────────────
+
+
+
+Cette semaine (jusqu'au 7 juillet):
+
+□ Test le 438-900-4385 autant que tu veux
+
+□ Parle directement à l'agent de ce que tu aimerais:
+
+   → "J'aimerais que tu dises X quand on parle de gainage"
+
+   → "Voici comment je veux que tu gères les urgences"
+
+   → "Les prix devraient être présentés comme ça"
+
+□ Tout est enregistré - je vais écouter et implémenter
+
+□ Envoie-moi aussi tes observations par texto
+
+
+
+Lundi 7 juillet - ACTION REQUISE:
+
+□ Retourner le questionnaire de personnalisation
+
+   → Par courriel, téléphone ou texto
+
+   → 10 minutes max de ton temps
+
+   → CRITIQUE pour adapter l'agent à Drain Fortin
+
+
+
+Semaine prochaine (7-11 juillet):
+
+□ Je personnalise ton agent avec tes infos
+
+□ Vendredi 11: Rapport détaillé Phase 2
+
+
+
+Semaine finale (14-18 juillet):
+
+□ Tests intensifs de ta version personnalisée
+
+□ Ajustements en temps réel selon ton feedback
+
+□ Jeudi 17 ou vendredi 18: Déploiement officiel
+
+
+
+Pour le questionnaire, dis-moi simplement comment
+
+tu préfères procéder et on s'arrange.
+
+
+
+Je reste disponible pour toute question.
+
+
+
+Cordialement,
+
+
+
+J-S @ AutoScale AI  
+
+Chief AI Officer
+
+450-280-3222
+
+contact@autoscaleai.ca
+
+───────────────────────────────────────────
+
+P.S. Une fois que ton système sera déployé et que tu
+
+auras vu les résultats concrets, une offre de référencement
+
+à 500$ sera active. Tu m'avais parlé de tes frères en
+
+excavation et commerce de bœuf - ils pourront voir
+
+exactement ce que ça donne chez Drain Fortin avant
+
+de prendre leur décision.
+
+
+
+
+
+One attachment  •  Scanned by Gmail
+
+
+
+
+
+Guillaume Fortin
+
+
+
+6:53 AM (3 hours ago)
+
+
+
+
+
+
+
+to me
+
+
+
+Questionnaire sera par courriel. Est-ce bien la pièce qui était jointe à ton courriel?
+
+ 
+
+Guillaume Fortin Montréal : 514-529-6037 Extérieur de l’Île  450-806-4888
+
+estimation@drainfortin.caDrain Fortin Inc RBQ 5794-7517-01
+
+Expertise, entretien et gainage d’égouts et de drainswww.drainfortin.ca
+
+ 
+
+ 
+
+ 
+
+ 
+
+De : Jean-Samuel Leboeuf <contact@autoscaleai.ca>Envoyé : 4 juillet 2025 06:47À : Guillaume Fortin <estimation@drainfortin.ca>Objet : Agent IA Drain Fortin - Rapport d'avancement semaine 1
+
+
+
+
+
+
+
+Ada <ada@autoscaleai.ca>
+
+
+
+8:47 AM (1 hour ago)
+
+
+
+
+
+
+
+to Guillaume
+
+
+
+Oui exactement. 
+
+
+
+Tu peux télécharger le fichier et  appuyer sur envoyer la configuration à la fin, je vais recevoir les résultats par courriel. 
+
+
+
+N’hésite pas si tu as des questions !
+
+
+

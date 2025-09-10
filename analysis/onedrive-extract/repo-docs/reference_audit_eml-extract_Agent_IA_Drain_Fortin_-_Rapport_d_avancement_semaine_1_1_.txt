@@ -1,0 +1,479 @@
+﻿--0000000000003e2c5b063919e654
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Oui exactement.
+
+Tu peux tÃ©lÃ©charger le fichier et  appuyer sur envoyer la configuration Ã 
+la fin, je vais recevoir les rÃ©sultats par courriel.
+
+NâhÃ©site pas si tu as des questions !
+
+Le ven. 4 juill. 2025 Ã  06:53, Guillaume Fortin <estimation@drainfortin.ca>
+a Ã©crit :
+
+> Questionnaire sera par courriel. Est-ce bien la piÃ¨ce qui Ã©tait jointe Ã 
+> ton courriel?
+>
+>
+>
+> Guillaume Fortin MontrÃ©al : 514-529-6037 ExtÃ©rieur de lâÃle  450-806-4888
+>
+> estimation@drainfortin.ca
+> Drain Fortin Inc RBQ 5794-7517-01
+>
+> Expertise, entretien et gainage dâÃ©gouts et de drains
+> www.drainfortin.ca
+>
+>
+>
+>
+>
+>
+>
+>
+>
+> *De :* Jean-Samuel Leboeuf <contact@autoscaleai.ca>
+> *EnvoyÃ© :* 4 juillet 2025 06:47
+> *Ã :* Guillaume Fortin <estimation@drainfortin.ca>
+> *Objet :* Agent IA Drain Fortin - Rapport d'avancement semaine 1
+>
+>
+>
+> Salut Guillaume,
+>
+> Voici ton rapport hebdomadaire aprÃ¨s notre premiÃ¨re semaine de
+> dÃ©veloppement.
+>
+> ÃTAT DU PROJET
+> âââââââââââââ
+> â Phase 1: Infrastructure complÃ©tÃ©e
+> â¸ Phase 2: Personnalisation (7-11 juillet)
+> â¸ Phase 3: Tests et dÃ©ploiement (14-17 juillet)
+>
+> Livraison prÃ©vue: 17 juillet 2025 - dans les dÃ©lais.
+>
+> INFRASTRUCTURE EN PLACE - CE QUE TU AS DÃJÃ
+> ââââââââââââââââââââââââââââââââââââââââââ
+>
+> SystÃ¨me haute disponibilitÃ©
+> - Redondance multi-serveurs (jamais de panne)
+> - CapacitÃ© 1000+ appels/jour sans ralentissement
+> - Enregistrement automatique de tous les appels
+> - Backup en temps rÃ©el (aucune perte de donnÃ©es)
+>
+> Intelligence artificielle avancÃ©e
+> - Reconnaissance vocale optimisÃ©e pour l'accent quÃ©bÃ©cois
+> - ComprÃ©hension du contexte (pas juste des mots-clÃ©s)
+> - Auto-Ã©valuation et amÃ©lioration continue
+> - DÃ©tection d'intention multi-niveaux
+>
+> Capture de donnÃ©es structurÃ©e
+> - Chaque appel gÃ©nÃ¨re une fiche client complÃ¨te
+> - Transcription automatique intÃ©grale
+> - CatÃ©gorisation du type de problÃ¨me
+> - Ãvaluation automatique du potentiel commercial
+>
+> Base de connaissances spÃ©cialisÃ©e
+> - 150+ termes techniques de plomberie/drainage
+> - Reconnaissance des vrais symptÃ´mes d'urgence
+> - DiffÃ©renciation automatique des types de clients
+> - ComprÃ©hension des expressions locales
+>
+> BÃ©nÃ©fices immÃ©diats pour toi:
+> â Plus jamais un appel manquÃ©
+> â Documentation automatique de chaque interaction
+> â DonnÃ©es pour analyser les tendances
+> â Base pour optimiser tes opÃ©rations
+>
+> MÃTRIQUES ACTUELLES
+> âââââââââââââââââ
+> Appels testÃ©s: 48
+> Taux de succÃ¨s: 100%
+> DurÃ©e moyenne: 2 min 17 sec
+> DonnÃ©es capturÃ©es: 100%
+> Urgences dÃ©tectÃ©es: 100%
+>
+> PHASE 2 - PERSONNALISATION DRAIN FORTIN
+> ââââââââââââââââââââââââââââââââââââââ
+>
+> Ce que Ã§a va t'apporter concrÃ¨tement:
+>
+> Qualification automatique des leads
+> - L'agent donnera des ranges basÃ©s sur TES prix
+> - Filtrage intelligent selon TES critÃ¨res
+> - Priorisation selon TA logique d'affaires
+> - Questions de qualification personnalisÃ©es
+>
+> Conversion amÃ©liorÃ©e
+> - Scripts basÃ©s sur ce qui fonctionne pour TOI
+> - RÃ©ponses Ã  TES objections les plus frÃ©quentes
+> - PrÃ©sentation de tes services avec TES arguments
+> - Ton de voix alignÃ© avec ton image de marque
+>
+> EfficacitÃ© opÃ©rationnelle
+> - SMS formatÃ©s selon TES besoins exacts
+> - Dispatch automatique par zone gÃ©ographique
+> - Temps de rÃ©ponse communiquÃ©s automatiquement
+> - Technicien suggÃ©rÃ© selon la nature du problÃ¨me
+>
+> Intelligence d'affaires
+> - DÃ©tection automatique des gros contrats
+> - Identification des clients rÃ©currents
+> - Alertes pour projets municipaux/commerciaux
+> - Analyse des patterns d'appels
+>
+> Pour activer tout Ã§a, j'ai besoin de ton expertise
+> via le questionnaire joint (10 minutes max).
+>
+> PHASE 3 - DÃPLOIEMENT INTELLIGENT
+> âââââââââââââââââââââââââââââââââ
+>
+> Mode 3e ligne automatique
+> - Quand tu gÃ¨res dÃ©jÃ  2 appels simultanÃ©s
+> - L'agent prend automatiquement le 3e, 4e, 5e...
+> - Plus jamais de signal occupÃ© pour tes clients
+> - Capture complÃ¨te mÃªme pendant les heures de pointe
+> - Notification prioritaire si urgence dÃ©tectÃ©e
+>
+> ScÃ©nario rÃ©el:
+> â 8h30: Tu parles avec M. Tremblay (drain bouchÃ©)
+> â 8h31: Mme Gagnon appelle, tu prends ligne 2
+> â 8h32: Ville de MontrÃ©al appelle = Ton agent rÃ©pond!
+> â 8h35: SMS urgent sur ton cell avec tous les dÃ©tails
+>
+> RÃ©sultat: 100% des appels traitÃ©s, mÃªme dans le rush
+>
+> Apprentissage par performance
+> - L'agent s'Ã©value automatiquement sur:
+>   - Taux de capture d'information
+>   - DurÃ©e optimale des appels
+>   - Conversion en rendez-vous
+>   - DÃ©tection correcte des urgences
+> - Ajustements automatiques selon les rÃ©sultats
+> - AmÃ©lioration continue mesurable
+>
+> Google Sheets CRM en temps rÃ©el
+> - Tableau de bord avec toutes tes mÃ©triques
+> - Historique complet consultable
+> - Analyse des tendances automatique
+> - Export facile vers d'autres systÃ¨mes
+>
+> Multi-scÃ©narios intelligents
+> - Transfert selon disponibilitÃ©
+> - Prise de rendez-vous dans ton calendrier
+> - Rappels automatiques programmÃ©s
+> - Gestion des suivis
+>
+> RETOUR SUR INVESTISSEMENT - RAPPEL DE NOTRE OBJECTIF
+> âââââââââââââââââââââââââââââââââââââââââââ
+> Investissement: 5 000$ (paiement unique)
+>
+> Comme on l'avait calculÃ© ensemble sur ta landing page: -
+> Appels rÃ©cupÃ©rÃ©s: 96 000$/an
+> (20 appels manquÃ©s/mois Ã 20% conversion Ã 2000$)
+> - Salaire rÃ©ceptionniste Ã©vitÃ©: 50 000$/an
+> - Potentiel total: 146 000$/an
+>
+> Notre objectif: RÃ©cupÃ©rer ton investissement en 1 semaine
+> ROI visÃ© premiÃ¨re annÃ©e: 2 820%
+>
+> Frais rÃ©currents: 0$ (tout inclus Ã  vie)
+>
+> PROCHAINES ÃTAPES CONCRÃTES
+> ââââââââââââââââââââââââââ
+>
+> Cette semaine (jusqu'au 7 juillet):
+> â¡ Test le 438-900-4385 autant que tu veux
+> â¡ Parle directement Ã  l'agent de ce que tu aimerais:
+>    â "J'aimerais que tu dises X quand on parle de gainage"
+>    â "Voici comment je veux que tu gÃ¨res les urgences"
+>    â "Les prix devraient Ãªtre prÃ©sentÃ©s comme Ã§a"
+> â¡ Tout est enregistrÃ© - je vais Ã©couter et implÃ©menter
+> â¡ Envoie-moi aussi tes observations par texto
+>
+> Lundi 7 juillet - ACTION REQUISE:
+> â¡ Retourner le questionnaire de personnalisation
+>    â Par courriel, tÃ©lÃ©phone ou texto
+>    â 10 minutes max de ton temps
+>    â CRITIQUE pour adapter l'agent Ã  Drain Fortin
+>
+> Semaine prochaine (7-11 juillet):
+> â¡ Je personnalise ton agent avec tes infos
+> â¡ Vendredi 11: Rapport dÃ©taillÃ© Phase 2
+>
+> Semaine finale (14-18 juillet):
+> â¡ Tests intensifs de ta version personnalisÃ©e
+> â¡ Ajustements en temps rÃ©el selon ton feedback
+> â¡ Jeudi 17 ou vendredi 18: DÃ©ploiement officiel
+>
+>
+> Pour le questionnaire, dis-moi simplement comment
+> tu prÃ©fÃ¨res procÃ©der et on s'arrange.
+>
+> Je reste disponible pour toute question.
+>
+> Cordialement,
+>
+>
+> J-S @ AutoScale AI
+>
+> Chief AI Officer
+>
+> 450-280-3222
+> contact@autoscaleai.ca
+>
+> âââââââââââââââââââââââââââââââââââââââââââ
+>
+> P.S. Une fois que ton systÃ¨me sera dÃ©ployÃ© et que tu
+> auras vu les rÃ©sultats concrets, une offre de rÃ©fÃ©rencement
+> Ã  500$ sera active. Tu m'avais parlÃ© de tes frÃ¨res en
+> excavation et commerce de bÅuf - ils pourront voir
+> exactement ce que Ã§a donne chez Drain Fortin avant
+> de prendre leur dÃ©cision.
+>
+>
+>
+
+--0000000000003e2c5b063919e654
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div><div><div dir="auto">Oui exactement.Â </div><div dir="auto"><br></div><div dir="auto">Tu peux tÃ©lÃ©charger le fichier et Â appuyer sur envoyer la configuration Ã  la fin, je vais recevoir les rÃ©sultats par courriel.Â </div><div dir="auto"><br></div><div dir="auto">NâhÃ©site pas si tu as des questions !</div></div></div><div><div><div><br><div class="gmail_quote"><div dir="ltr" class="gmail_attr">Le ven. 4 juill. 2025 Ã  06:53, Guillaume Fortin &lt;<a href="mailto:estimation@drainfortin.ca" target="_blank">estimation@drainfortin.ca</a>&gt; a Ã©critÂ :<br></div><blockquote class="gmail_quote" style="margin:0px 0px 0px 0.8ex;border-left-width:1px;border-left-style:solid;padding-left:1ex;border-left-color:rgb(204,204,204)">
+
+
+
+
+
+<div lang="FR-CA" link="blue" vlink="purple">
+<div>
+<p class="MsoNormal"><span style="font-size:11pt">Questionnaire sera par courriel. Est-ce bien la piÃ¨ce qui Ã©tait jointe Ã  ton courriel?<u></u><u></u></span></p>
+<p class="MsoNormal"><span style="font-size:11pt"><u></u>Â <u></u></span></p>
+<p class="MsoNormal">Guillaume Fortin MontrÃ©alÂ : <span style="color:black">514-529-6037 ExtÃ©rieur de lâÃleÂ  450-806-4888
+</span><span style="font-size:11pt;color:black"><u></u><u></u></span></p>
+<p class="MsoNormal"><span style="color:black"><a href="mailto:estimation@drainfortin.ca" target="_blank"><span style="color:rgb(5,99,193)">estimation@drainfortin.ca</span></a></span><br>
+<span style="color:rgb(132,60,12)">Drain Fortin Inc RBQ 5794-7517-01<u></u><u></u></span></p>
+<p class="MsoNormal"><span style="color:rgb(132,60,12)">Expertise, entretien et gainage dâÃ©gouts et de drains</span><br>
+<a href="http://www.drainfortin.ca/" target="_blank"><span style="color:rgb(5,99,193)">www.drainfortin.ca</span></a><br>
+<img border="0" src="cid:ii_197d5719a1b4cd34f0f1" style="width: 200px; max-width: 100%; background-color: rgba(0, 0, 0, 0) !important; border-color: rgb(255, 255, 255) !important; color: rgb(255, 255, 255) !important;"><img border="0" src="cid:ii_197d5719a1b11bfad142" style="width: 250px; max-width: 100%; background-color: rgba(0, 0, 0, 0) !important; border-color: rgb(255, 255, 255) !important; color: rgb(255, 255, 255) !important;"><img border="0" src="cid:ii_197d5719a1b155f77113" style="width: 174px; max-width: 100%; background-color: rgba(0, 0, 0, 0) !important; border-color: rgb(255, 255, 255) !important; color: rgb(255, 255, 255) !important;"><u></u><u></u></p>
+<p class="MsoNormal"><u></u>Â <u></u></p>
+<p class="MsoNormal"><u></u>Â <u></u></p>
+<p class="MsoNormal"><u></u>Â <u></u></p>
+<p class="MsoNormal"><span style="font-size:11pt"><u></u>Â <u></u></span></p>
+<div style="border-width:1pt medium medium;border-style:solid none none;padding:3pt 0cm 0cm;border-color:rgb(225,225,225) currentcolor currentcolor">
+<p class="MsoNormal"><b><span lang="FR" style="font-size:11pt;font-family:Calibri,sans-serif">DeÂ :</span></b><span lang="FR" style="font-size:11pt;font-family:Calibri,sans-serif"> Jean-Samuel Leboeuf &lt;<a href="mailto:contact@autoscaleai.ca" style="font-family:Calibri,sans-serif" target="_blank">contact@autoscaleai.ca</a>&gt;
+<br>
+<b style="font-family:Calibri,sans-serif">EnvoyÃ©Â :</b> 4 juillet 2025 06:47<br>
+<b style="font-family:Calibri,sans-serif">ÃÂ :</b> Guillaume Fortin &lt;<a href="mailto:estimation@drainfortin.ca" style="font-family:Calibri,sans-serif" target="_blank">estimation@drainfortin.ca</a>&gt;<br>
+<b style="font-family:Calibri,sans-serif">ObjetÂ :</b> Agent IA Drain Fortin - Rapport d&#39;avancement semaine 1<u style="font-family:Calibri,sans-serif"></u><u style="font-family:Calibri,sans-serif"></u></span></p>
+</div></div></div><div lang="FR-CA" link="blue" vlink="purple"><div>
+<p class="MsoNormal"><u></u>Â <u></u></p>
+<div>
+<p class="MsoNormal">Salut Guillaume,<br>
+<br>
+Voici ton rapport hebdomadaire aprÃ¨s notre premiÃ¨re semaine de dÃ©veloppement.<br>
+<br>
+ÃTAT DU PROJET<br>
+âââââââââââââ<br>
+â Phase 1: Infrastructure complÃ©tÃ©e<br>
+<span style="font-family:&quot;Cambria Math&quot;,serif">â¸</span> Phase 2: Personnalisation (7-11 juillet) Â <br>
+<span style="font-family:&quot;Cambria Math&quot;,serif">â¸</span> Phase 3: Tests et dÃ©ploiement (14-17 juillet)<br>
+<br>
+Livraison prÃ©vue: 17 juillet 2025 - dans les dÃ©lais.<br>
+<br>
+INFRASTRUCTURE EN PLACE - CE QUE TU AS DÃJÃ<br>
+ââââââââââââââââââââââââââââââââââââââââââ<br>
+<br>
+SystÃ¨me haute disponibilitÃ©<br>
+- Redondance multi-serveurs (jamais de panne)<br>
+- CapacitÃ© 1000+ appels/jour sans ralentissement<br>
+- Enregistrement automatique de tous les appels<br>
+- Backup en temps rÃ©el (aucune perte de donnÃ©es)<br>
+<br>
+Intelligence artificielle avancÃ©e<br>
+- Reconnaissance vocale optimisÃ©e pour l&#39;accent quÃ©bÃ©cois<br>
+- ComprÃ©hension du contexte (pas juste des mots-clÃ©s)<br>
+- Auto-Ã©valuation et amÃ©lioration continue<br>
+- DÃ©tection d&#39;intention multi-niveaux<br>
+<br>
+Capture de donnÃ©es structurÃ©e<br>
+- Chaque appel gÃ©nÃ¨re une fiche client complÃ¨te<br>
+- Transcription automatique intÃ©grale<br>
+- CatÃ©gorisation du type de problÃ¨me<br>
+- Ãvaluation automatique du potentiel commercial<br>
+<br>
+Base de connaissances spÃ©cialisÃ©e<br>
+- 150+ termes techniques de plomberie/drainage<br>
+- Reconnaissance des vrais symptÃ´mes d&#39;urgence<br>
+- DiffÃ©renciation automatique des types de clients<br>
+- ComprÃ©hension des expressions locales<br>
+<br>
+BÃ©nÃ©fices immÃ©diats pour toi:<br>
+â Plus jamais un appel manquÃ©<br>
+â Documentation automatique de chaque interaction<br>
+â DonnÃ©es pour analyser les tendances<br>
+â Base pour optimiser tes opÃ©rations<br>
+<br>
+MÃTRIQUES ACTUELLES<br>
+âââââââââââââââââ<br>
+Appels testÃ©s: 48<br>
+Taux de succÃ¨s: 100%<br>
+DurÃ©e moyenne: 2 min 17 sec<br>
+DonnÃ©es capturÃ©es: 100%<br>
+Urgences dÃ©tectÃ©es: 100%<br>
+<br>
+PHASE 2 - PERSONNALISATION DRAIN FORTIN<br>
+ââââââââââââââââââââââââââââââââââââââ<br>
+<br>
+Ce que Ã§a va t&#39;apporter concrÃ¨tement:<br>
+<br>
+Qualification automatique des leads<br>
+- L&#39;agent donnera des ranges basÃ©s sur TES prix<br>
+- Filtrage intelligent selon TES critÃ¨res<br>
+- Priorisation selon TA logique d&#39;affaires<br>
+- Questions de qualification personnalisÃ©es<br>
+<br>
+Conversion amÃ©liorÃ©e<br>
+- Scripts basÃ©s sur ce qui fonctionne pour TOI<br>
+- RÃ©ponses Ã  TES objections les plus frÃ©quentes<br>
+- PrÃ©sentation de tes services avec TES arguments<br>
+- Ton de voix alignÃ© avec ton image de marque<br>
+<br>
+EfficacitÃ© opÃ©rationnelle<br>
+- SMS formatÃ©s selon TES besoins exacts<br>
+- Dispatch automatique par zone gÃ©ographique<br>
+- Temps de rÃ©ponse communiquÃ©s automatiquement<br>
+- Technicien suggÃ©rÃ© selon la nature du problÃ¨me<br>
+<br>
+Intelligence d&#39;affaires<br>
+- DÃ©tection automatique des gros contrats<br>
+- Identification des clients rÃ©currents<br>
+- Alertes pour projets municipaux/commerciaux<br>
+- Analyse des patterns d&#39;appels<br>
+<br>
+Pour activer tout Ã§a, j&#39;ai besoin de ton expertise <br>
+via le questionnaire joint (10 minutes max).<br>
+<br>
+PHASE 3 - DÃPLOIEMENT INTELLIGENT<br>
+âââââââââââââââââââââââââââââââââ<br>
+<br>
+Mode 3e ligne automatique<br>
+- Quand tu gÃ¨res dÃ©jÃ  2 appels simultanÃ©s<br>
+- L&#39;agent prend automatiquement le 3e, 4e, 5e...<br>
+- Plus jamais de signal occupÃ© pour tes clients<br>
+- Capture complÃ¨te mÃªme pendant les heures de pointe<br>
+- Notification prioritaire si urgence dÃ©tectÃ©e<br>
+<br>
+ScÃ©nario rÃ©el:<br>
+â 8h30: Tu parles avec M. Tremblay (drain bouchÃ©)<br>
+â 8h31: Mme Gagnon appelle, tu prends ligne 2<br>
+â 8h32: Ville de MontrÃ©al appelle = Ton agent rÃ©pond!<br>
+â 8h35: SMS urgent sur ton cell avec tous les dÃ©tails<br>
+<br>
+RÃ©sultat: 100% des appels traitÃ©s, mÃªme dans le rush<br>
+<br>
+Apprentissage par performance<br>
+- L&#39;agent s&#39;Ã©value automatiquement sur:<br>
+Â  - Taux de capture d&#39;information<br>
+Â  - DurÃ©e optimale des appels<br>
+Â  - Conversion en rendez-vous<br>
+Â  - DÃ©tection correcte des urgences<br>
+- Ajustements automatiques selon les rÃ©sultats<br>
+- AmÃ©lioration continue mesurable<br>
+<br>
+Google Sheets CRM en temps rÃ©el<br>
+- Tableau de bord avec toutes tes mÃ©triques<br>
+- Historique complet consultable<br>
+- Analyse des tendances automatique<br>
+- Export facile vers d&#39;autres systÃ¨mes<br>
+<br>
+Multi-scÃ©narios intelligents<br>
+- Transfert selon disponibilitÃ©<br>
+- Prise de rendez-vous dans ton calendrier<br>
+- Rappels automatiques programmÃ©s<br>
+- Gestion des suivis<br>
+<br>
+RETOUR SUR INVESTISSEMENT - RAPPEL DE NOTRE OBJECTIF <br>
+âââââââââââââââââââââââââââââââââââââââââââ<br>
+Investissement: 5 000$ (paiement unique)<br>
+<br>
+Comme on l&#39;avait calculÃ© ensemble sur ta landing page: - <br>
+Appels rÃ©cupÃ©rÃ©s: 96 000$/an <br>
+(20 appels manquÃ©s/mois Ã 20% conversion Ã 2000$)<br>
+- Salaire rÃ©ceptionniste Ã©vitÃ©: 50 000$/an <br>
+- Potentiel total: 146 000$/an<br>
+<br>
+Notre objectif: RÃ©cupÃ©rer ton investissement en 1 semaine <br>
+ROI visÃ© premiÃ¨re annÃ©e: 2 820%<br>
+<br>
+Frais rÃ©currents: 0$ (tout inclus Ã  vie)<br>
+<br>
+PROCHAINES ÃTAPES CONCRÃTES<br>
+ââââââââââââââââââââââââââ<br>
+<br>
+Cette semaine (jusqu&#39;au 7 juillet):<br>
+â¡ Test le 438-900-4385 autant que tu veux<br>
+â¡ Parle directement Ã  l&#39;agent de ce que tu aimerais:<br>
+Â  Â â &quot;J&#39;aimerais que tu dises X quand on parle de gainage&quot;<br>
+Â  Â â &quot;Voici comment je veux que tu gÃ¨res les urgences&quot;<br>
+Â  Â â &quot;Les prix devraient Ãªtre prÃ©sentÃ©s comme Ã§a&quot;<br>
+â¡ Tout est enregistrÃ© - je vais Ã©couter et implÃ©menter<br>
+â¡ Envoie-moi aussi tes observations par texto<br>
+<br>
+Lundi 7 juillet - ACTION REQUISE:<br>
+â¡ Retourner le questionnaire de personnalisation<br>
+Â  Â â Par courriel, tÃ©lÃ©phone ou texto<br>
+Â  Â â 10 minutes max de ton temps<br>
+Â  Â â CRITIQUE pour adapter l&#39;agent Ã  Drain Fortin<br>
+<br>
+Semaine prochaine (7-11 juillet):<br>
+â¡ Je personnalise ton agent avec tes infos<br>
+â¡ Vendredi 11: Rapport dÃ©taillÃ© Phase 2<br>
+<br>
+Semaine finale (14-18 juillet):<br>
+â¡ Tests intensifs de ta version personnalisÃ©e<br>
+â¡ Ajustements en temps rÃ©el selon ton feedback<br>
+â¡ Jeudi 17 ou vendredi 18: DÃ©ploiement officiel<u></u><u></u></p>
+<div>
+<p class="MsoNormal"><br>
+Pour le questionnaire, dis-moi simplement comment <br>
+tu prÃ©fÃ¨res procÃ©der et on s&#39;arrange.<br>
+<br>
+Je reste disponible pour toute question.<br>
+<br>
+Cordialement,<u></u><u></u></p>
+<div>
+<p class="MsoNormal"><br>
+J-S @ AutoScale AIÂ Â <u></u><u></u></p>
+</div>
+<div>
+<p class="MsoNormal">Chief AI Officer<u></u><u></u></p>
+</div>
+<div>
+<p class="MsoNormal">450-280-3222<br>
+<a href="mailto:contact@autoscaleai.ca" target="_blank">contact@autoscaleai.ca</a><u></u><u></u></p>
+</div>
+<div>
+<p class="MsoNormal">âââââââââââââââââââââââââââââââââââââââââââ<u></u><u></u></p>
+</div>
+<p class="MsoNormal">P.S. Une fois que ton systÃ¨me sera dÃ©ployÃ© et que tu <br>
+auras vu les rÃ©sultats concrets, une offre de rÃ©fÃ©rencement <br>
+Ã  500$ sera active. Tu m&#39;avais parlÃ© de tes frÃ¨res en <br>
+excavation et commerce de bÅuf - ils pourront voir <br>
+exactement ce que Ã§a donne chez Drain Fortin avant <br>
+de prendre leur dÃ©cision.<u></u><u></u></p>
+</div>
+<div>
+<p class="MsoNormal"><u></u>Â <u></u></p>
+</div>
+</div>
+</div>
+</div>
+
+</blockquote></div></div>
+</div>
+</div>
+
+--0000000000003e2c5b063919e654--
+
+

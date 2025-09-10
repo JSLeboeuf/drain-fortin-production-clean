@@ -20,6 +20,13 @@
     "dotenv": "^17.2.2",
     "mime-types": "^3.0.1",
     "node-fetch": "~3.3.2",
-    "playwright": "^1.55.0"
+    "playwright": "^1.55.0",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "fast-glob": "^3.3.3",
+    "mammoth": "^1.10.0",
+    "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^5.4.149"
   }
 }

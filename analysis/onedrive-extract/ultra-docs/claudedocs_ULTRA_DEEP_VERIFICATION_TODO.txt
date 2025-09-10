@@ -1,0 +1,117 @@
+# 🔍 ULTRA-DEEP VERIFICATION TODO - DRAIN FORTIN SYSTEM
+**Generated**: 2025-09-09  
+**Status**: IN_PROGRESS  
+**Criticality**: MAXIMUM
+
+## 🚨 CRITICAL ISSUES TO RESOLVE
+
+### ✅ COMPLETED TASKS
+- [x] **Project Structure Analysis** - Directory structure analyzed
+- [x] **Environment Configuration Analysis** - .env files read and compared
+- [x] **Git Status Check** - Multiple modified files identified
+- [x] **Frontend Dev Server Check** - Server running on port 5173, responding ✅
+
+### 🔄 IN PROGRESS TASKS
+
+### ❌ PENDING TASKS
+
+#### 🎯 **ISSUE #1: TRANSCRIBER VERIFICATION (CRITICAL)**
+- [ ] **Direct VAPI API Call** - Check current transcriber configuration
+- [ ] **Verify Azure fr-CA** - Ensure NOT using Deepgram
+- [ ] **Fix if needed** - Update to Azure fr-CA transcriber
+- [ ] **Test transcription** - Validate French Canadian language processing
+
+#### 🖥️ **ISSUE #2: DASHBOARD FRONTEND DEBUGGING (CRITICAL)**
+- [ ] **Analyze dev server logs** - Check for console errors
+- [ ] **Frontend code inspection** - Identify potential React/TypeScript issues
+- [ ] **Component-by-component analysis** - Check CRM Dashboard, Calls Table, etc.
+- [ ] **Browser console validation** - Real browser testing
+- [ ] **Fix identified issues** - Resolve any blocking errors
+
+#### 📞 **ISSUE #3: COMPLETE VAPI CONFIGURATION VERIFICATION**
+- [ ] **API Assistant Check** - Verify Assistant ID: 90395b6a-5b14-4515-a7b8-1149db5787bc
+- [ ] **Phone Number Validation** - Confirm 450-280-3222 configuration
+- [ ] **Voice Configuration** - Verify Adam (ElevenLabs) voice
+- [ ] **Webhook URL Testing** - Test Supabase function endpoint
+- [ ] **Complete settings audit** - All VAPI parameters validation
+
+#### 🗄️ **ISSUE #4: SUPABASE INFRASTRUCTURE VALIDATION**
+- [ ] **Connection Testing** - Validate Supabase connectivity
+- [ ] **Database Schema Check** - Verify all required tables exist
+- [ ] **Function Deployment Status** - Check vapi-webhook function
+- [ ] **Authentication Testing** - Validate service keys
+- [ ] **Real-time subscriptions** - Test Supabase real-time features
+
+#### 📋 **ISSUE #5: 156 CONSTRAINTS COMPLIANCE VERIFICATION**
+- [ ] **Constraints Framework Analysis** - Read all constraint documents
+- [ ] **Automated Testing Suite** - Run comprehensive constraint tests
+- [ ] **Manual Validation** - Test key constraint scenarios
+- [ ] **Compliance Report** - Generate detailed compliance matrix
+- [ ] **Fix non-compliant items** - Address any constraint violations
+
+## 🔧 TECHNICAL INVESTIGATION TASKS
+
+### 🌐 **DIRECT API TESTING**
+- [ ] **VAPI Get Assistant** - `GET /assistants/{assistant_id}`
+- [ ] **VAPI Get Phone** - `GET /phone-numbers/{phone_id}`
+- [ ] **VAPI List Calls** - Recent calls analysis
+- [ ] **Webhook Health Check** - Test Supabase function directly
+
+### 🧪 **E2E SIMULATION TESTING**
+- [ ] **Mock Phone Call** - Simulate complete call flow
+- [ ] **SMS Integration Test** - Verify SMS alerts to Guillaume/Maxime
+- [ ] **CRM Data Flow** - Test data persistence to Supabase
+- [ ] **Error Handling** - Test failure scenarios
+
+### 📊 **COMPREHENSIVE ANALYSIS**
+- [ ] **Performance Metrics** - Response times, latency analysis
+- [ ] **Security Validation** - Webhook signatures, API key security
+- [ ] **Monitoring Setup** - Verify all monitoring components
+- [ ] **Backup Verification** - Data backup and recovery testing
+
+## 🎯 SPECIFICATIONS TO VERIFY
+
+### ✅ **CONFIRMED REQUIREMENTS**
+- Assistant ID: `90395b6a-5b14-4515-a7b8-1149db5787bc` ✅
+- Phone: `450-280-3222` ✅
+- Voice: Adam (ElevenLabs) - KEEP ✅
+- VAPI API Key: `0559e007-874d-444c-8091-720b44d1c84c` ✅
+
+### ⚠️ **CRITICAL TO VERIFY**
+- **Transcriber**: MUST be Azure fr-CA (not Deepgram) ❗
+- **Frontend Dashboard**: Must work at localhost:5173 ❗
+- **All 156 constraints**: Must be 100% compliant ❗
+
+## 🚀 EXECUTION STRATEGY
+
+### **Phase 1: Direct API Verification** (Next)
+- VAPI API calls to get real configuration
+- Transcriber verification and fix if needed
+- Complete assistant configuration audit
+
+### **Phase 2: Frontend Deep Dive**
+- Console error analysis
+- Component debugging
+- Browser testing and validation
+
+### **Phase 3: Infrastructure Testing**
+- Supabase connectivity and schema validation
+- Webhook function testing
+- E2E flow simulation
+
+### **Phase 4: Compliance & Reporting**
+- 156 constraints comprehensive testing
+- Generate ultra-deep verification report
+- Final production readiness assessment
+
+## 📋 SUCCESS CRITERIA
+- [ ] ✅ Transcriber confirmed as Azure fr-CA
+- [ ] ✅ Frontend dashboard fully functional
+- [ ] ✅ All VAPI configuration 100% correct
+- [ ] ✅ Supabase infrastructure validated
+- [ ] ✅ 156 constraints 100% compliant
+- [ ] ✅ E2E tests passing
+- [ ] ✅ Production ready certification
+
+---
+**Priority**: CRITICAL | **Depth**: MAXIMUM | **Timeline**: IMMEDIATE

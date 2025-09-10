@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votre solution drainage est prête - Drain Fortin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background-color: #f8fafc;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0B5FFF 0%, #1e40af 100%);
+            padding: 32px 24px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+        
+        .tagline {
+            color: #bfdbfe;
+            font-size: 14px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        
+        .content {
+            padding: 40px 32px;
+        }
+        
+        .greeting {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 24px;
+            line-height: 1.3;
+        }
+        
+        .intro {
+            font-size: 16px;
+            color: #475569;
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+        
+        .value-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-left: 4px solid #F97316;
+            padding: 24px;
+            margin: 32px 0;
+            border-radius: 8px;
+        }
+        
+        .value-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 16px;
+        }
+        
+        .value-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .value-list li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            color: #475569;
+            font-size: 15px;
+        }
+        
+        .value-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #F97316;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .cta-section {
+            background: #0B5FFF;
+            color: white;
+            padding: 32px 24px;
+            text-align: center;
+            margin: 32px -32px;
+            border-radius: 12px;
+        }
+        
+        .cta-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+        
+        .cta-subtitle {
+            font-size: 16px;
+            color: #bfdbfe;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: #F97316;
+            color: white;
+            border: 2px solid #F97316;
+        }
+        
+        .btn-primary:hover {
+            background-color: #ea580c;
+            border-color: #ea580c;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: white;
+            color: #0B5FFF;
+        }
+        
+        .pricing-note {
+            font-size: 14px;
+            color: #64748b;
+            text-align: center;
+            margin-top: 32px;
+            padding: 16px;
+            background-color: #f1f5f9;
+            border-radius: 6px;
+        }
+        
+        .support-section {
+            margin-top: 40px;
+            padding: 24px;
+            background-color: #fef3c7;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .support-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 12px;
+        }
+        
+        .support-text {
+            color: #a16207;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .footer {
+            background-color: #1e293b;
+            color: #cbd5e1;
+            padding: 32px 24px;
+            text-align: center;
+        }
+        
+        .footer-contact {
+            margin-bottom: 16px;
+        }
+        
+        .footer-contact a {
+            color: #F97316;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .footer-note {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            .content {
+                padding: 24px 20px;
+            }
+            
+            .greeting {
+                font-size: 20px;
+            }
+            
+            .cta-section {
+                margin: 24px -20px;
+                padding: 24px 20px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">DRAIN FORTIN</div>
+            <div class="tagline">Solutions drainage professionnelles</div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <div class="greeting">
+                Bonjour Guillaume,
+            </div>
+            
+            <div class="intro">
+                Je sais que ça fait un bout que tu attends des nouvelles. Le développement a pris plus de temps que prévu, mais voici la bonne nouvelle : <strong>ta solution de gestion est maintenant prête</strong>.
+            </div>
+            
+            <div class="value-card">
+                <div class="value-title">Ce que tu obtiens concrètement :</div>
+                <ul class="value-list">
+                    <li>Gestion complète de tes clients et interventions</li>
+                    <li>Facturation automatisée avec rappels</li>
+                    <li>Statistiques en temps réel sur ton business</li>
+                    <li>Application mobile pour tes techniciens</li>
+                    <li>Backup automatique de toutes tes données</li>
+                    <li>Support technique direct avec moi</li>
+                </ul>
+            </div>
+            
+            <!-- CTA Section -->
+            <div class="cta-section">
+                <div class="cta-title">Prêt à tester ? C'est parti.</div>
+                <div class="cta-subtitle">
+                    Test gratuit de 48h pour que tu puisses voir si ça répond à tes besoins
+                </div>
+                
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-primary">
+                        Démarrer le test gratuit
+                    </a>
+                    <a href="#" class="btn btn-secondary">
+                        Voir une démo rapide
+                    </a>
+                </div>
+            </div>
+            
+            <div class="pricing-note">
+                <strong>Prix final :</strong> 297$/mois après le test gratuit. Pas de contrat, tu peux arrêter quand tu veux.
+            </div>
+            
+            <!-- Support Section -->
+            <div class="support-section">
+                <div class="support-title">Support inclus</div>
+                <div class="support-text">
+                    Je reste disponible pour t'aider à configurer le système selon tes besoins spécifiques. 
+                    Formation incluse pour toi et ton équipe.
+                </div>
+            </div>
+            
+            <div class="intro" style="margin-top: 40px; margin-bottom: 0;">
+                Questions ? Réponds-moi directement à ce courriel ou appelle-moi. 
+                <br><br>
+                Merci pour ta patience,<br>
+                <strong>Alexandre</strong>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-contact">
+                <div><a href="mailto:contact@drainfortin.com">contact@drainfortin.com</a></div>
+                <div><a href="tel:+15141234567">(514) 123-4567</a></div>
+            </div>
+            <div class="footer-note">
+                Tu reçois ce courriel car tu as demandé une solution de gestion pour Drain Fortin.<br>
+                Pour te désabonner, réponds simplement "STOP" à ce message.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
