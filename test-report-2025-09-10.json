@@ -1,0 +1,131 @@
+[
+  {
+    "timestamp": "2025-09-10T05:18:55.970Z",
+    "type": "info",
+    "message": "Test 1: Vérification de la disponibilité du serveur",
+    "details": null
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.017Z",
+    "type": "success",
+    "message": "Serveur accessible sur http://localhost:5177",
+    "details": {
+      "statusCode": 200,
+      "headers": {
+        "vary": "Origin",
+        "content-type": "text/html",
+        "cache-control": "no-cache",
+        "etag": "W/\"b86-aolu/4oI/f9SlE83CLMXgGxUxrY\"",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://phiduqxcufdmgjvdipyu.supabase.co wss://phiduqxcufdmgjvdipyu.supabase.co",
+        "date": "Wed, 10 Sep 2025 05:18:56 GMT",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "content-length": "2950"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.018Z",
+    "type": "info",
+    "message": "Test 2: Vérification de l'intégrité de la base de données",
+    "details": null
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.219Z",
+    "type": "success",
+    "message": "Table call_logs accessible",
+    "details": {
+      "count": 0
+    }
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.314Z",
+    "type": "success",
+    "message": "Table customers accessible",
+    "details": {
+      "count": null
+    }
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.393Z",
+    "type": "success",
+    "message": "Table alerts accessible",
+    "details": {
+      "count": 0
+    }
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.453Z",
+    "type": "success",
+    "message": "Table analytics accessible",
+    "details": {
+      "count": null
+    }
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.453Z",
+    "type": "info",
+    "message": "Test 3: Vérification du rendu de l'interface",
+    "details": null
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.468Z",
+    "type": "success",
+    "message": "Élément trouvé: \"root\"",
+    "details": null
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.468Z",
+    "type": "warning",
+    "message": "Élément non trouvé dans le HTML initial: \"Gestion d'activité\"",
+    "details": null
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.469Z",
+    "type": "warning",
+    "message": "Élément non trouvé dans le HTML initial: \"Pilotez vos appels\"",
+    "details": null
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.469Z",
+    "type": "info",
+    "message": "Test 4: Simulation d'interactions utilisateur",
+    "details": null
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.537Z",
+    "type": "error",
+    "message": "Erreur lors des interactions",
+    "details": {}
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.538Z",
+    "type": "info",
+    "message": "Test 5: Vérification des performances",
+    "details": null
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.588Z",
+    "type": "success",
+    "message": "Performances excellentes",
+    "details": {
+      "serverResponse": 8,
+      "databaseQuery": 42,
+      "totalLoadTime": 50
+    }
+  },
+  {
+    "timestamp": "2025-09-10T05:18:56.588Z",
+    "type": "info",
+    "message": "Test 6: Vérification de la synchronisation temps réel",
+    "details": null
+  },
+  {
+    "timestamp": "2025-09-10T05:19:01.607Z",
+    "type": "error",
+    "message": "Aucun événement temps réel reçu",
+    "details": null
+  }
+]

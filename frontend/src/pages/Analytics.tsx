@@ -1,14 +1,12 @@
 import { useMemo, useState } from "react";
-import { Clock, Sparkles, Phone, TrendingUp, Percent } from "lucide-react";
-import Sidebar from "@/components/shared/Sidebar";
-import Header from "@/components/shared/Header";
-import TableSkeleton from "@/components/skeletons/TableSkeleton";
+import { Clock, Phone, TrendingUp, Percent, BarChart3, PieChart } from "lucide-react";
 import MetricsCard from "@/components/dashboard/MetricsCard";
+import CallsChart from "@/components/analytics/CallsChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageErrorBoundary } from "@/components/ErrorBoundary";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { getAnalyticsSummary } from "@/lib/services";
+import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
 type SortKey = "intent" | "count";
 type SortDir = "asc" | "desc";
@@ -26,13 +24,11 @@ export default function Analytics() {
 
   if (isLoading || !summary) {
     return (
-      <div className="flex h-screen bg-gray-50 dark:bg-background">
-        <Sidebar />
-        <main className="flex-1 flex items-center justify-center p-6">
-          <div className="w-full max-w-3xl">
-            <TableSkeleton rows={6} />
-          </div>
-        </main>
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="text-gray-600 mt-4">Chargement des analytics...</p>
+        </div>
       </div>
     );
   }
@@ -59,108 +55,201 @@ export default function Analytics() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-background">
-      <Sidebar />
-      <main id="main" role="main" className="flex-1 flex flex-col overflow-hidden">
-        <Header title="Analytics" subtitle="Métriques et analyse des performances" />
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
+            <p className="text-gray-600 mt-2">
+              Analyse des performances et métriques des appels
+            </p>
+          </div>
+          <Select value={timeframe} onValueChange={setTimeframe}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">7 jours</SelectItem>
+              <SelectItem value="30d">30 jours</SelectItem>
+              <SelectItem value="90d">90 jours</SelectItem>
+              <SelectItem value="1y">1 an</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <PageErrorBoundary pageName="Analytics">
-          <div className="flex-1 overflow-y-auto p-6" data-panel>
-            <div className="sticky top-0 z-10 -mt-6 pt-6 pb-2 bg-gray-50/80 dark:bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-gray-50/60 dark:supports-[backdrop-filter]:bg-background/60">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-foreground">Aperçu des performances</h2>
-                <Select value={timeframe} onValueChange={setTimeframe}>
-                  <SelectTrigger className="w-32" data-testid="select-timeframe">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="7d">7 jours</SelectItem>
-                    <SelectItem value="30d">30 jours</SelectItem>
-                    <SelectItem value="90d">90 jours</SelectItem>
-                    <SelectItem value="1y">1 an</SelectItem>
-                  </SelectContent>
-                </Select>
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Phone className="h-5 w-5 text-blue-600" />
+                <CardTitle className="text-sm font-medium">Total des Appels</CardTitle>
               </div>
-              <div className="text-xs text-muted-foreground mt-1">Dernière mise à jour: {new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' })}</div>
-              <div className="h-px bg-border mt-2"></div>
-            </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">
+                {summary.totalCalls}
+              </div>
+              <p className="text-sm text-gray-600 mt-1">Cette période</p>
+            </CardContent>
+          </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <MetricsCard title="Total des appels" value={String(summary.totalCalls)} change={0} icon={<Phone className="h-6 w-6 text-primary" />} trend="stable" />
-              <MetricsCard title="Durée moyenne" value={`${summary.avgDuration} sec`} change={0} icon={<Clock className="h-6 w-6 text-blue-500" />} trend="stable" />
-              <MetricsCard title="Taux de réponse" value={`${summary.answeredPct}%`} change={0} icon={<Sparkles className="h-6 w-6 text-amber-500" />} trend="stable" />
-              <MetricsCard title="Conversion" value={`${summary.conversionPct}%`} change={0} icon={<Percent className="h-6 w-6 text-green-600" />} trend="stable" />
-            </div>
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-green-600" />
+                <CardTitle className="text-sm font-medium">Durée Moyenne</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                {summary.avgDuration}s
+              </div>
+              <p className="text-sm text-gray-600 mt-1">Par appel</p>
+            </CardContent>
+          </Card>
 
-            {summary.totalCalls === 0 ? (
-              <Card className="mt-6">
-                <CardContent className="py-10 text-center">
-                  <TrendingUp className="h-10 w-10 mx-auto text-muted-foreground mb-3" aria-hidden="true" />
-                  <div className="text-sm text-muted-foreground mb-4">Aucune métrique disponible pour cette période. Essayez un autre intervalle ou revenez plus tard.</div>
-                  <div className="flex items-center justify-center gap-4">
-                    <a href="/dashboard" className="text-primary text-sm hover:underline">Tableau de bord</a>
-                    <a href="/intake" className="text-primary text-sm hover:underline">Nouvelle demande</a>
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-purple-600" />
+                <CardTitle className="text-sm font-medium">Taux de Réponse</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-purple-600">
+                {summary.answeredPct}%
+              </div>
+              <p className="text-sm text-gray-600 mt-1">Appels répondus</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Percent className="h-5 w-5 text-orange-600" />
+                <CardTitle className="text-sm font-medium">Conversion</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">
+                {summary.conversionPct}%
+              </div>
+              <p className="text-sm text-gray-600 mt-1">Taux de conversion</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {summary.totalCalls === 0 ? (
+          <Card>
+            <CardContent className="py-10 text-center">
+              <BarChart3 className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune donnée disponible</h3>
+              <p className="text-gray-600 mb-4">
+                Aucune métrique disponible pour cette période. Essayez un autre intervalle.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-6">
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <CallsChart 
+                data={[]} // You'll need to pass real chart data here
+                title={`Volume d'appels - ${timeframe}`}
+              />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PieChart className="h-5 w-5 text-blue-600" />
+                    Distribution des Appels
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span className="text-sm">Appels réussis</span>
+                      </div>
+                      <span className="font-medium">{Math.round((summary.answeredPct / 100) * summary.totalCalls)}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                        <span className="text-sm">Appels manqués</span>
+                      </div>
+                      <span className="font-medium">{summary.totalCalls - Math.round((summary.answeredPct / 100) * summary.totalCalls)}</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                        <span className="text-sm">Conversions</span>
+                      </div>
+                      <span className="font-medium">{Math.round((summary.conversionPct / 100) * summary.totalCalls)}</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Principales intentions</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full text-sm">
-                        <thead>
-                          <tr className="text-left text-muted-foreground">
-                            <th className="py-2 pr-4 cursor-pointer" onClick={() => toggleSort("intent")}>
-                              Intention {intSortKey === "intent" ? (intSortDir === "asc" ? "▲" : "▼") : null}
-                            </th>
-                            <th className="py-2 pl-4 cursor-pointer" onClick={() => toggleSort("count")}>
-                              Occurrences {intSortKey === "count" ? (intSortDir === "asc" ? "▲" : "▼") : null}
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {sortedIntents.map((it) => (
-                            <tr key={it.intent} className="border-t">
-                              <td className="py-2 pr-4">{it.intent}</td>
-                              <td className="py-2 pl-4 font-medium">{it.count}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </CardContent>
-                </Card>
+            </div>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Performance actuelle</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Appels traités aujourd'hui</span>
-                        <span className="font-medium" aria-live="polite">{summary.totalCalls}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Durée moyenne par appel</span>
-                        <span className="font-medium">{summary.avgDuration} sec</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Taux de réponse</span>
-                        <span className="font-medium">{summary.answeredPct}%</span>
-                      </div>
+            {/* Intents and Performance */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Principales Intentions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {sortedIntents.length === 0 ? (
+                    <p className="text-gray-500 text-center py-4">Aucune intention détectée</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {sortedIntents.slice(0, 10).map((intent) => (
+                        <div key={intent.intent} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                          <span className="text-sm text-gray-700">{intent.intent}</span>
+                          <div className="flex items-center gap-2">
+                            <div className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
+                              {intent.count}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Métriques de Performance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                      <span className="text-sm text-gray-600">Appels traités</span>
+                      <span className="font-semibold text-lg">{summary.totalCalls}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                      <span className="text-sm text-gray-600">Durée moyenne</span>
+                      <span className="font-semibold text-lg">{summary.avgDuration}s</span>
+                    </div>
+                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                      <span className="text-sm text-gray-600">Taux de réponse</span>
+                      <span className="font-semibold text-lg text-green-600">{summary.answeredPct}%</span>
+                    </div>
+                    <div className="flex justify-between items-center py-3">
+                      <span className="text-sm text-gray-600">Taux de conversion</span>
+                      <span className="font-semibold text-lg text-purple-600">{summary.conversionPct}%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </PageErrorBoundary>
-      </main>
+        )}
+      </div>
     </div>
   );
 }

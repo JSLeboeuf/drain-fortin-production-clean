@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "scripts": {
     "test": "npm --prefix backend test",
     "test:coverage": "npm --prefix backend run test:coverage",

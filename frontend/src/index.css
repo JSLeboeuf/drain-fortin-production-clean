@@ -1,6 +1,7 @@
 /* Import custom animations (must precede other statements) */
 @import './styles/animations.css';
 @import './styles/accessibility.css';
+@import './styles/mobile-optimizations.css';
 
 @tailwind base;
 @tailwind components;
@@ -161,6 +162,11 @@
   /* Offsets for global banners */
   --top-banner-offset: 0px;
   --banner-offset: 0px;
+
+  /* Performance optimization variables */
+  --animation-duration: 0.3s;
+  --transition-duration: 0.2s;
+  --gpu-acceleration: translateZ(0);
 }
 
 .dark {
@@ -224,15 +230,31 @@
 @layer base {
   * {
     @apply border-border;
+    /* Mobile performance optimizations */
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    /* Mobile performance optimizations */
+    -webkit-text-size-adjust: 100%;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
   }
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    /* Optimize rendering performance */
+    will-change: auto;
+    transform: var(--gpu-acceleration);
+    backface-visibility: hidden;
   }
+
   /* Ensure main content never hides under the top P1 banner */
   main[role="main"], #main {
     padding-top: calc(var(--top-banner-offset, 0px));
   }
+  
   /* Accessible Skip Link */
   .skip-link {
     position: absolute;
@@ -249,6 +271,31 @@
     top: 0;
     outline: 3px solid #ffcc00;
   }
+
+  /* Performance optimizations for common elements */
+  img {
+    max-width: 100%;
+    height: auto;
+    loading: lazy;
+    decoding: async;
+  }
+
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Optimize focus states for better accessibility */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Smooth scrolling for all scrollable elements */
+  * {
+    scroll-behavior: smooth;
+  }
 }
 
 @layer components {
@@ -257,6 +304,7 @@
     content-visibility: auto;
     contain-intrinsic-size: 800px 600px;
   }
+
   /* Priority badges premium */
   .priority-p1 {
     @apply text-red-700 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 dark:text-red-300 dark:from-red-950/50 dark:to-red-900/50 dark:border-red-800;
@@ -281,6 +329,8 @@
   /* Cards premium avec hover effects */
   .card-premium {
     @apply bg-card border border-border rounded-xl shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:border-primary hover:-translate-y-1;
+    will-change: transform, box-shadow;
+    contain: layout style paint;
   }
   
   .card-gradient {
@@ -292,11 +342,13 @@
   .btn-primary-gradient {
     background: var(--gradient-primary);
     @apply text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:-translate-y-0.5;
+    will-change: transform, box-shadow;
   }
   
   .btn-success-gradient {
     background: var(--gradient-success);
     @apply text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:-translate-y-0.5;
+    will-change: transform, box-shadow;
   }
 
   /* Animations fluides */
@@ -335,6 +387,36 @@
     border-left: 4px solid hsl(200 95% 45%);
     background: linear-gradient(90deg, hsl(200 95% 97%) 0%, transparent 100%);
   }
+
+  /* Performance optimizations for large lists */
+  .virtual-list {
+    contain: strict;
+    overflow: auto;
+    height: 400px;
+  }
+
+  .virtual-list-item {
+    contain: layout style paint;
+    will-change: auto;
+  }
+
+  /* GPU-accelerated animations */
+  .gpu-optimized {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* Critical path optimization */
+  .above-fold {
+    content-visibility: visible;
+    contain: layout style paint;
+  }
+
+  .below-fold {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 400px;
+  }
 }
 
 /* Keyframes pour animations premium */
@@ -356,4 +438,58 @@
 @keyframes livePulse {
   0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
   50% { opacity: 0.6; transform: translateY(-50%) scale(1.2); }
+}
+
+/* Media queries for performance optimization */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-pulse-urgent {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --animation-duration: 0.1s;
+    --transition-duration: 0.1s;
+  }
+}
+
+/* Print optimization */
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: hsl(0 0% 0%);
+    --background: hsl(0 0% 100%);
+    --foreground: hsl(0 0% 0%);
+  }
+
+  .dark {
+    --border: hsl(0 0% 100%);
+    --background: hsl(0 0% 0%);
+    --foreground: hsl(0 0% 100%);
+  }
 }

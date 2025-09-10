@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 
 export function CRMDashboard() {
   const [activeView, setActiveView] = useState<'dashboard' | 'clients' | 'sms' | 'interventions' | 'alerts'>('dashboard');
-  // const [realtimeAlerts, setRealtimeAlerts] = useState<InternalAlert[]>([]);
+  const [realtimeAlerts, setRealtimeAlerts] = useState<InternalAlert[]>([]);
 
   // Fetch statistics
   const { data: stats } = useQuery({

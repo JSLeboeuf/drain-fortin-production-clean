@@ -11,26 +11,12 @@ import { queryClient } from '@/lib/queryClient';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/components/theme-provider';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { Activity, BarChart3, Users } from 'lucide-react';
 
-// Lazy load all routes for optimal bundle splitting
-const Dashboard = lazy(() => 
-  import(/* webpackChunkName: "dashboard" */ './pages/Dashboard')
-);
-
-const Analytics = lazy(() => 
-  import(/* webpackChunkName: "analytics" */ './pages/Analytics').then(module => {
-    // Prefetch related components
-    startTransition(() => {
-      import('./components/dashboard/MetricsCard');
-      import('./components/skeletons/TableSkeleton');
-    });
-    return module;
-  })
-);
-
-const Calls = lazy(() => 
-  import(/* webpackChunkName: "calls" */ './pages/Calls').then(module => {
-    // Prefetch WebSocket connection
+// Lazy load only the 3 core pages
+const Monitoring = lazy(() => 
+  import(/* webpackChunkName: "monitoring" */ './pages/Monitoring').then(module => {
+    // Prefetch WebSocket connection for real-time monitoring
     startTransition(() => {
       import('./hooks/useWebSocket');
     });
@@ -38,39 +24,42 @@ const Calls = lazy(() =>
   })
 );
 
-const Settings = lazy(() => 
-  import(/* webpackChunkName: "settings" */ './pages/Settings')
+const Analytics = lazy(() => 
+  import(/* webpackChunkName: "analytics" */ './pages/Analytics').then(module => {
+    // Prefetch chart components
+    startTransition(() => {
+      import('./components/analytics/CallsChart');
+      import('./components/dashboard/MetricsCard');
+    });
+    return module;
+  })
 );
 
-const Constraints = lazy(() => 
-  import(/* webpackChunkName: "constraints" */ './pages/Constraints')
-);
-
-const Monitoring = lazy(() => 
-  import(/* webpackChunkName: "monitoring" */ './pages/Monitoring')
+const CRM = lazy(() => 
+  import(/* webpackChunkName: "crm" */ './pages/CRM').then(module => {
+    // Prefetch CRM components
+    startTransition(() => {
+      import('./components/CRM/CRMDashboard');
+      import('./components/CRM/ClientsView');
+    });
+    return module;
+  })
 );
 
 // Preload critical routes on hover
 const preloadRoute = (routeName: string) => {
   switch(routeName) {
-    case 'dashboard':
-      import('./pages/Dashboard');
+    case 'monitoring':
+      import('./pages/Monitoring');
+      import('./hooks/useWebSocket');
       break;
     case 'analytics':
       import('./pages/Analytics');
+      import('./components/analytics/CallsChart');
       break;
-    case 'calls':
-      import('./pages/Calls');
-      import('./hooks/useWebSocket');
-      break;
-    case 'settings':
-      import('./pages/Settings');
-      break;
-    case 'constraints':
-      import('./pages/Constraints');
-      break;
-    case 'monitoring':
-      import('./pages/Monitoring');
+    case 'crm':
+      import('./pages/CRM');
+      import('./components/CRM/CRMDashboard');
       break;
   }
 };
@@ -85,51 +74,43 @@ const PageLoader = () => (
   </div>
 );
 
-// Navigation with preloading
+// Clean Navigation with only 3 core features
 const Navigation = () => (
-  <nav className="flex space-x-6 p-4 bg-card border-b">
-    <Link 
-      href="/" 
-      onMouseEnter={() => preloadRoute('dashboard')}
-      className="hover:text-primary transition-colors"
-    >
-      Dashboard
-    </Link>
-    <Link 
-      href="/analytics" 
-      onMouseEnter={() => preloadRoute('analytics')}
-      className="hover:text-primary transition-colors"
-    >
-      Analytics
-    </Link>
-    <Link 
-      href="/calls" 
-      onMouseEnter={() => preloadRoute('calls')}
-      className="hover:text-primary transition-colors"
-    >
-      Appels
-    </Link>
-    <Link 
-      href="/settings" 
-      onMouseEnter={() => preloadRoute('settings')}
-      className="hover:text-primary transition-colors"
-    >
-      Paramètres
-    </Link>
-    <Link 
-      href="/constraints" 
-      onMouseEnter={() => preloadRoute('constraints')}
-      className="hover:text-primary transition-colors"
-    >
-      Contraintes
-    </Link>
-    <Link 
-      href="/monitoring" 
-      onMouseEnter={() => preloadRoute('monitoring')}
-      className="hover:text-primary transition-colors"
-    >
-      Monitoring
-    </Link>
+  <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
+    <div className="mx-auto px-6 py-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Activity className="h-6 w-6 text-blue-600" />
+          <h1 className="text-xl font-bold text-gray-900">Drain Fortin Dashboard</h1>
+        </div>
+        <div className="flex space-x-1">
+          <Link 
+            href="/" 
+            onMouseEnter={() => preloadRoute('monitoring')}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-blue-600"
+          >
+            <Activity className="h-4 w-4" />
+            Monitoring
+          </Link>
+          <Link 
+            href="/analytics" 
+            onMouseEnter={() => preloadRoute('analytics')}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-blue-600"
+          >
+            <BarChart3 className="h-4 w-4" />
+            Analytics
+          </Link>
+          <Link 
+            href="/crm" 
+            onMouseEnter={() => preloadRoute('crm')}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-blue-600"
+          >
+            <Users className="h-4 w-4" />
+            CRM
+          </Link>
+        </div>
+      </div>
+    </div>
   </nav>
 );
 
@@ -137,25 +118,24 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="system" storageKey="vapi-theme">
-          <div className="min-h-screen bg-background">
+        <ThemeProvider defaultTheme="light" storageKey="drain-fortin-theme">
+          <div className="min-h-screen bg-gray-50">
             <Navigation />
             
             <Suspense fallback={<PageLoader />}>
               <Switch>
-                <Route path="/" component={Dashboard} />
+                <Route path="/" component={Monitoring} />
                 <Route path="/analytics" component={Analytics} />
-                <Route path="/calls" component={Calls} />
-                <Route path="/settings" component={Settings} />
-                <Route path="/constraints" component={Constraints} />
-                <Route path="/monitoring" component={Monitoring} />
+                <Route path="/crm" component={CRM} />
                 <Route>
-                  <div className="flex h-screen items-center justify-center">
+                  <div className="flex h-screen items-center justify-center bg-gray-50">
                     <div className="text-center">
-                      <h1 className="text-4xl font-bold mb-4">404</h1>
-                      <p className="text-muted-foreground">Page non trouvée</p>
-                      <Link href="/" className="text-primary hover:underline mt-4 inline-block">
-                        Retour au tableau de bord
+                      <Activity className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                      <h1 className="text-2xl font-bold text-gray-900 mb-2">Page non trouvée</h1>
+                      <p className="text-gray-600 mb-6">Cette page n'existe pas dans le dashboard.</p>
+                      <Link href="/" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <Activity className="h-4 w-4" />
+                        Retour au Monitoring
                       </Link>
                     </div>
                   </div>
@@ -183,22 +163,21 @@ if (typeof window !== 'undefined') {
   link.href = '/fonts/inter-var.woff2';
   document.head.appendChild(link);
 
-  // Preconnect to API
+  // Preconnect to Supabase
   const preconnect = document.createElement('link');
   preconnect.rel = 'preconnect';
-  preconnect.href = process.env['VITE_API_URL'] || 'http://localhost:8080';
+  preconnect.href = process.env['VITE_SUPABASE_URL'] || 'https://localhost:54321';
   document.head.appendChild(preconnect);
 
-  // Enable resource hints
+  // Enable resource hints for core features
   if ('connection' in navigator && (navigator as any).connection.saveData === false) {
-    // Prefetch dashboard data if not on slow connection
+    // Prefetch monitoring data if not on slow connection
     setTimeout(() => {
-      import('./pages/Dashboard');
-      queryClient.prefetchQuery({
-        queryKey: ['/api/analytics/summary'],
-        queryFn: () => fetch('/api/analytics/summary').then(r => r.json()),
-        staleTime: 5 * 60 * 1000, // 5 minutes
-      });
+      import('./pages/Monitoring');
+      import('./hooks/useWebSocket');
+      // Prefetch analytics components
+      import('./components/analytics/CallsChart');
+      import('./components/CRM/CRMDashboard');
     }, 2000);
   }
 }
