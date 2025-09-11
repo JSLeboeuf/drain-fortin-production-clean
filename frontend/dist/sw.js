@@ -1,1 +1,379 @@
-if(!self.define){let e,s={};const i=(i,r)=>(i=new URL(i+".js",r).href,s[i]||new Promise(s=>{if("document"in self){const e=document.createElement("script");e.src=i,e.onload=s,document.head.appendChild(e)}else e=i,importScripts(i),s()}).then(()=>{let e=s[i];if(!e)throw new Error(`Module ${i} didn’t register its module`);return e}));self.define=(r,a)=>{const c=e||("document"in self?document.currentScript.src:"")||location.href;if(s[c])return;let d={};const n=e=>i(e,c),b={module:{uri:c},exports:d,require:n};s[c]=Promise.all(r.map(e=>b[e]||n(e))).then(e=>(a(...e),d))}}define(["./workbox-020e1147"],function(e){"use strict";self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"assets/index-BMIJaErp.css",revision:null},{url:"index.html",revision:"3cc9c04f3ab39b522a743a20be4092e0"},{url:"js/alert-CsBOiY2u.js",revision:"c76b468ec722e2b50a61783b18cad147"},{url:"js/analytics-A2EB1Mnw.js",revision:"81859b64d5504e2fd049d896cd2333d9"},{url:"js/analytics-chunk-B-mz0Wu3.js",revision:"8517006a68cc076ec0ed5fbdfb3ba738"},{url:"js/AnalyticsWidget-BO3qMvKI.js",revision:"2f587af8894ae802da97c20bcb6a2277"},{url:"js/CallDetail-c4YRCCyV.js",revision:"3cb07a40dbcfda0c4dcc8bc6c700ede9"},{url:"js/Calls-De85z0rn.js",revision:"47dec6e5c643d5538957b3f1dd587fc7"},{url:"js/ClientIntake-CbSWnw0G.js",revision:"bdcfc5bd73987b99a05f3618cc5a15c8"},{url:"js/crm-chunk-D9I0y51O.js",revision:"d1c089ddf3563d1f70e6dc67464b64f3"},{url:"js/CRMWidget-Dl09lhr6.js",revision:"4e509ddd41c60d2ab41361e75948e5e8"},{url:"js/Dashboard-BmF5bsyy.js",revision:"01280182081d81a2f09b6f34cd71f370"},{url:"js/Dashboard-D6-lmZyP.js",revision:"40cac0cbb7a36562dde5ea2c5dbe8911"},{url:"js/data-layer-BwrzapRF.js",revision:"5755fe59d624d3534415927e1e102e23"},{url:"js/DrainFortinServices-BC2CgmLq.js",revision:"2ba98f7ea599c89784f0a6d5bbfcc34d"},{url:"js/GuillaumeSettings-BwRw_ATV.js",revision:"4fa67a0020d9b50225e7c176f6831a9e"},{url:"js/index-DrxReTV4.js",revision:"3f1960fcc3dbb629a30b52453729003d"},{url:"js/Login-D-1TzD-W.js",revision:"f0a4cb8a29899cedb5d9b3767d5fad72"},{url:"js/monitoring-chunk-uP1InHw1.js",revision:"b1d04155ef81e876a3b8dd08fccc6072"},{url:"js/MonitoringWidget-BRohey9V.js",revision:"3013dffcee8a270a075932489ba06110"},{url:"js/PricingTool-BWbZz7wP.js",revision:"3be2779fa0bee31dcdf8dae5e5997a99"},{url:"js/react-vendor-Cgw4gmqc.js",revision:"b7dc002c7d6f26a5f0e7aa37e85e7e0c"},{url:"js/RealTimeMonitoring-BEhU-n-o.js",revision:"638b86bacf79512fc6b2de033d5ea29a"},{url:"js/sanitize-DsUuIKAJ.js",revision:"48a5717bce0cf13828e6cf8526b9e645"},{url:"js/Settings-RIrBs06_.js",revision:"a6e2610e8099512adef70ee72be85182"},{url:"js/SettingsConstraints-_Q90OOoy.js",revision:"8b812b6631f50885e26758ab9b329c1f"},{url:"js/SettingsPricing-Cyu3TYAA.js",revision:"691962f4c1ad6b047866e4be428aa279"},{url:"js/SettingsPrompts-CjRuAA6p.js",revision:"26d112829163da8889387bab815fe62b"},{url:"js/statsService-n0qUPx9A.js",revision:"7ea2003fdde0362fcca5e227eb7d8dac"},{url:"js/switch-DOB8mrla.js",revision:"6af441b2923c2a0836e3f71312ae0de6"},{url:"js/tabs-DnlIQiLt.js",revision:"e29b98b61a21a33790986ca4808fea9b"},{url:"js/Templates-bHgGV-OB.js",revision:"a02034e4367f0c00af05ac505d78bfcb"},{url:"js/test-chunk-DAmjgJis.js",revision:"44d4772cfa884ad06f322af5a8f16b72"},{url:"js/textarea--74EIpqs.js",revision:"72d5a29db647f884d35abec17f3a2b49"},{url:"js/ui-components-Dozjk7Op.js",revision:"0c7f97c96fd188e3c4f535dbf877de31"},{url:"js/useConstraints-Dmjt9Ad4.js",revision:"6f9d2a5f0b55a45a5527b4a980758271"},{url:"js/useSettings-BzLUDzYA.js",revision:"9901a9c3e91e1db24c55484a72f6c5fd"},{url:"js/utils-BeLtu-UY.js",revision:"30545a329b4dc2703aec1b21d74dc428"},{url:"js/vendor-DV7wnEAk.js",revision:"9506ff396bea4ed94ff982b371f4904c"},{url:"js/visualization-BDTX4h2N.js",revision:"5f9e9ed918ae04a81e68dc4edc708a50"},{url:"registerSW.js",revision:"1872c500de691dce40960bb85481de07"},{url:"shared.worker.js",revision:"8281c3d5bee628932cd563a3590bdc85"},{url:"sw-enhanced.js",revision:"fdadfdfd6bd4e40a4b86ee35ed1a6c49"},{url:"manifest.webmanifest",revision:"c24b8e7f42e51d686b45f015ea24baa0"}],{}),e.cleanupOutdatedCaches(),e.registerRoute(new e.NavigationRoute(e.createHandlerBoundToURL("index.html"))),e.registerRoute(/^https:\/\/phiduqxcufdmgjvdipyu\.supabase\.co/,new e.StaleWhileRevalidate({cacheName:"api-cache",plugins:[new e.ExpirationPlugin({maxEntries:50,maxAgeSeconds:86400})]}),"GET")});
+// Enhanced Service Worker for Aggressive Caching
+// Version 1.0 - Performance Optimized
+
+const CACHE_NAME = 'drain-fortin-v1.0';
+const STATIC_CACHE = 'static-v1.0';
+const DYNAMIC_CACHE = 'dynamic-v1.0';
+const API_CACHE = 'api-v1.0';
+
+// Resources to cache immediately
+const STATIC_RESOURCES = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/favicon.ico',
+  '/pwa-192.png',
+  '/pwa-512.png'
+];
+
+// API endpoints to cache with TTL
+const API_CACHE_PATTERNS = [
+  /^https:\/\/phiduqxcufdmgjvdipyu\.supabase\.co\/rest\/v1\//,
+  /^https:\/\/phiduqxcufdmgjvdipyu\.supabase\.co\/auth\/v1\//
+];
+
+// Cache durations (in seconds)
+const CACHE_DURATIONS = {
+  static: 365 * 24 * 60 * 60, // 1 year for static resources
+  dynamic: 24 * 60 * 60,      // 1 day for dynamic content
+  api: 5 * 60,                // 5 minutes for API responses
+  images: 30 * 24 * 60 * 60   // 30 days for images
+};
+
+// Install event - cache static resources
+self.addEventListener('install', (event) => {
+  console.log('[SW] Installing service worker...');
+  
+  event.waitUntil(
+    Promise.all([
+      caches.open(STATIC_CACHE).then(cache => {
+        console.log('[SW] Caching static resources');
+        return cache.addAll(STATIC_RESOURCES);
+      }),
+      // Skip waiting to activate immediately
+      self.skipWaiting()
+    ])
+  );
+});
+
+// Activate event - clean up old caches
+self.addEventListener('activate', (event) => {
+  console.log('[SW] Activating service worker...');
+  
+  event.waitUntil(
+    Promise.all([
+      // Clean up old caches
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames
+            .filter(cacheName => 
+              cacheName !== CACHE_NAME && 
+              cacheName !== STATIC_CACHE && 
+              cacheName !== DYNAMIC_CACHE &&
+              cacheName !== API_CACHE
+            )
+            .map(cacheName => {
+              console.log('[SW] Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            })
+        );
+      }),
+      // Take control of all clients
+      self.clients.claim()
+    ])
+  );
+});
+
+// Fetch event - implement caching strategies
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Only handle GET requests
+  if (request.method !== 'GET') {
+    return;
+  }
+
+  // Skip caching for chrome-extension and browser-internal requests
+  if (url.protocol === 'chrome-extension:' || url.protocol === 'moz-extension:') {
+    return;
+  }
+
+  event.respondWith(handleRequest(request));
+});
+
+async function handleRequest(request) {
+  const url = new URL(request.url);
+  
+  try {
+    // Strategy 1: Static Resources (Cache First with Long TTL)
+    if (isStaticResource(url)) {
+      return await cacheFirst(request, STATIC_CACHE, CACHE_DURATIONS.static);
+    }
+
+    // Strategy 2: API Requests (Stale While Revalidate with TTL)
+    if (isApiRequest(url)) {
+      return await staleWhileRevalidate(request, API_CACHE, CACHE_DURATIONS.api);
+    }
+
+    // Strategy 3: Images (Cache First with Medium TTL)
+    if (isImageRequest(url)) {
+      return await cacheFirst(request, DYNAMIC_CACHE, CACHE_DURATIONS.images);
+    }
+
+    // Strategy 4: JavaScript/CSS (Stale While Revalidate)
+    if (isAssetRequest(url)) {
+      return await staleWhileRevalidate(request, DYNAMIC_CACHE, CACHE_DURATIONS.dynamic);
+    }
+
+    // Strategy 5: HTML Pages (Network First with Fallback)
+    if (isPageRequest(url)) {
+      return await networkFirst(request, DYNAMIC_CACHE);
+    }
+
+    // Default: Network first
+    return await fetch(request);
+
+  } catch (error) {
+    console.warn('[SW] Request failed:', request.url, error);
+    
+    // Return cached version if available
+    const cachedResponse = await getCachedResponse(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    // Return offline page for navigation requests
+    if (request.mode === 'navigate') {
+      return getOfflinePage();
+    }
+
+    throw error;
+  }
+}
+
+// Cache First Strategy - Good for static resources
+async function cacheFirst(request, cacheName, maxAge) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+
+  if (cached && !isExpired(cached, maxAge)) {
+    return cached;
+  }
+
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const responseClone = response.clone();
+      await cache.put(request, addTimestamp(responseClone));
+    }
+    return response;
+  } catch (error) {
+    if (cached) {
+      console.log('[SW] Serving stale cache for:', request.url);
+      return cached;
+    }
+    throw error;
+  }
+}
+
+// Stale While Revalidate Strategy - Good for API calls
+async function staleWhileRevalidate(request, cacheName, maxAge) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+
+  // Background update
+  const fetchPromise = fetch(request).then(response => {
+    if (response.ok) {
+      const responseClone = response.clone();
+      cache.put(request, addTimestamp(responseClone));
+    }
+    return response;
+  }).catch(error => {
+    console.warn('[SW] Background fetch failed:', error);
+  });
+
+  // Return cached if available and not expired
+  if (cached && !isExpired(cached, maxAge)) {
+    fetchPromise; // Fire and forget
+    return cached;
+  }
+
+  // Wait for network if no cache or expired
+  try {
+    return await fetchPromise;
+  } catch (error) {
+    if (cached) {
+      console.log('[SW] Network failed, serving stale cache for:', request.url);
+      return cached;
+    }
+    throw error;
+  }
+}
+
+// Network First Strategy - Good for HTML pages
+async function networkFirst(request, cacheName) {
+  const cache = await caches.open(cacheName);
+
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const responseClone = response.clone();
+      await cache.put(request, addTimestamp(responseClone));
+    }
+    return response;
+  } catch (error) {
+    const cached = await cache.match(request);
+    if (cached) {
+      console.log('[SW] Network failed, serving cache for:', request.url);
+      return cached;
+    }
+    throw error;
+  }
+}
+
+// Helper Functions
+function isStaticResource(url) {
+  return STATIC_RESOURCES.some(resource => url.pathname === resource) ||
+         url.pathname.includes('/assets/') ||
+         url.pathname.includes('/fonts/');
+}
+
+function isApiRequest(url) {
+  return API_CACHE_PATTERNS.some(pattern => pattern.test(url.href));
+}
+
+function isImageRequest(url) {
+  return /\.(jpg|jpeg|png|gif|webp|svg|ico)$/i.test(url.pathname);
+}
+
+function isAssetRequest(url) {
+  return /\.(js|css|woff|woff2|ttf|eot)$/i.test(url.pathname);
+}
+
+function isPageRequest(url) {
+  return url.pathname.endsWith('.html') || 
+         (!url.pathname.includes('.') && url.pathname !== '/');
+}
+
+function addTimestamp(response) {
+  const headers = new Headers(response.headers);
+  headers.set('sw-cache-timestamp', Date.now().toString());
+  
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: headers
+  });
+}
+
+function isExpired(response, maxAge) {
+  const timestamp = response.headers.get('sw-cache-timestamp');
+  if (!timestamp) return true;
+  
+  const age = (Date.now() - parseInt(timestamp)) / 1000;
+  return age > maxAge;
+}
+
+async function getCachedResponse(request) {
+  const cacheNames = [API_CACHE, DYNAMIC_CACHE, STATIC_CACHE];
+  
+  for (const cacheName of cacheNames) {
+    const cache = await caches.open(cacheName);
+    const response = await cache.match(request);
+    if (response) return response;
+  }
+  
+  return null;
+}
+
+async function getOfflinePage() {
+  const cache = await caches.open(STATIC_CACHE);
+  const response = await cache.match('/index.html');
+  
+  if (response) {
+    return response;
+  }
+
+  // Fallback offline response
+  return new Response(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Hors ligne - Drain Fortin</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+          body { 
+            font-family: system-ui, sans-serif; 
+            text-align: center; 
+            padding: 50px; 
+            background: #f5f5f5; 
+          }
+          .container { 
+            max-width: 400px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+          }
+          h1 { color: #333; }
+          button { 
+            background: #0066cc; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin-top: 20px; 
+          }
+          button:hover { background: #0052a3; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>🔌 Hors ligne</h1>
+          <p>Vous êtes actuellement hors ligne. Veuillez vérifier votre connexion internet.</p>
+          <button onclick="window.location.reload()">Réessayer</button>
+        </div>
+      </body>
+    </html>
+  `, {
+    headers: { 'Content-Type': 'text/html' }
+  });
+}
+
+// Background sync for failed requests
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'background-sync') {
+    console.log('[SW] Background sync triggered');
+    event.waitUntil(handleBackgroundSync());
+  }
+});
+
+async function handleBackgroundSync() {
+  // Implement background sync logic for failed API calls
+  console.log('[SW] Handling background sync...');
+}
+
+// Push notifications
+self.addEventListener('push', (event) => {
+  const options = {
+    body: event.data ? event.data.text() : 'Notification reçue',
+    icon: '/pwa-192.png',
+    badge: '/pwa-192.png',
+    vibrate: [100, 50, 100],
+    data: {
+      dateOfArrival: Date.now(),
+      primaryKey: 1
+    }
+  };
+
+  event.waitUntil(
+    self.registration.showNotification('Drain Fortin', options)
+  );
+});
+
+// Notification click handler
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Notification click received.');
+
+  event.notification.close();
+
+  event.waitUntil(
+    self.clients.openWindow('/')
+  );
+});
+
+console.log('[SW] Service Worker loaded and ready!');
