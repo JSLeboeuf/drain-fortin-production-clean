@@ -75,15 +75,72 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'supabase': ['@supabase/supabase-js'],
-          'ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast'],
-          'utils': ['date-fns', 'clsx', 'zustand']
+        manualChunks: (id) => {
+          // Core React ecosystem - most stable
+          if (id.includes('react') || id.includes('react-dom')) {
+            return 'react-vendor';
+          }
+          
+          // Database and API layer
+          if (id.includes('@supabase') || id.includes('@tanstack/react-query')) {
+            return 'data-layer';
+          }
+          
+          // UI component libraries - split by usage frequency
+          if (id.includes('@radix-ui') || id.includes('lucide-react')) {
+            return 'ui-components';
+          }
+          
+          // Charts and visualization - lazy loaded only when needed
+          if (id.includes('recharts') || id.includes('framer-motion')) {
+            return 'visualization';
+          }
+          
+          // Utilities and helpers - small frequently used
+          if (id.includes('date-fns') || id.includes('clsx') || id.includes('zustand')) {
+            return 'utils';
+          }
+          
+          // Analytics and monitoring components
+          if (id.includes('/pages/Analytics') || id.includes('/components/analytics')) {
+            return 'analytics-chunk';
+          }
+          
+          // CRM components
+          if (id.includes('/pages/CRM') || id.includes('/components/CRM')) {
+            return 'crm-chunk';
+          }
+          
+          // Monitoring and performance
+          if (id.includes('/pages/Monitoring') || id.includes('/components/performance')) {
+            return 'monitoring-chunk';
+          }
+          
+          // Testing and development
+          if (id.includes('/pages/Test') || id.includes('/testing/')) {
+            return 'test-chunk';
+          }
+          
+          // Node modules - group by vendor
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'react-vendor';
+            if (id.includes('@radix') || id.includes('lucide')) return 'ui-vendor';
+            return 'vendor';
+          }
         },
         chunkFileNames: 'js/[name]-[hash].js',
         entryFileNames: 'js/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]'
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
+            return `images/[name]-[hash].[ext]`;
+          }
+          if (/woff2?|eot|ttf|otf/i.test(ext)) {
+            return `fonts/[name]-[hash].[ext]`;
+          }
+          return `assets/[name]-[hash].[ext]`;
+        }
       }
     },
     cssCodeSplit: true,
@@ -101,6 +158,33 @@ export default defineConfig(({ mode }) => ({
   },
 
   optimizeDeps: {
-    include: ['react', 'react-dom', '@supabase/supabase-js', 'zustand']
+    include: [
+      'react', 
+      'react-dom', 
+      'react-router-dom',
+      '@supabase/supabase-js', 
+      'zustand',
+      '@tanstack/react-query',
+      'clsx',
+      'date-fns',
+      'lucide-react'
+    ],
+    exclude: [
+      // Heavy components that should remain lazy
+      'recharts',
+      'framer-motion'
+    ]
+  },
+
+  // Enhanced caching for development
+  cacheDir: 'node_modules/.vite',
+  
+  // Additional performance settings
+  esbuild: {
+    target: 'es2022',
+    legalComments: 'none',
+    minifyIdentifiers: true,
+    minifySyntax: true,
+    minifyWhitespace: true
   }
 }))

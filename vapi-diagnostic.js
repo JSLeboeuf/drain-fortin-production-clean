@@ -3,8 +3,16 @@
  * Identifie et corrige les problèmes de prononciation
  */
 
-const VAPI_API_KEY = '88c0382e-069c-4ec3-b8a9-5fae174c0d7e';
-const VAPI_BASE_URL = 'https://api.vapi.ai';
+// Load environment variables (use dotenv in production)
+const VAPI_API_KEY = process.env.VAPI_API_KEY || '';
+const VAPI_BASE_URL = process.env.VAPI_BASE_URL || 'https://api.vapi.ai';
+
+// Security check
+if (!VAPI_API_KEY) {
+  console.error('❌ ERREUR: VAPI_API_KEY non définie dans les variables d\'environnement');
+  console.error('Configurez la variable VAPI_API_KEY dans votre fichier .env');
+  process.exit(1);
+}
 
 // Configuration de prononciation optimale
 const PRONUNCIATION_CONFIG = {
