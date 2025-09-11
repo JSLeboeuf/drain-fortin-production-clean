@@ -69,3 +69,9 @@ Additional operational metrics (this project):
 - Validation scripts as deliverables: provide PowerShell/bash scripts to prove behavior (401/403 and 200 paths) and simple REST counts
 - Clear function env docs: document legacy `VAPI_SERVER_SECRET` vs new `VAPI_WEBHOOK_SECRET` fallback to prevent 500s
 
+## Communication Insights (Guillaume / Drain Fortin)
+
+- Tone & style: professionnel, direct, orienté valeur métier; tolère les détails techniques s’ils sont reliés à des preuves concrètes (HTTP codes, IDs d’exécution, Content-Range).
+- Préférences: synthèse en tête (2–3 lignes), sections à puces, CTA explicites (créneaux + téléphone), preuves d’audit (401/200/OPTIONS) et scripts reproductibles.
+- Sensibilités: éviter le jargon non relié à un bénéfice; rassurer par rollback simple, temps court d’activation (20–30 min), et traçabilité.
+- Ce qui fonctionne: “white‑glove” activation, rapport horodaté, scripts Windows/Mac, promesse de rotation des clés post‑stabilisation, chiffrer la valeur (+15–25 %).

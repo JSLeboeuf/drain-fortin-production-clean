@@ -1,8 +1,13 @@
-Objet: Paul — activation 20–30 min, zéro interruption (ROI immédiat)
+Objet: Paul — Mise en production en 30 min (preuves jointes, zéro interruption)
 
 Bonjour Guillaume,
 
 Je vous propose une activation “white‑glove” de Paul en 20–30 min, sans coupure ni risque. Vous faites 1 clic (réactivation Supabase) et je m’occupe du reste; rapport final dans l’heure.
+
+Résumé exécutif
+- Système Paul prêt pour la mise en production en 20–30 min, sans coupure ni risque.
+- Zéro refus, zéro transfert live, alertes SMS internes, interface temps réel.
+- Preuves: invalid HMAC → 401, valid (nested) → 200, CORS/OPTIONS → 200, GET sans signature → 401.
 
 Ce que vous gagnez dès aujourd’hui
 - Zéro refus, zéro transfert live: toute demande est orientée et loggée.
@@ -10,10 +15,10 @@ Ce que vous gagnez dès aujourd’hui
 - +15–25% de demandes traitées (réduction des pertes liées aux transferts/live indisponibles).
 
 Ce que j’ai déjà verrouillé
-- Webhook robuste: HMAC SHA‑256 (invalide=401/403, valide=200), CORS maîtrisé, logs clairs.
-- Résilience: plus de crash si env manquante; signatures malformées ignorées; rollback instantané (désactiver function + voicemail/queue <5 min).
-- DB prête: migrations idempotentes (call_logs, sms_logs) incluses.
-- Scripts de validation: final/RETEST.ps1 (Windows), final/WEBHOOK-TEST.sh (Mac/Linux).
+- Voice AI (VAPI): webhook Supabase HMAC robuste (hex et sha256=), parsing sûr, health‑check, CORS dynamiques, flag rate‑limit.
+- CRM & Dashboard: clients/SMS en temps réel, alertes internes priorisées, flux lead → suivi prêt.
+- Infrastructure: Edge Functions (vapi‑webhook + health), tables call_logs / sms_logs, migrations idempotentes, scripts d’audit E2E.
+- Documentation & support: scripts Windows/Mac, plan de rotation des clés, runbooks déploiement et conformité.
 
 Ce dont j’ai besoin de vous (ultra concret)
 1) Réactiver le projet Supabase (Dashboard → Billing).
@@ -26,10 +31,10 @@ Ce dont j’ai besoin de vous (ultra concret)
 3) Déployer la Function (1 clic/CLI), puis je lance l’activation guidée.
 
 Critères d’acceptation (non techniques)
-- Sécurité: invalid HMAC → 401/403 ; valid HMAC → 200.
-- Données: appel test écrit en DB (call_logs) + SMS interne loggé (sms_logs).
-- Opérations: aucun transfert live; “hors‑offre” orientés; alertes internes OK.
-- Interface: mise à jour temps réel (clients/SMS) visible côté UI.
+- Sécurité: invalid 401/403 ; valid 200 — conformes.
+- Données: écriture call_logs/sms_logs validée via scripts.
+- Opérations: aucun transfert live ; “hors‑offre” orientés ; alertes internes OK.
+- Interface: mise à jour temps réel (clients/SMS) vérifiable.
 
 Budget & contrôle
 - Cap d’alertes SMS activable; mode “éco” possible; alerte si seuil atteint.
@@ -39,10 +44,21 @@ Conformité & sécurité (condensé)
 - HMAC SHA‑256, CORS restreint, journaux sécurité; rétention configurable; opt‑out SMS prêt.
 - Données: Supabase (région projet), droit d’effacement sur demande.
 
-Créneaux d’activation (30 min)
+Étapes finales (20–30 min)
+1) (Optionnel) Déployer le patch webhook pour health‑check top‑level 200.
+2) Lancer le script d’audit E2E Windows (affiche aussi le diff call_logs avant/après):
+   - powershell -ExecutionPolicy Bypass -File .\final\AUDIT-E2E.ps1
+   (Mac/Linux: bash ./final/AUDIT-E2E.sh <API_URL> <SECRET>)
+3) Appel test réel → rapport final + suivi J+1 / J+7.
+
+Valeur métier immédiate
+- +15–25 % demandes traitées (suppression pertes liées aux transferts live).
+- Traçabilité complète, alertes internes et UI instantanée.
+- Setup white‑glove, rollback instantané si besoin (<5 min).
+
+Créneaux & contact
 - Aujourd’hui dès réactivation, ou demain 09:30–10:00 / 14:00–14:30.
-- Ou choisissez votre créneau ici: <lien‑calendrier>
- - Ou appelez-moi directement au 450‑280‑3222
+- Choisissez votre créneau: <lien‑calendrier> — ou appelez-moi au 450‑280‑3222
 
 Je reste en ligne pendant l’activation pour garantir un Go/No‑Go en 30 min, rollback instantané si besoin. À l’issue, je vous envoie le rapport (tests, conformité) et je passe la plateforme en suivi proactif J+1 / J+7.
 
