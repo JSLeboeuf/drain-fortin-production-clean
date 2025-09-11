@@ -13,6 +13,10 @@ const VAPI_SERVER_SECRET: string =
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY') ?? ''
+const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') ?? '*')
+  .split(',')
+  .map((s) => s.trim())
+const RATE_LIMIT_DISABLED = (Deno.env.get('RATE_LIMIT_DISABLED') ?? 'false').toLowerCase() === 'true'
 
 // Rate limiting storage
 const rateLimitMap = new Map<string, number[]>()
@@ -97,8 +101,8 @@ serve(async (req) => {
     // Get client IP
     const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown'
     
-    // Check rate limit
-    if (isRateLimited(clientIp)) {
+    // Check rate limit (can be disabled via env)
+    if (!RATE_LIMIT_DISABLED && isRateLimited(clientIp)) {
       return new Response(
         JSON.stringify({ error: 'Too many requests' }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -201,9 +205,22 @@ serve(async (req) => {
         console.log('Unknown message type:', message?.type)
     }
 
+    // Compute dynamic CORS based on request origin if ALLOWED_ORIGINS specified
+    const origin = req.headers.get('origin') || ''
+    const allowOrigin = (ALLOWED_ORIGINS.includes('*') || ALLOWED_ORIGINS.includes(origin))
+      ? (origin || '*')
+      : '*'
+
     return new Response(
       JSON.stringify({ success: true }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': allowOrigin,
+        }
+      }
     )
 
   } catch (error) {
