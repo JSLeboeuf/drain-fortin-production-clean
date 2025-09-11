@@ -65,7 +65,7 @@ Preuves d’audit (extraits, 10/09 UTC)
 
 Créneaux & contact
 - Aujourd’hui dès réactivation, ou demain 09:30–10:00 / 14:00–14:30.
-- Choisissez votre créneau: <lien‑calendrier> — ou appelez-moi au 450‑280‑3222
+- Choisissez votre créneau: https://calendly.com/autoscaleai/activation-30min — ou appelez-moi au 450‑280‑3222
 
 Conclusion
 Je reste en ligne pendant l’activation pour garantir un Go/No‑Go en 30 min et un rapport final (tests, conformité) dans l’heure. Ensuite: suivi J+1 / J+7 et rotation des clés.
