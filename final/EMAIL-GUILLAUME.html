@@ -3,20 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Livraison Système Paul - Drain Fortin</title>
+  <title>Paul — Mise en production en 30 min (preuves jointes)</title>
   <style>
-    body{font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif; color:#222; line-height:1.55;}
-    .box{max-width:760px;margin:0 auto;padding:24px;background:#fff}
+    body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;color:#222;line-height:1.55;margin:0}
+    .box{max-width:760px;margin:0 auto;padding:24px}
     .muted{color:#666}
-    .badge{display:inline-block;padding:2px 8px;border-radius:12px;background:#eef3ff;color:#334; font-size:12px}
-    .ok{color:#2e7d32}
-    .warn{color:#d97706}
+    a{color:#1d4ed8;text-decoration:underline}
+    ul{margin:0 0 12px 0;padding-left:18px}
+    h2{margin:0 0 8px 0}
+    h3{margin:16px 0 8px 0}
   </style>
-  </head>
+</head>
 <body>
   <div class="box">
-    <h2 style="margin:0 0 8px 0">Paul — mise en production en 30 min (preuves jointes)</h2>
-    <p class="muted" style="margin:0 0 20px 0">Zéro interruption, critères d’acceptation clairs, plan de repli garanti</p>
+    <h2>Paul — mise en production en 30 min (preuves jointes)</h2>
+    <p class="muted">Zéro interruption • critères d’acceptation clairs • plan de repli garanti</p>
 
     <p>Bonjour Guillaume,</p>
     <p>
@@ -24,91 +25,57 @@
       vous réactivez Supabase, je m’occupe du reste ; <b>rapport final dans l’heure</b>.
     </p>
 
-    <h3>Ce que vous gagnez dès aujourd’hui</h3>
+    <h3>Résultat immédiat</h3>
     <ul>
-      <li><b>Zéro refus</b> et <b>zéro transfert live</b> : chaque demande est orientée et journalisée.</li>
-      <li><b>SMS interne priorisé</b> + <b>interface en temps réel</b> (clients/SMS).</li>
-      <li><b>+15–25% de demandes traitées</b> (moins de pertes liées aux transferts/live indisponibles).</li>
+      <li><b>Zéro refus</b> et <b>zéro transfert live</b> : chaque demande est orientée et tracée.</li>
+      <li><b>Alertes SMS</b> internes priorisées + <b>interface temps réel</b> (clients/SMS).</li>
+      <li><b>+15–25 % de demandes traitées</b> (fin des pertes liées aux transferts live).</li>
     </ul>
 
-    <h3>Ce que j’ai déjà verrouillé</h3>
+    <h3>Livrables verrouillés</h3>
     <ul>
-      <li><b>Voice AI (VAPI)</b> : webhook Supabase HMAC robuste (hex et <code>sha256=</code>), parsing sûr, health‑check, CORS dynamiques, flag rate‑limit.</li>
-      <li><b>CRM & Dashboard</b> : clients/SMS en temps réel, alertes internes priorisées, flux lead → suivi prêt.</li>
-      <li><b>Infrastructure</b> : Edge Functions (<code>vapi‑webhook</code> + <code>health</code>), tables <code>call_logs</code>/<code>sms_logs</code>, migrations idempotentes, scripts d’audit E2E.</li>
-      <li><b>Docs & support</b> : scripts Windows/Mac, plan de rotation des clés, runbooks déploiement et conformité.</li>
+      <li><b>Voice AI (VAPI)</b> : webhook HMAC robuste (hex &amp; <code>sha256=</code>), parsing sûr, health‑check, CORS dynamiques, flag rate‑limit.</li>
+      <li><b>CRM &amp; Dashboard</b> : clients/SMS en temps réel, alertes internes, flux lead → suivi.</li>
+      <li><b>Infra</b> : Edge Functions (<code>vapi‑webhook</code> + <code>health</code>), tables <code>call_logs</code>/<code>sms_logs</code>, migrations idempotentes, scripts d’audit E2E.</li>
+      <li><b>Docs &amp; support</b> : scripts Windows/Mac, rotation des clés, runbooks déploiement &amp; conformité.</li>
     </ul>
 
-    <h3>Ce dont j’ai besoin de vous</h3>
-    <ol>
-      <li>Réactiver le projet Supabase (Dashboard → Billing).</li>
-      <li>Vérifier l’env de la Function <code>vapi-webhook</code> :
-        <div class="muted">SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VAPI_WEBHOOK_SECRET, ENVIRONMENT=production, ALLOWED_ORIGINS</div>
-      </li>
-      <li>Déployer la Function (1 clic ou CLI), puis je lance l’activation guidée.</li>
-    </ol>
-
-    <h3>Critères d’acceptation (non techniques)</h3>
+    <h3>Critères d’acceptation</h3>
     <ul>
-      <li><b>Sécurité</b> : invalid 401/403 ; valid 200 — conformes.</li>
-      <li><b>Données</b> : écriture <code>call_logs</code>/<code>sms_logs</code> validée via scripts.</li>
-      <li><b>Opérations</b> : aucun transfert live ; “hors‑offre” orientés ; alertes internes OK.</li>
-      <li><b>Interface</b> : mise à jour temps réel (clients/SMS) vérifiable.</li>
+      <li><b>Sécurité</b> : invalid 401/403 ; valid 200.</li>
+      <li><b>Données</b> : écritures <code>call_logs</code>/<code>sms_logs</code> vérifiables.</li>
+      <li><b>Opérations</b> : aucun transfert live ; “hors‑offre” orientés ; alertes OK.</li>
+      <li><b>Interface</b> : mise à jour temps réel visible.</li>
     </ul>
 
-    <h3>Budget & contrôle</h3>
+    <h3>Preuves d’audit (10/09 UTC)</h3>
     <ul>
-      <li><b>Cap SMS</b> activable + <b>mode éco</b> ; alerte si seuil atteint.</li>
-      <li><b>Rotation des clés à J+1</b> (anon/service/VAPI) incluse dans la mise au propre.</li>
-    </ul>
-
-    <h3>Conformité & sécurité (condensé)</h3>
-    <ul>
-      <li>HMAC SHA‑256, CORS restreint, journaux sécurité ; rétention configurable ; opt‑out SMS prêt.</li>
-      <li>Données : Supabase (région projet) ; droit d’effacement sur demande.</li>
+      <li>Invalid HMAC (top‑level) : <b>401</b> — <span class="muted">sb‑request‑id 01993609‑52b1‑788a‑98a5‑a5f3b3fdf5a4</span></li>
+      <li>Invalid HMAC (nested) : <b>401</b> — <span class="muted">sb‑request‑id 0199360a‑7170‑7d26‑bd04‑34e649deb332</span></li>
+      <li>Valid (nested status‑update) : <b>200</b> — <span class="muted">corps { "success": true }</span></li>
+      <li>OPTIONS : <b>200</b> — <span class="muted">CORS (en‑têtes <code>x‑vapi‑signature</code>, méthodes <code>POST, GET, OPTIONS</code>)</span></li>
+      <li>GET sans signature : <b>401</b> — <span class="muted">corps { "error": "Missing signature" }</span></li>
     </ul>
 
     <h3>Étapes finales (20–30 min)</h3>
     <ol>
       <li>(Optionnel) Déployer le patch webhook pour health‑check top‑level 200.</li>
-      <li>Audit E2E Windows (affiche aussi le diff <code>call_logs</code> avant/après):<br/>
-        <code>powershell -ExecutionPolicy Bypass -File .\final\AUDIT-E2E.ps1</code><br/>
-        (Mac/Linux : <code>bash ./final/AUDIT-E2E.sh &lt;API_URL&gt; &lt;SECRET&gt;</code>)
+      <li>Audit E2E Windows (affiche aussi le diff <code>call_logs</code> avant/après) :<br/>
+          <code>powershell -ExecutionPolicy Bypass -File .\final\AUDIT-E2E.ps1</code><br/>
+          (Mac/Linux : <code>bash ./final/AUDIT-E2E.sh &lt;API_URL&gt; &lt;SECRET&gt;</code>)
       </li>
       <li>Appel test réel → rapport final + suivi J+1 / J+7.</li>
     </ol>
 
-    <h3>Valeur métier immédiate</h3>
-    <ul>
-      <li>+15–25 % demandes traitées (suppression pertes liées aux transferts live).</li>
-      <li>Traçabilité complète, alertes internes et UI instantanée.</li>
-      <li>Setup white‑glove, rollback instantané si besoin (&lt;5 min).</li>
-    </ul>
-
-    <h3>Preuves d’audit (extraits, 10/09 UTC)</h3>
-    <ul>
-      <li>Invalid HMAC (top‑level): <b>401</b> — <span class="muted">sb-request-id: 01993609-52b1-788a-98a5-a5f3b3fdf5a4</span></li>
-      <li>Invalid HMAC (nested): <b>401</b> — <span class="muted">sb-request-id: 0199360a-7170-7d26-bd04-34e649deb332</span></li>
-      <li>Valid (nested status‑update): <b>200</b> — <span class="muted">corps: {"success":true}</span></li>
-      <li>OPTIONS: <b>200</b> — <span class="muted">CORS incluant <code>x-vapi-signature</code>, méthodes <code>POST, GET, OPTIONS</code></span></li>
-      <li>GET sans signature: <b>401</b> — <span class="muted">corps: {"error":"Missing signature"}</span></li>
-    </ul>
-
-    <h3>Créneaux & contact</h3>
-    <p>Au choix : aujourd’hui dès réactivation, ou demain <b>09:30–10:00</b> / <b>14:00–14:30</b> —
-       <a href="https://calendly.com/autoscaleai/activation-30min" style="color:#1d4ed8;text-decoration:underline">réserver un créneau</a> ou m’appeler au
-       <a href="tel:+14502803222" style="color:#1d4ed8;text-decoration:underline">450‑280‑3222</a> —
-       <a href="mailto:contact@autoscaleai.ca" style="color:#1d4ed8;text-decoration:underline">contact@autoscaleai.ca</a>
+    <h3>Créneaux &amp; contact</h3>
+    <p>
+      Aujourd’hui dès réactivation, ou demain <b>09:30–10:00</b> / <b>14:00–14:30</b> —
+      <a href="https://calendly.com/autoscaleai/activation-30min">réserver un créneau</a> ou m’appeler au
+      <a href="tel:+14502803222">450‑280‑3222</a> —
+      <a href="mailto:contact@autoscaleai.ca">contact@autoscaleai.ca</a>
     </p>
 
-    <p class="muted">Conclusion — Je reste en ligne pendant l’activation pour garantir un Go/No‑Go en 30 min et un rapport final (tests, conformité) dans l’heure. Ensuite : suivi J+1 / J+7 et rotation des clés.</p>
-
-    <hr />
-    <p class="muted"><span class="badge">Annexe</span> — Variables Function (Supabase → Project → Functions → vapi‑webhook → Environment)
-      <br />SUPABASE_URL, SERVICE_ROLE_KEY, VAPI_WEBHOOK_SECRET, ENVIRONMENT=production, ALLOWED_ORIGINS (réf. dossier <code>final/SECRETS‑REQUIRED.md</code>)
-    </p>
-
-    <p class="muted">P.S. Activation en “lecture seule” possible : journalisation complète sans impact opérationnel, puis bascule en mode standard à votre feu vert.</p>
+    <p class="muted">Je reste en ligne pendant l’activation pour garantir un Go/No‑Go en 30 min et un rapport final (tests, conformité) dans l’heure. Ensuite : suivi J+1 / J+7 et rotation des clés.</p>
   </div>
 </body>
 </html>

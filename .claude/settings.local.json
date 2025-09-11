@@ -3,7 +3,9 @@
     "allow": [
       "Bash(powershell:*)",
       "Bash(git fetch:*)",
-      "Bash(gh repo view:*)"
+      "Bash(gh repo view:*)",
+      "Bash(git describe:*)",
+      "Bash(git rev-list:*)"
     ],
     "deny": [],
     "ask": []
