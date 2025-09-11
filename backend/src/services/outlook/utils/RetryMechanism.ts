@@ -215,6 +215,18 @@ export class RetryMechanism extends EventEmitter {
   }
 
   /**
+   * Alias pour la compatibilité avec l'ancienne API
+   * @deprecated Utilisez execute() à la place
+   */
+  async executeWithRetry<T>(
+    operation: () => Promise<T>,
+    context?: string,
+    customConfig?: Partial<RetryConfig>
+  ): Promise<T> {
+    return this.execute(operation, context, customConfig);
+  }
+
+  /**
    * Exécute une opération avec timeout
    */
   private async executeWithTimeout<T>(

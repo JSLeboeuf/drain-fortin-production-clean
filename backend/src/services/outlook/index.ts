@@ -7,6 +7,24 @@
  * @author Claude Code - Anthropic
  */
 
+// ===== IMPORTS INTERNES =====
+import { CacheManager } from './utils/CacheManager';
+import { AuditLogger } from './security/AuditLogger';
+import { EncryptionService } from './security/EncryptionService';
+import { OutlookService } from './OutlookService';
+import { OutlookCalendarSync } from './OutlookCalendarSync';
+import { OutlookContactSync } from './OutlookContactSync';
+import { OutlookEmailManager } from './OutlookEmailManager';
+import { OutlookRoutingEngine } from './OutlookRoutingEngine';
+import { GraphAPIClient } from './utils/GraphAPIClient';
+import { OAuth2Manager } from './security/OAuth2Manager';
+import { OutlookErrorHandler } from './utils/OutlookErrorHandler';
+import { RetryMechanism } from './utils/RetryMechanism';
+import { RateLimiter } from './security/RateLimiter';
+import { BatchProcessor } from './utils/BatchProcessor';
+import { HealthChecker } from './utils/HealthChecker';
+import { MetricsCollector } from './utils/MetricsCollector';
+
 // ===== SERVICES PRINCIPAUX =====
 
 // Service principal et orchestrateur

@@ -600,7 +600,8 @@ export const OUTLOOK_CONSTANTS = {
   EMAIL,
   CALENDAR,
   PHONE,
-  WEBHOOK
+  WEBHOOK,
+  CACHE: DEFAULT_CONFIG.CACHE
 } as const;
 
 export default OUTLOOK_CONSTANTS;
