@@ -5,9 +5,9 @@ Bonjour Guillaume,
 Je vous propose une activation “white‑glove” de Paul en 20–30 min, sans coupure ni risque. Vous faites 1 clic (réactivation Supabase) et je m’occupe du reste; rapport final dans l’heure.
 
 Résumé exécutif
-- Système Paul prêt pour la mise en production en 20–30 min, sans coupure ni risque.
-- Zéro refus, zéro transfert live, alertes SMS internes, interface temps réel.
-- Preuves: invalid HMAC → 401, valid (nested) → 200, CORS/OPTIONS → 200, GET sans signature → 401.
+- Paul est prêt pour la mise en production en 20–30 min, sans coupure ni risque.
+- Contraintes respectées: zéro refus, zéro transfert live, alertes SMS internes, interface temps réel.
+- Preuves (10/09 UTC): invalid HMAC → 401, valid (nested) → 200, OPTIONS → 200, GET sans signature → 401.
 
 Ce que vous gagnez dès aujourd’hui
 - Zéro refus, zéro transfert live: toute demande est orientée et loggée.
@@ -56,9 +56,19 @@ Valeur métier immédiate
 - Traçabilité complète, alertes internes et UI instantanée.
 - Setup white‑glove, rollback instantané si besoin (<5 min).
 
+Preuves d’audit (extraits, 10/09 UTC)
+- Invalid HMAC (top‑level): 401 — sb-request-id: 01993609-52b1-788a-98a5-a5f3b3fdf5a4
+- Invalid HMAC (nested): 401 — sb-request-id: 0199360a-7170-7d26-bd04-34e649deb332
+- Valid (nested status‑update): 200 — corps: {"success":true}
+- OPTIONS: 200 — CORS exposant `x-vapi-signature`, méthodes `POST, GET, OPTIONS`
+- GET sans signature: 401 — corps: {"error":"Missing signature"}
+
 Créneaux & contact
 - Aujourd’hui dès réactivation, ou demain 09:30–10:00 / 14:00–14:30.
 - Choisissez votre créneau: <lien‑calendrier> — ou appelez-moi au 450‑280‑3222
+
+Conclusion
+Je reste en ligne pendant l’activation pour garantir un Go/No‑Go en 30 min et un rapport final (tests, conformité) dans l’heure. Ensuite: suivi J+1 / J+7 et rotation des clés.
 
 Je reste en ligne pendant l’activation pour garantir un Go/No‑Go en 30 min, rollback instantané si besoin. À l’issue, je vous envoie le rapport (tests, conformité) et je passe la plateforme en suivi proactif J+1 / J+7.
 

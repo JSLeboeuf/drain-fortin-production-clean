@@ -20,8 +20,8 @@
 
     <p>Bonjour Guillaume,</p>
     <p>
-      Je vous propose une activation <b>white‑glove</b> de Paul en <b>20–30 min</b>, sans coupure ni risque :
-      vous réactivez Supabase, je m’occupe du reste ; <b>rapport final dans l’heure</b>.
+      Je vous propose une activation <b>white‑glove</b> de Paul en <b>20–30 min</b>, sans coupure ni risque :
+      vous réactivez Supabase, je m’occupe du reste ; <b>rapport final dans l’heure</b>.
     </p>
 
     <h3>Ce que vous gagnez dès aujourd’hui</h3>
@@ -85,12 +85,23 @@
       <li>Setup white‑glove, rollback instantané si besoin (&lt;5 min).</li>
     </ul>
 
+    <h3>Preuves d’audit (extraits, 10/09 UTC)</h3>
+    <ul>
+      <li>Invalid HMAC (top‑level): <b>401</b> — <span class="muted">sb-request-id: 01993609-52b1-788a-98a5-a5f3b3fdf5a4</span></li>
+      <li>Invalid HMAC (nested): <b>401</b> — <span class="muted">sb-request-id: 0199360a-7170-7d26-bd04-34e649deb332</span></li>
+      <li>Valid (nested status‑update): <b>200</b> — <span class="muted">corps: {"success":true}</span></li>
+      <li>OPTIONS: <b>200</b> — <span class="muted">CORS incluant <code>x-vapi-signature</code>, méthodes <code>POST, GET, OPTIONS</code></span></li>
+      <li>GET sans signature: <b>401</b> — <span class="muted">corps: {"error":"Missing signature"}</span></li>
+    </ul>
+
     <h3>Créneaux & contact</h3>
     <p>Au choix : aujourd’hui dès réactivation, ou demain <b>09:30–10:00</b> / <b>14:00–14:30</b> —
        <a href="#" style="color:#1d4ed8;text-decoration:underline">réserver un créneau</a> ou m’appeler au
        <a href="tel:+14502803222" style="color:#1d4ed8;text-decoration:underline">450‑280‑3222</a> —
        <a href="mailto:contact@autoscaleai.ca" style="color:#1d4ed8;text-decoration:underline">contact@autoscaleai.ca</a>
     </p>
+
+    <p class="muted">Conclusion — Je reste en ligne pendant l’activation pour garantir un Go/No‑Go en 30 min et un rapport final (tests, conformité) dans l’heure. Ensuite : suivi J+1 / J+7 et rotation des clés.</p>
 
     <hr />
     <p class="muted"><span class="badge">Annexe</span> — Variables Function (Supabase → Project → Functions → vapi‑webhook → Environment)
