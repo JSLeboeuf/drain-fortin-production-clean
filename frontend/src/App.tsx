@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect, Suspense, lazy, startTransition } from 'react';
-import { supabase } from './lib/supabase';
+import { Suspense, lazy, startTransition } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import LoadingFallback from './components/common/LoadingFallback';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Lazy load heavy components with strategic prefetching
 const Dashboard = lazy(() => {
@@ -46,24 +47,8 @@ const CallDetail = lazy(() => import('./pages/CallDetail'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Test = lazy(() => import('./pages/Test'));
 
-function App() {
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Check session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+function AppRoutes() {
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -77,49 +62,89 @@ function App() {
   }
 
   return (
+    <Suspense fallback={<LoadingFallback />}>
+      <Routes>
+        <Route 
+          path="/login" 
+          element={!user ? <Login /> : <Navigate to="/" />} 
+        />
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/analytics" 
+          element={
+            <ProtectedRoute>
+              <Analytics />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/crm" 
+          element={
+            <ProtectedRoute>
+              <CRMDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/monitoring" 
+          element={
+            <ProtectedRoute>
+              <Monitoring />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/calls" 
+          element={
+            <ProtectedRoute>
+              <Calls />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/calls/:id" 
+          element={
+            <ProtectedRoute>
+              <CallDetail />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/settings" 
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/test" 
+          element={
+            <ProtectedRoute>
+              <Test />
+            </ProtectedRoute>
+          } 
+        />
+      </Routes>
+    </Suspense>
+  );
+}
+
+function App() {
+  return (
     <ErrorBoundary>
-      <Router>
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route 
-              path="/login" 
-              element={!session ? <Login /> : <Navigate to="/" />} 
-            />
-            <Route 
-              path="/" 
-              element={session ? <Dashboard /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/analytics" 
-              element={session ? <Analytics /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/crm" 
-              element={session ? <CRMDashboard /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/monitoring" 
-              element={session ? <Monitoring /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/calls" 
-              element={session ? <Calls /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/calls/:id" 
-              element={session ? <CallDetail /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/settings" 
-              element={session ? <Settings /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/test" 
-              element={session ? <Test /> : <Navigate to="/login" />} 
-            />
-          </Routes>
-        </Suspense>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

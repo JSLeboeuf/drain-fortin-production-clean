@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 export default function Login() {
-  const [email, setEmail] = useState('admin@drainfortin.com');
-  const [password, setPassword] = useState('Admin123!@#');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -78,13 +78,6 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="mt-6 p-4 bg-blue-50 rounded-md">
-          <p className="text-xs text-gray-600">
-            <strong>Identifiants de test:</strong><br/>
-            Email: admin@drainfortin.com<br/>
-            Mot de passe: Admin123!@#
-          </p>
-        </div>
       </div>
     </div>
   );
