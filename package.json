@@ -15,7 +15,6 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.5",
     "@supabase/supabase-js": "^2.57.2",
-    "axios": "^1.11.0",
     "colors": "^1.4.0",
     "dotenv": "^17.2.2",
     "mime-types": "^3.0.1",
