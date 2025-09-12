@@ -1,0 +1,204 @@
+{
+  "id": "90395b6a-5b14-4515-a7b8-1149db5787bc",
+  "orgId": "30f961c8-b6b0-4343-b496-25af045c65f8",
+  "name": "Paul - Agent Drain Fortin Production",
+  "voice": {
+    "model": "eleven_turbo_v2",
+    "speed": 1,
+    "style": 0.3,
+    "voiceId": "93nuHbke4dTER9x2pDwE",
+    "language": "fr",
+    "provider": "11labs",
+    "stability": 0.65,
+    "similarityBoost": 0.75,
+    "useSpeakerBoost": true,
+    "enableSsmlParsing": true,
+    "optimizeStreamingLatency": 2
+  },
+  "createdAt": "2025-08-26T07:08:32.494Z",
+  "updatedAt": "2025-09-12T06:46:03.569Z",
+  "functions": [
+    {
+      "name": "validateServiceRequest",
+      "description": "Valide une demande de service et collecte les 8 informations obligatoires",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "description": "Nom du client",
+            "type": "string"
+          },
+          "email": {
+            "description": "Adresse courriel",
+            "type": "string"
+          },
+          "source": {
+            "description": "Comment avez-vous trouvé Drain Fortin?",
+            "type": "string"
+          },
+          "adresse": {
+            "description": "Adresse complète + code postal",
+            "type": "string"
+          },
+          "service": {
+            "description": "Type de service demandé",
+            "type": "string"
+          },
+          "urgence": {
+            "description": "Niveau d'urgence",
+            "type": "string",
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ]
+          },
+          "probleme": {
+            "description": "Description du problème",
+            "type": "string"
+          },
+          "telephone": {
+            "description": "Numéro de téléphone (+1...)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nom",
+          "telephone",
+          "adresse",
+          "service",
+          "probleme",
+          "urgence"
+        ]
+      }
+    },
+    {
+      "name": "calculateQuote",
+      "description": "Calcule un devis avec minimum 350$ + taxes selon les règles Drain Fortin",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "details": {
+            "description": "Détails additionnels",
+            "type": "string"
+          },
+          "service": {
+            "description": "Type de service",
+            "type": "string"
+          },
+          "urgence": {
+            "type": "string",
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ]
+          },
+          "rive_sud": {
+            "description": "Client en Rive-Sud (+100$)",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "service"
+        ]
+      }
+    },
+    {
+      "name": "sendSMSAlert",
+      "description": "Envoie une alerte SMS selon la priorité (P1→Guillaume, P2-P4→équipe)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "urgence": {
+            "description": "Marquer comme urgence",
+            "type": "boolean"
+          },
+          "priorite": {
+            "type": "string",
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ]
+          },
+          "client_info": {
+            "description": "Informations client",
+            "type": "string"
+          },
+          "service_info": {
+            "description": "Détails du service",
+            "type": "string"
+          }
+        },
+        "required": [
+          "priorite",
+          "client_info",
+          "service_info"
+        ]
+      }
+    }
+  ],
+  "model": {
+    "model": "gpt-4o-mini",
+    "messages": [
+      {
+        "role": "system",
+        "content": "# Paul - Drain Fortin 24/7\n\n## Règle: 1 question à la fois, attendre réponse\n\n## Processus:\n1. \"Comment puis-je vous aider?\"\n2. \"Votre nom?\"\n3. \"Votre adresse?\"\n4. \"Votre téléphone?\"\n5. \"Décrivez le problème\"\n6. \"C'est urgent?\"\n\n## Prix (dire clairement):\n- Débouchage: trois cent cinquante dollars\n- Inspection: quatre cent cinquante dollars\n- Nettoyage: quatre cents dollars\n- Rive-Sud: +cinquante dollars\n\n## Urgences:\nP1: Inondation → SMS Guillaume immédiat\nP2-P4: SMS équipe\n\nToujours: patient, professionnel, une question à la fois."
+      }
+    ],
+    "provider": "openai",
+    "maxTokens": 150,
+    "temperature": 0.7
+  },
+  "firstMessage": "Bonjour! Paul de Drain Fortin, disponible 24/7. Comment puis-je vous aider?",
+  "voicemailMessage": "Drain Fortin. Laissez vos coordonnées et problème. Merci.",
+  "endCallMessage": "Merci d'avoir appelé Drain Fortin. Bonne journée!",
+  "transcriber": {
+    "model": "nova-2",
+    "language": "fr-CA",
+    "provider": "deepgram"
+  },
+  "silenceTimeoutSeconds": 10,
+  "clientMessages": [
+    "conversation-update",
+    "function-call",
+    "speech-update",
+    "transcript"
+  ],
+  "serverMessages": [
+    "conversation-update",
+    "function-call",
+    "speech-update",
+    "status-update",
+    "transcript",
+    "tool-calls"
+  ],
+  "responseDelaySeconds": 0,
+  "serverUrl": "https://phiduqxcufdmgjvdipyu.supabase.co/functions/v1/vapi-webhook",
+  "endCallPhrases": [
+    "au revoir",
+    "bye",
+    "goodbye",
+    "merci beaucoup",
+    "c'est tout"
+  ],
+  "llmRequestDelaySeconds": 0,
+  "maxDurationSeconds": 600,
+  "metadata": {
+    "smsMaxime": "+15146175425",
+    "phoneNumber": "+14502803222",
+    "smsGuillaume": "+15145296037"
+  },
+  "backgroundSound": "office",
+  "firstMessageMode": "assistant-speaks-first",
+  "backgroundDenoisingEnabled": true,
+  "server": {
+    "url": "https://phiduqxcufdmgjvdipyu.supabase.co/functions/v1/vapi-webhook",
+    "timeoutSeconds": 20
+  },
+  "isServerUrlSecretSet": true
+}

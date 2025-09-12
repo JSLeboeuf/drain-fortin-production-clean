@@ -10,7 +10,19 @@
     "outlook:test": "node scripts/test-outlook.js",
     "outlook:auth": "node scripts/outlook-auth.js",
     "outlook:sync": "node scripts/outlook-sync.js",
-    "outlook:monitor": "node scripts/outlook-monitor.js"
+    "outlook:monitor": "node scripts/outlook-monitor.js",
+    "test:production": "node tests/run-all-tests.js --production",
+    "test:development": "node tests/run-all-tests.js",
+    "test:security": "node tests/run-all-tests.js --suite=security",
+    "test:performance": "node tests/run-all-tests.js --suite=performance",
+    "test:integration": "node tests/run-all-tests.js --suite=comprehensive",
+    "test:edge-cases": "node tests/run-all-tests.js --suite=edge",
+    "test:all": "node tests/run-all-tests.js --production --verbose",
+    "test:quick": "npx vitest run tests/comprehensive-test-suite.js",
+    "test:stress": "ENABLE_STRESS_TESTS=true node tests/run-all-tests.js --suite=edge",
+    "test:ci": "node tests/run-all-tests.js --production --bail",
+    "test:debug": "LOG_LEVEL=debug node tests/run-all-tests.js --verbose",
+    "test:parallel": "node tests/run-all-tests.js --parallel"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.5",
@@ -27,6 +39,7 @@
     "fast-glob": "^3.3.3",
     "mammoth": "^1.10.0",
     "pdf-parse": "^1.1.1",
-    "pdfjs-dist": "^5.4.149"
+    "pdfjs-dist": "^5.4.149",
+    "vitest": "^2.1.5"
   }
 }

@@ -1,0 +1,355 @@
+{
+  "id": "90395b6a-5b14-4515-a7b8-1149db5787bc",
+  "orgId": "30f961c8-b6b0-4343-b496-25af045c65f8",
+  "name": "Paul - Agent Drain Fortin Production",
+  "voice": {
+    "model": "eleven_multilingual_v2",
+    "speed": 0.9,
+    "style": 0.3,
+    "voiceId": "93nuHbke4dTER9x2pDwE",
+    "language": "fr",
+    "provider": "11labs",
+    "stability": 0.65,
+    "similarityBoost": 0.75,
+    "useSpeakerBoost": true,
+    "enableSsmlParsing": true,
+    "optimizeStreamingLatency": 3
+  },
+  "createdAt": "2025-08-26T07:08:32.494Z",
+  "updatedAt": "2025-09-11T03:59:51.467Z",
+  "functions": [
+    {
+      "name": "validateServiceRequest",
+      "description": "Valide une demande de service et collecte les 8 informations obligatoires",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "description": "Nom du client",
+            "type": "string"
+          },
+          "email": {
+            "description": "Adresse courriel",
+            "type": "string"
+          },
+          "source": {
+            "description": "Comment avez-vous trouvé Drain Fortin?",
+            "type": "string"
+          },
+          "adresse": {
+            "description": "Adresse complète + code postal",
+            "type": "string"
+          },
+          "service": {
+            "description": "Type de service demandé",
+            "type": "string"
+          },
+          "urgence": {
+            "description": "Niveau d'urgence",
+            "type": "string",
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ]
+          },
+          "probleme": {
+            "description": "Description du problème",
+            "type": "string"
+          },
+          "telephone": {
+            "description": "Numéro de téléphone (+1...)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nom",
+          "telephone",
+          "adresse",
+          "service",
+          "probleme",
+          "urgence"
+        ]
+      }
+    },
+    {
+      "name": "calculateQuote",
+      "description": "Calcule un devis avec minimum 350$ + taxes selon les règles Drain Fortin",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "details": {
+            "description": "Détails additionnels",
+            "type": "string"
+          },
+          "service": {
+            "description": "Type de service",
+            "type": "string"
+          },
+          "urgence": {
+            "type": "string",
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ]
+          },
+          "rive_sud": {
+            "description": "Client en Rive-Sud (+100$)",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "service"
+        ]
+      }
+    },
+    {
+      "name": "sendSMSAlert",
+      "description": "Envoie une alerte SMS selon la priorité (P1→Guillaume, P2-P4→équipe)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "urgence": {
+            "description": "Marquer comme urgence",
+            "type": "boolean"
+          },
+          "priorite": {
+            "type": "string",
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ]
+          },
+          "client_info": {
+            "description": "Informations client",
+            "type": "string"
+          },
+          "service_info": {
+            "description": "Détails du service",
+            "type": "string"
+          }
+        },
+        "required": [
+          "priorite",
+          "client_info",
+          "service_info"
+        ]
+      }
+    }
+  ],
+  "model": {
+    "model": "gpt-4o-mini",
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "validateServiceRequest",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "serviceType",
+              "urgency",
+              "location"
+            ],
+            "properties": {
+              "address": {
+                "type": "string",
+                "description": "Adresse complète du client"
+              },
+              "urgency": {
+                "type": "boolean",
+                "description": "Si c'est une urgence (inondation, refoulement)"
+              },
+              "location": {
+                "enum": [
+                  "montreal",
+                  "rive_sud",
+                  "rive_nord"
+                ],
+                "type": "string",
+                "description": "Localisation"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description du problème"
+              },
+              "serviceType": {
+                "enum": [
+                  "debouchage",
+                  "camera_inspection",
+                  "racines_alesage",
+                  "gainage",
+                  "drain_francais",
+                  "installation_cheminee",
+                  "sous_dalle"
+                ],
+                "type": "string",
+                "description": "Type de service demandé"
+              }
+            }
+          },
+          "description": "Valide une demande de service et collecte les informations obligatoires"
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculateQuote",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "serviceType",
+              "location"
+            ],
+            "properties": {
+              "urgency": {
+                "type": "boolean",
+                "description": "Urgence soir/weekend"
+              },
+              "location": {
+                "enum": [
+                  "montreal",
+                  "rive_sud",
+                  "rive_nord"
+                ],
+                "type": "string"
+              },
+              "complexity": {
+                "enum": [
+                  "standard",
+                  "complex",
+                  "very_complex"
+                ],
+                "type": "string"
+              },
+              "serviceType": {
+                "type": "string",
+                "description": "Type de service"
+              }
+            }
+          },
+          "description": "Calcule un devis avec minimum 350$ + taxes"
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sendSMSAlert",
+          "parameters": {
+            "type": "object",
+            "required": [
+              "priority",
+              "customerInfo",
+              "recipient"
+            ],
+            "properties": {
+              "priority": {
+                "enum": [
+                  "P1",
+                  "P2",
+                  "P3",
+                  "P4"
+                ],
+                "type": "string"
+              },
+              "recipient": {
+                "enum": [
+                  "guillaume",
+                  "maxime",
+                  "both"
+                ],
+                "type": "string"
+              },
+              "customerInfo": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "phone",
+                  "serviceType"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "serviceType": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "description": "Envoie une alerte SMS selon la priorité"
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "system",
+        "content": "# Assistant VAPI Paul - Drain Fortin Production\n\n## Identité\nTu es Paul, représentant de Drain Fortin, entreprise de plomberie spécialisée.\n\n## Capacité d'exécution de fonctions\nTu peux exécuter ces fonctions pour servir le client:\n- validateServiceRequest: Vérifier si on offre le service demandé\n- calculateQuote: Calculer une estimation de prix\n- sendSMSAlert: Envoyer SMS pour urgences P1/P2\n\n## Services offerts\n✅ ACCEPTÉS:\n- Débouchage avec caméra (350-650$)\n- Racines et alésage (450-750$)\n- Gainage et installation (3900-8000$)\n- Drain français (500-800$ par mètre)\n\n❌ REFUSÉS:\n- Fosses septiques\n- Piscines\n- Gouttières\n- Puisards\n\n## Règles d'affaires\n1. Minimum 350$ pour tout déplacement\n2. Rive-sud: +100$ frais de déplacement\n3. Urgence soir/weekend: +75$\n4. Priorités:\n   - P1: Inondation/refoulement (immédiat)\n   - P2: Municipal (2h max)\n   - P3: Gainage/+3000$ (1h)\n   - P4: Standard (30min)\n\n## Flow de conversation\n1. Accueil chaleureux\n2. Identifier le problème\n3. Valider si on offre le service\n4. Donner estimation de prix\n5. Proposer plage de rendez-vous\n6. Collecter informations client\n7. Si urgent: envoyer SMS automatiquement\n\n## Réponses\n- Sois professionnel mais chaleureux\n- Parle français québécois\n- Maximum 2-3 phrases par réponse\n- Guide vers la prise de rendez-vous"
+      }
+    ],
+    "provider": "openai",
+    "maxTokens": 150,
+    "temperature": 0.7
+  },
+  "firstMessage": "Bonjour! Ici Paul, agent virtuel de Drain Fortin, disponible vingt quatre heures sur vingt quatre, sept jours sur sept. Comment puis-je vous aider aujourd'hui?",
+  "voicemailMessage": " Bonjour, vous êtes bien chez Drain Fortin. Votre appel n’a pas pu être pris en charge en direct. Veuillez laisser un message avec vos coordonnées et la nature de votre problème. Merci et bonne journée",
+  "endCallMessage": "Merci d'avoir appelé Drain Fortin. Bonne journée!",
+  "transcriber": {
+    "language": "fr-CA",
+    "provider": "azure",
+    "segmentationStrategy": "Semantic",
+    "segmentationSilenceTimeoutMs": 600
+  },
+  "silenceTimeoutSeconds": 20,
+  "clientMessages": [
+    "conversation-update",
+    "function-call",
+    "speech-update",
+    "transcript"
+  ],
+  "serverMessages": [
+    "conversation-update",
+    "function-call",
+    "speech-update",
+    "status-update",
+    "transcript",
+    "tool-calls"
+  ],
+  "serverUrl": "https://phiduqxcufdmgjvdipyu.supabase.co/functions/v1/vapi-webhook",
+  "endCallPhrases": [
+    "au revoir",
+    "bye",
+    "goodbye",
+    "merci beaucoup",
+    "c'est tout"
+  ],
+  "maxDurationSeconds": 600,
+  "metadata": {
+    "smsMaxime": "+15146175425",
+    "phoneNumber": "+14502803222",
+    "smsGuillaume": "+15145296037"
+  },
+  "backgroundSound": "office",
+  "firstMessageMode": "assistant-speaks-first",
+  "backgroundDenoisingEnabled": true,
+  "server": {
+    "url": "https://phiduqxcufdmgjvdipyu.supabase.co/functions/v1/vapi-webhook",
+    "timeoutSeconds": 20
+  },
+  "isServerUrlSecretSet": true
+}
