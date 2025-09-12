@@ -1,0 +1,7 @@
+Root: C:\\Users\\Utilisateur\\OneDrive - Veta Veterinaire\\Downloads\\Drain Fortin
+PDFs found: 4
+Extracted: 4
+- C:/Users/Utilisateur/OneDrive - Veta Veterinaire/Downloads/Drain Fortin/Complément configuration agent IA (6).pdf -> C:\Users\Utilisateur\AI-Projects\nexus\drain-fortin-production-clean\final\DF_SCAN\text-extract\pdf\Complément configuration agent IA (6).txt
+- C:/Users/Utilisateur/OneDrive - Veta Veterinaire/Downloads/Drain Fortin/Complément configuration agent IA.pdf -> C:\Users\Utilisateur\AI-Projects\nexus\drain-fortin-production-clean\final\DF_SCAN\text-extract\pdf\Complément configuration agent IA.txt
+- C:/Users/Utilisateur/OneDrive - Veta Veterinaire/Downloads/Drain Fortin/CONTRAT DE SERVICE AGENT IA (8).pdf -> C:\Users\Utilisateur\AI-Projects\nexus\drain-fortin-production-clean\final\DF_SCAN\text-extract\pdf\CONTRAT DE SERVICE AGENT IA (8).txt
+- C:/Users/Utilisateur/OneDrive - Veta Veterinaire/Downloads/Drain Fortin/CONTRAT DE SERVICE AGENT IA.pdf -> C:\Users\Utilisateur\AI-Projects\nexus\drain-fortin-production-clean\final\DF_SCAN\text-extract\pdf\CONTRAT DE SERVICE AGENT IA.txt
