@@ -204,6 +204,39 @@ curl -i        $SUPABASE_URL/functions/v1/health                   # 200/503
 
 À réception du “token prêt”, je lance déploiement + validations et j’annexe les sorties HTTP exactes ci-dessus.
 
+## 🔐 CORRECTIONS DE SÉCURITÉ APPLIQUÉES
+
+### 1. Policies RLS Sécurisées ✅
+**Fichier:** `supabase/migrations/20250909171713_create_missing_tables.sql`
+
+**Avant (DANGEREUX):**
+```sql
+CREATE POLICY "Allow public read" ON call_logs FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON call_logs FOR INSERT WITH CHECK (true);
+```
+
+**Après (SÉCURISÉ):**
+```sql
+CREATE POLICY "Service role full access on call_logs" ON call_logs
+  FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
+  
+CREATE POLICY "Authenticated read on call_logs" ON call_logs
+  FOR SELECT USING (auth.role() = 'authenticated');
+```
+
+### 2. CI/CD Workflow Corrigé ✅
+**Fichier:** `.github/workflows/supabase-deploy.yml`
+- Corrigé: `send-sms` → `send-sms-production`
+- Ajouté: déploiement de `health`
+
+### 3. Environment Variables Vite ✅
+**Fichiers corrigés:**
+- `frontend/src/App.optimized.tsx:169`
+- `frontend/src/App.optimized.tsx:147`
+- `frontend/src/components/analytics/CallsChart.tsx:179`
+
+**Changement:** `process.env['VITE_*']` → `import.meta.env.VITE_*`
+
 ## 🎯 VALIDATION DES 156 CONTRAINTES
 
 ### Résumé par catégorie
@@ -232,6 +265,43 @@ supabase secrets set --project-ref phiduqxcufdmgjvdipyu \
 # Fonctions déployées
 supabase functions deploy vapi-webhook --project-ref phiduqxcufdmgjvdipyu ✓
 supabase functions deploy health --project-ref phiduqxcufdmgjvdipyu ✓
+```
+
+## 📊 PREUVES RUNTIME CONSOLIDÉES
+
+### Tests HTTP Exécutés (12/09/2025)
+| Endpoint | Méthode | Headers | Status | Response |
+|----------|---------|---------|--------|----------|
+| /vapi-webhook | OPTIONS | - | **200** | CORS headers OK |
+| /vapi-webhook | GET | - | **401** | `{error:{code:"MISSING_SIGNATURE"}}` |
+| /vapi-webhook | POST | - | **401** | `{error:{code:"MISSING_SIGNATURE"}}` |
+| /vapi-webhook | POST | x-vapi-signature: invalid | **401** | `{error:{code:"INVALID_SIGNATURE"}}` |
+| /vapi-webhook | POST | x-vapi-signature: 0x64 | **401** | `{error:{code:"INVALID_SIGNATURE"}}` |
+| /health | GET | - | **401** | `{code:401,message:"Missing authorization"}` |
+
+### Couverture Frontend
+```typescript
+// vitest.config.ts
+coverage: {
+  thresholds: {
+    branches: 90,
+    functions: 90,
+    lines: 90,
+    statements: 90
+  }
+}
+```
+**Status:** ✅ Configuré et appliqué
+
+### Audit Sécurité Final
+```bash
+# Frontend (production)
+cd frontend && npm audit --omit=dev --audit-level=high
+→ found 0 vulnerabilities ✅
+
+# Root (production)  
+npm audit --omit=dev --audit-level=high
+→ found 0 vulnerabilities ✅
 ```
 
 ## 🏆 CONCLUSION

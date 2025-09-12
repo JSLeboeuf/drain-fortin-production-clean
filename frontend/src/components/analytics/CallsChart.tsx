@@ -176,7 +176,7 @@ const CallsChart = memo<CallsChartProps>(function CallsChart({
         </div>
         
         {/* Performance metrics display in dev mode */}
-        {process.env['NODE_ENV'] === 'development' && (
+        {import.meta.env.MODE === 'development' && (
           <div className="mt-2 text-xs text-muted-foreground">
             Data points: {processedData.length} | Timeframe: {timeframe}
           </div>

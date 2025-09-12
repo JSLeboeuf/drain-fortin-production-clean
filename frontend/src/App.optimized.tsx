@@ -144,7 +144,7 @@ function App() {
             </Suspense>
           </div>
           
-          {process.env['NODE_ENV'] === 'development' && (
+          {import.meta.env.MODE === 'development' && (
             <ReactQueryDevtools initialIsOpen={false} />
           )}
         </ThemeProvider>
