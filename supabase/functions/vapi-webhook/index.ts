@@ -1,105 +1,194 @@
-// Deno Edge Function for VAPI Webhook
+// Deno Edge Function for VAPI Webhook - Production Ready
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { corsHeaders } from '../_shared/cors.ts'
 
-const VAPI_SERVER_SECRET = Deno.env.get('VAPI_SERVER_SECRET')!
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY')!
-
-// Create Supabase client
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+// Error codes for structured responses
+const ERROR_CODES = {
+  MISSING_SIGNATURE: 'MISSING_SIGNATURE',
+  INVALID_SIGNATURE: 'INVALID_SIGNATURE',
+  INVALID_JSON: 'INVALID_JSON',
+  PAYLOAD_TOO_LARGE: 'PAYLOAD_TOO_LARGE',
+  TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
+  INVALID_ENV: 'INVALID_ENV'
+} as const
 
 // Rate limiting storage
 const rateLimitMap = new Map<string, number[]>()
 
-// Validate HMAC signature
-async function validateHMAC(payload: string, signature: string): Promise<boolean> {
-  const encoder = new TextEncoder()
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(VAPI_SERVER_SECRET),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['verify']
-  )
-  
-  const signatureBuffer = Uint8Array.from(
-    signature.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
-  )
-  
-  return await crypto.subtle.verify(
-    'HMAC',
-    key,
-    signatureBuffer,
-    encoder.encode(payload)
-  )
-}
-
-// Check rate limit
-function isRateLimited(clientIp: string): boolean {
-  const now = Date.now()
-  const windowMs = 60000 // 1 minute
-  const maxRequests = 10
-  
-  const timestamps = rateLimitMap.get(clientIp) || []
-  const recentRequests = timestamps.filter(t => now - t < windowMs)
-  
-  if (recentRequests.length >= maxRequests) {
-    return true
-  }
-  
-  recentRequests.push(now)
-  rateLimitMap.set(clientIp, recentRequests)
-  return false
-}
-
 // Main handler
 serve(async (req) => {
-  // Handle CORS
+  // Validate environment variables first
+  const VAPI_SECRET = Deno.env.get('VAPI_SERVER_SECRET') || Deno.env.get('VAPI_WEBHOOK_SECRET')
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+  const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  
+  if (!VAPI_SECRET || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    return new Response(
+      JSON.stringify({ 
+        error: { 
+          code: ERROR_CODES.INVALID_ENV, 
+          message: 'Missing required environment variables' 
+        } 
+      }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+
+  // Create Supabase client after env validation
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { status: 200, headers: corsHeaders })
+  }
+
+  // Check signature before any parsing (GET or POST without signature)
+  const signatureHeader = req.headers.get('x-vapi-signature')
+  if (!signatureHeader) {
+    return new Response(
+      JSON.stringify({ 
+        error: { 
+          code: ERROR_CODES.MISSING_SIGNATURE, 
+          message: 'Missing x-vapi-signature header' 
+        } 
+      }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+
+  // Parse signature - support multiple formats
+  const raw = signatureHeader.toLowerCase()
+  const hex = raw.replace(/^(?:hmac-)?sha256=/, '')
+  
+  // Validate hex format (64 chars)
+  if (!/^[0-9a-f]{64}$/.test(hex)) {
+    return new Response(
+      JSON.stringify({ 
+        error: { 
+          code: ERROR_CODES.INVALID_SIGNATURE, 
+          message: 'Invalid signature format' 
+        } 
+      }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   }
 
   try {
-    // Get client IP
-    const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown'
+    // Read payload with size limit
+    const payload = await req.text()
     
-    // Check rate limit
-    if (isRateLimited(clientIp)) {
+    // Check payload size (1MB limit)
+    if (payload.length > 1_048_576) {
       return new Response(
-        JSON.stringify({ error: 'Too many requests' }),
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ 
+          error: { 
+            code: ERROR_CODES.PAYLOAD_TOO_LARGE, 
+            message: 'Payload exceeds 1MB limit' 
+          } 
+        }),
+        { status: 413, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
     // Validate HMAC
-    const signature = req.headers.get('x-vapi-signature')
-    if (!signature) {
-      return new Response(
-        JSON.stringify({ error: 'Missing signature' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    const payload = await req.text()
-    const isValid = await validateHMAC(payload, signature.replace('sha256=', ''))
+    const encoder = new TextEncoder()
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(VAPI_SECRET),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    )
+    
+    const signatureBuffer = Uint8Array.from(
+      hex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
+    )
+    
+    const isValid = await crypto.subtle.verify(
+      'HMAC',
+      key,
+      signatureBuffer,
+      encoder.encode(payload)
+    )
     
     if (!isValid) {
       return new Response(
-        JSON.stringify({ error: 'Invalid signature' }),
+        JSON.stringify({ 
+          error: { 
+            code: ERROR_CODES.INVALID_SIGNATURE, 
+            message: 'Invalid HMAC signature' 
+          } 
+        }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    const data = JSON.parse(payload)
-    const { message } = data
+    // Parse JSON safely
+    let data: any
+    try {
+      data = JSON.parse(payload)
+    } catch {
+      return new Response(
+        JSON.stringify({ 
+          error: { 
+            code: ERROR_CODES.INVALID_JSON, 
+            message: 'Invalid JSON payload' 
+          } 
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Support both nested and top-level message type
+    const message = data?.message ?? { type: data?.type }
+    
+    // Fast-path health check
+    if (message?.type === 'health-check') {
+      return new Response(
+        JSON.stringify({ 
+          status: 'healthy', 
+          timestamp: new Date().toISOString() 
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Rate limiting (configurable)
+    const RATE_LIMIT_DISABLED = Deno.env.get('RATE_LIMIT_DISABLED') === 'true'
+    const MAX_REQUESTS = parseInt(Deno.env.get('RATE_LIMIT_MAX_REQUESTS') || '100')
+    const WINDOW_SECONDS = parseInt(Deno.env.get('RATE_LIMIT_WINDOW_SECONDS') || '60')
+    
+    if (!RATE_LIMIT_DISABLED) {
+      const clientIp = req.headers.get('x-forwarded-for') || 
+                       req.headers.get('cf-connecting-ip') || 
+                       'unknown'
+      
+      const now = Date.now()
+      const windowMs = WINDOW_SECONDS * 1000
+      const timestamps = rateLimitMap.get(clientIp) || []
+      const recentRequests = timestamps.filter(t => now - t < windowMs)
+      
+      if (recentRequests.length >= MAX_REQUESTS) {
+        return new Response(
+          JSON.stringify({ 
+            error: { 
+              code: ERROR_CODES.TOO_MANY_REQUESTS, 
+              message: `Rate limit exceeded: ${MAX_REQUESTS} requests per ${WINDOW_SECONDS} seconds` 
+            } 
+          }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      
+      recentRequests.push(now)
+      rateLimitMap.set(clientIp, recentRequests)
+    }
 
     // Process different message types
     switch (message.type) {
       case 'end-of-call-report': {
-        // Save to database
         const { error } = await supabase
           .from('call_logs')
           .insert({
@@ -119,22 +208,20 @@ serve(async (req) => {
         if (error) {
           console.error('Database error:', error)
           return new Response(
-            JSON.stringify({ error: 'Database error' }),
+            JSON.stringify({ 
+              error: { 
+                code: ERROR_CODES.INTERNAL_ERROR, 
+                message: 'Database operation failed' 
+              } 
+            }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           )
         }
-
-        // Send notification if needed
-        if (message.analysis?.requiresFollowUp) {
-          // TODO: Send SMS via Brevo
-        }
-
         break
       }
 
       case 'tool-calls': {
-        // Handle tool calls
-        const toolResponse = await processToolCalls(message.toolCalls)
+        const toolResponse = await processToolCalls(message.toolCalls, supabase)
         return new Response(
           JSON.stringify(toolResponse),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -143,12 +230,12 @@ serve(async (req) => {
 
       case 'status-update':
       case 'transcript':
-        // Log these for monitoring
-        console.log(`Received ${message.type}:`, message)
+        // Minimal logging for non-sensitive events
         break
 
       default:
-        console.log('Unknown message type:', message.type)
+        // Unknown message type - log but don't fail
+        break
     }
 
     return new Response(
@@ -159,34 +246,47 @@ serve(async (req) => {
   } catch (error) {
     console.error('Webhook error:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ 
+        error: { 
+          code: ERROR_CODES.INTERNAL_ERROR, 
+          message: 'Internal server error' 
+        } 
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
 
-// Send SMS via Brevo
+// Send SMS function (updated for E.164 format)
 async function sendSMS(phone: string, message: string): Promise<boolean> {
-  if (!BREVO_API_KEY || BREVO_API_KEY === 'YOUR_BREVO_KEY_HERE') {
-    console.log('SMS would be sent to:', phone, message)
-    return true // Simulate success in development
+  const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID')
+  const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN')
+  const TWILIO_PHONE_NUMBER = Deno.env.get('TWILIO_PHONE_NUMBER')
+  
+  // Ensure E.164 format
+  const e164Phone = phone.startsWith('+') ? phone : `+1${phone.replace(/\D/g, '')}`
+  
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
+    console.log('SMS simulation (missing credentials):', e164Phone)
+    return true
   }
 
   try {
-    const response = await fetch('https://api.brevo.com/v3/transactionalSMS/sms', {
-      method: 'POST',
-      headers: {
-        'api-key': BREVO_API_KEY,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        sender: 'DrainFortin',
-        recipient: phone,
-        content: message,
-        type: 'transactional'
-      })
-    })
-
+    const response = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          From: TWILIO_PHONE_NUMBER,
+          To: e164Phone,
+          Body: message
+        })
+      }
+    )
     return response.ok
   } catch (error) {
     console.error('SMS sending failed:', error)
@@ -194,8 +294,8 @@ async function sendSMS(phone: string, message: string): Promise<boolean> {
   }
 }
 
-// Process tool calls
-async function processToolCalls(toolCalls: any[]): Promise<any> {
+// Process tool calls (updated with corrected business rules)
+async function processToolCalls(toolCalls: any[], supabase: any): Promise<any> {
   const results = []
   
   for (const call of toolCalls) {
@@ -203,14 +303,18 @@ async function processToolCalls(toolCalls: any[]): Promise<any> {
     
     switch (call.function?.name) {
       case 'validateServiceRequest': {
-        const serviceType = args.serviceType
+        // Accept both args.service and args.serviceType
+        const serviceType = args.service || args.serviceType
+        
         const acceptedServices = [
           'debouchage', 'camera_inspection', 'racines_alesage', 
           'gainage', 'drain_francais', 'installation_cheminee', 'sous_dalle'
         ]
+        
         const rejectedServices = [
-          'fosses_septiques', 'piscines', 'goutieres', 
-          'vacuum_aspiration', 'puisard'
+          'vacuum_aspiration', 'fosses_septiques', 'piscines', 
+          'gouttieres', 'vidage_bac_garage'
+          // Note: exception for drain desservant bac would be handled by agent logic
         ]
         
         const isAccepted = acceptedServices.includes(serviceType)
@@ -219,54 +323,92 @@ async function processToolCalls(toolCalls: any[]): Promise<any> {
         results.push({
           toolCallId: call.id,
           result: {
-            serviceAccepted: isAccepted,
-            serviceRejected: isRejected,
+            accepted: isAccepted,
+            reason: isRejected ? 'service_not_offered' : (isAccepted ? 'service_offered' : 'unknown_service'),
             message: isAccepted 
-              ? `✅ Nous offrons ce service: ${serviceType}`
+              ? `Nous offrons ce service: ${serviceType}`
               : isRejected 
-                ? `❌ Désolé, nous ne faisons pas: ${serviceType}`
-                : `❓ Service non reconnu: ${serviceType}`
+                ? `Désolé, nous ne faisons pas: ${serviceType}`
+                : `Service non reconnu: ${serviceType}`
           }
         })
         break
       }
         
       case 'calculateQuote': {
-        const { serviceType, location, urgency, complexity } = args
+        const { 
+          serviceType, 
+          location, 
+          urgency, 
+          complexity,
+          lengthFeet, // For gainage
+          gps,
+          chimneyInstallPossible
+        } = args
         
-        // Base prices (minimum 350$)
-        const basePrices = {
+        // Base prices with updated minimums
+        const basePrices: { [key: string]: { min: number, max: number } } = {
           'debouchage': { min: 350, max: 650 },
           'camera_inspection': { min: 350, max: 350 },
           'racines_alesage': { min: 450, max: 750 },
-          'gainage': { min: 350, max: 750 }, // First visit only
+          'gainage': { min: 3900, max: 6000 }, // Base price for 10 feet
           'drain_francais': { min: 500, max: 800 },
+          'drain_toit': { min: 450, max: 650 },
           'installation_cheminee': { min: 2500, max: 2500 },
           'sous_dalle': { min: 350, max: 1000 }
         }
         
         const basePrice = basePrices[serviceType] || { min: 350, max: 500 }
         let estimatedPrice = basePrice.min
+        let adjustments: any = {}
         
-        // Location adjustments
-        if (location === 'rive_sud') {
-          estimatedPrice += 100
+        // Special gainage calculation
+        if (serviceType === 'gainage' && lengthFeet) {
+          // Base: 3900$ for 10 feet, +90$ per additional foot
+          const baseFeet = 10
+          const additionalFeet = Math.max(0, lengthFeet - baseFeet)
+          estimatedPrice = 3900 + (additionalFeet * 90)
+          adjustments.gainageLength = `${lengthFeet} pieds`
         }
         
-        // Urgency surcharge
+        // Location adjustment (Rive-Sud +100$)
+        if (location === 'rive_sud') {
+          estimatedPrice += 100
+          adjustments.riveSud = 100
+        }
+        
+        // Urgency surcharge (+75$)
         if (urgency) {
           estimatedPrice += 75
+          adjustments.urgency = 75
+        }
+        
+        // GPS tracking (+50$)
+        if (gps) {
+          estimatedPrice += 50
+          adjustments.gps = 50
         }
         
         // Complexity adjustment
         if (complexity === 'complex') {
           estimatedPrice = Math.round(estimatedPrice * 1.3)
+          adjustments.complexity = 'complex (×1.3)'
         } else if (complexity === 'very_complex') {
           estimatedPrice = Math.round(estimatedPrice * 1.6)
+          adjustments.complexity = 'very_complex (×1.6)'
         }
         
+        // Chimney credit (-150$ if installation not possible)
+        if (chimneyInstallPossible === false && serviceType === 'drain_francais') {
+          estimatedPrice -= 150
+          adjustments.chimneyCredit = -150
+        }
+        
+        // Ensure minimum 350$ + taxes
+        estimatedPrice = Math.max(estimatedPrice, 350)
+        
         const priceRange = {
-          min: Math.max(estimatedPrice, 350),
+          min: estimatedPrice,
           max: Math.max(Math.round(estimatedPrice * 1.5), basePrice.max)
         }
         
@@ -276,11 +418,7 @@ async function processToolCalls(toolCalls: any[]): Promise<any> {
             serviceType,
             location,
             basePrice: basePrice.min,
-            adjustments: {
-              riveSud: location === 'rive_sud' ? 100 : 0,
-              urgency: urgency ? 75 : 0,
-              complexity: complexity || 'standard'
-            },
+            adjustments,
             estimatedPrice: priceRange,
             message: `Estimation: ${priceRange.min}$ à ${priceRange.max}$ + taxes`,
             note: 'Prix minimum 350$ + taxes pour tout déplacement'
@@ -292,24 +430,32 @@ async function processToolCalls(toolCalls: any[]): Promise<any> {
       case 'sendSMSAlert': {
         const { priority, customerInfo, recipient } = args
         
+        // Phone mapping (E.164 format)
+        const phoneMapping: { [key: string]: string } = {
+          guillaume: Deno.env.get('GUILLAUME_PHONE') || '+15145296037',
+          maxime: Deno.env.get('MAXIME_PHONE') || '+15146175425'
+        }
+        
         // Determine SMS recipients
         const smsTargets = []
         if (recipient === 'guillaume' || recipient === 'both') {
           smsTargets.push({
             name: 'Guillaume',
-            phone: '+15145296037' // From .env
+            phone: phoneMapping.guillaume
           })
         }
         if ((recipient === 'maxime' || recipient === 'both') && 
             customerInfo.serviceType === 'sous_dalle') {
           smsTargets.push({
-            name: 'Maxime', 
-            phone: '+15146175425' // From .env
+            name: 'Maxime',
+            phone: phoneMapping.maxime
           })
         }
         
         // Format SMS message
-        const urgencyEmoji = { P1: '🚨', P2: '⚡', P3: '📞', P4: '📝' }
+        const urgencyEmoji: { [key: string]: string } = { 
+          P1: '🚨', P2: '⚡', P3: '📞', P4: '📝' 
+        }
         const smsMessage = `${urgencyEmoji[priority]} ${priority} - Drain Fortin\n` +
           `Client: ${customerInfo.name}\n` +
           `Tél: ${customerInfo.phone}\n` +
@@ -328,7 +474,7 @@ async function processToolCalls(toolCalls: any[]): Promise<any> {
           })
         }
         
-        // Log to database
+        // Log to database with detailed info
         const { error } = await supabase
           .from('sms_logs')
           .insert({

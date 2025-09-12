@@ -1,17 +1,35 @@
-// Health check Edge Function
+// Health check Edge Function - Production Ready
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { corsHeaders } from '../_shared/cors.ts'
 
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
-const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!
+// Safe environment variable access
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { status: 200, headers: corsHeaders })
   }
 
   try {
+    // Check if environment variables are set
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      return new Response(
+        JSON.stringify({
+          status: 'unhealthy',
+          timestamp: new Date().toISOString(),
+          version: '1.0.2',
+          database: 'unconfigured',
+          error: 'Missing environment variables'
+        }),
+        { 
+          status: 503,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     
     // Test database connection
