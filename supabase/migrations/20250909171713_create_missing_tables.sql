@@ -95,12 +95,27 @@ ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sms_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
 
--- Basic RLS policies
-CREATE POLICY "Allow public read" ON call_logs FOR SELECT USING (true);
-CREATE POLICY "Allow public insert" ON call_logs FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public read" ON leads FOR SELECT USING (true);
-CREATE POLICY "Allow public insert" ON leads FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow public update" ON leads FOR UPDATE USING (true);
-CREATE POLICY "Allow public read" ON sms_logs FOR SELECT USING (true);
-CREATE POLICY "Allow public insert" ON sms_logs FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow all" ON appointments FOR ALL USING (true);
+-- Secure RLS policies (service role only for sensitive operations)
+CREATE POLICY "Service role full access on call_logs" ON call_logs
+  FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
+
+CREATE POLICY "Authenticated read on call_logs" ON call_logs
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Service role full access on leads" ON leads
+  FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
+
+CREATE POLICY "Authenticated read on leads" ON leads
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Service role full access on sms_logs" ON sms_logs
+  FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
+
+CREATE POLICY "Authenticated read on sms_logs" ON sms_logs
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Service role full access on appointments" ON appointments
+  FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
+
+CREATE POLICY "Authenticated users can read own appointments" ON appointments
+  FOR SELECT USING (auth.role() = 'authenticated');

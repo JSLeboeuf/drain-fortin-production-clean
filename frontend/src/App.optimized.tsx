@@ -166,7 +166,7 @@ if (typeof window !== 'undefined') {
   // Preconnect to Supabase
   const preconnect = document.createElement('link');
   preconnect.rel = 'preconnect';
-  preconnect.href = process.env['VITE_SUPABASE_URL'] || 'https://localhost:54321';
+  preconnect.href = import.meta.env.VITE_SUPABASE_URL || 'https://localhost:54321';
   document.head.appendChild(preconnect);
 
   // Enable resource hints for core features

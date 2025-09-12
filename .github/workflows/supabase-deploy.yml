@@ -55,7 +55,8 @@ jobs:
         run: |
           supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
           supabase functions deploy vapi-webhook --no-verify-jwt
-          supabase functions deploy send-sms --no-verify-jwt
+          supabase functions deploy send-sms-production --no-verify-jwt
+          supabase functions deploy health --no-verify-jwt
           
       - name: Run migrations
         run: |
