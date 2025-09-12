@@ -1,0 +1,317 @@
+{
+  "name": "Paul - Agent Drain Fortin avec Knowledge Base",
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "messages": [
+      {
+        "role": "system",
+        "content": "# Assistant VAPI Paul - Drain Fortin Production avec Knowledge Base\n\n## Identité\nTu es Paul, représentant expert de Drain Fortin, entreprise de plomberie spécialisée depuis plus de 10 ans.\n\n## Capacités Avancées - Knowledge Base\nTu as maintenant accès à une base de connaissances complète via ces fonctions:\n- searchWebsiteInfo: Rechercher toute information sur le site drainfortin.ca\n- getServiceDetails: Obtenir détails complets d'un service avec garanties\n- checkServiceArea: Vérifier si une zone est desservie avec surcharge\n- getCompanyInfo: Accéder aux certifications, horaires, contacts\n\n## Capacités Standard\n- validateServiceRequest: Vérifier si on offre le service\n- calculateQuote: Calculer estimation de prix\n- classifyPriority: Déterminer l'urgence (P1-P4)\n- evaluateScheduling: Proposer plage de rendez-vous\n- sendSMSAlert: Envoyer SMS pour urgences\n\n## Utilisation de la Knowledge Base\nQUAND un client demande:\n- Une zone spécifique → checkServiceArea\n- Des détails sur un service → getServiceDetails\n- Des informations générales → searchWebsiteInfo\n- Certifications/horaires → getCompanyInfo\n\n## Services Offerts\n✅ ACCEPTÉS:\n- Débouchage avec caméra (350-650$)\n- Racines et alésage (450-750$)\n- Gainage sans excavation (350-750$ première visite)\n- Drain français (500-800$)\n- Installation cheminée (2500$ forfait)\n- Sous-dalle (350-1000$ puis Maxime)\n\n❌ REFUSÉS:\n- Fosses septiques\n- Piscines\n- Gouttières\n- Vacuum/Aspiration\n- Puisards\n\n## Règles d'Affaires\n1. Minimum 350$ pour tout déplacement\n2. Rive-Sud: +100$ automatique\n3. PAS de surcharge urgence (contrat)\n4. Horaires: 6h-15h lun-ven, parfois samedi\n5. Transfert Maxime (514-617-5425) SEULEMENT pour sous-dalle intérieur\n\n## Flow de Conversation Intelligent\n1. Accueil chaleureux\n2. Identifier le problème\n3. UTILISER LA KNOWLEDGE BASE pour réponses précises\n4. Valider service offert\n5. Donner estimation avec détails\n6. Vérifier zone de service\n7. Proposer rendez-vous\n8. Collecter informations\n9. Si urgent: SMS automatique\n\n## Réponses Enrichies\n- Toujours vérifier dans la knowledge base avant de répondre\n- Donner des informations précises sur garanties\n- Confirmer les zones desservies avec certitude\n- Fournir numéros de certification si demandés\n\n## Style\n- Professionnel mais chaleureux\n- Français québécois\n- Maximum 2-3 phrases\n- Précis grâce à la knowledge base"
+      }
+    ],
+    "temperature": 0.7,
+    "maxTokens": 200,
+    "emotionRecognitionEnabled": true,
+    "numFastTurns": 5,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "searchWebsiteInfo",
+          "description": "Rechercher des informations dans la base de connaissances du site drainfortin.ca",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": ["zones", "services", "garanties", "certifications", "processus", "tarifs", "horaires", "testimonials", "faq"],
+                "description": "Catégorie d'information à rechercher"
+              },
+              "query": {
+                "type": "string",
+                "description": "Question spécifique ou mot-clé à rechercher"
+              }
+            },
+            "required": ["category", "query"]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "getServiceDetails",
+          "description": "Obtenir les détails complets d'un service incluant processus, garanties et témoignages",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "service": {
+                "type": "string",
+                "enum": ["debouchage", "camera_inspection", "racines_alesage", "gainage", "drain_francais", "installation_cheminee", "sous_dalle"],
+                "description": "Type de service à détailler"
+              },
+              "includeGuarantee": {
+                "type": "boolean",
+                "description": "Inclure les informations de garantie",
+                "default": true
+              }
+            },
+            "required": ["service"]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "checkServiceArea",
+          "description": "Vérifier si une ville ou code postal est dans notre zone de service",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string",
+                "description": "Nom de la ville ou arrondissement"
+              },
+              "postalCode": {
+                "type": "string",
+                "description": "Code postal (format: H2X ou H2X 1A1)"
+              }
+            },
+            "required": ["city"]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "getCompanyInfo",
+          "description": "Obtenir les informations de l'entreprise (certifications, horaires, contact, etc.)",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "infoType": {
+                "type": "string",
+                "enum": ["certifications", "hours", "contact", "warranty", "about"],
+                "description": "Type d'information recherchée"
+              }
+            },
+            "required": ["infoType"]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "validateServiceRequest",
+          "description": "Valider si Drain Fortin offre le service demandé",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "serviceType": {
+                "type": "string",
+                "description": "Type de service demandé par le client"
+              }
+            },
+            "required": ["serviceType"]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "calculateQuote",
+          "description": "Calculer une estimation de prix pour un service",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "serviceType": {
+                "type": "string",
+                "enum": ["debouchage", "camera_inspection", "racines_alesage", "gainage", "drain_francais", "installation_cheminee", "sous_dalle"],
+                "description": "Type de service"
+              },
+              "location": {
+                "type": "string",
+                "enum": ["montreal", "rive_sud", "rive_nord", "laval"],
+                "description": "Zone géographique"
+              },
+              "urgency": {
+                "type": "boolean",
+                "description": "Service urgent requis"
+              },
+              "complexity": {
+                "type": "string",
+                "enum": ["standard", "complex", "very_complex"],
+                "description": "Complexité estimée"
+              }
+            },
+            "required": ["serviceType"]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "classifyPriority",
+          "description": "Classifier la priorité de l'appel (P1-P4)",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "serviceType": {
+                "type": "string",
+                "description": "Type de service"
+              },
+              "isEmergency": {
+                "type": "boolean",
+                "description": "Situation d'urgence"
+              },
+              "keywords": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Mots-clés mentionnés (inondation, refoulement, etc.)"
+              },
+              "estimatedValue": {
+                "type": "number",
+                "description": "Valeur estimée du projet"
+              }
+            },
+            "required": ["serviceType"]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "evaluateScheduling",
+          "description": "Évaluer et proposer une plage de rendez-vous",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "serviceType": {
+                "type": "string",
+                "description": "Type de service"
+              },
+              "priority": {
+                "type": "string",
+                "enum": ["P1", "P2", "P3", "P4"],
+                "description": "Niveau de priorité"
+              },
+              "customerPreference": {
+                "type": "string",
+                "description": "Préférence du client pour le rendez-vous"
+              }
+            },
+            "required": ["serviceType", "priority"]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "sendSMSAlert",
+          "description": "Envoyer une alerte SMS pour les urgences ou priorités élevées",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "priority": {
+                "type": "string",
+                "enum": ["P1", "P2", "P3", "P4"],
+                "description": "Niveau de priorité"
+              },
+              "customerInfo": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "serviceType": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "required": ["name", "phone", "serviceType"]
+              },
+              "recipient": {
+                "type": "string",
+                "enum": ["guillaume", "maxime", "both"],
+                "description": "Destinataire du SMS"
+              }
+            },
+            "required": ["priority", "customerInfo", "recipient"]
+          }
+        }
+      }
+    ]
+  },
+  "voice": {
+    "provider": "11labs",
+    "voiceId": "pNInz6obpgDQGcFmaJgB",
+    "model": "eleven_multilingual_v2",
+    "language": "fr-CA",
+    "stability": 0.65,
+    "similarityBoost": 0.75,
+    "useSpeakerBoost": true,
+    "optimizeStreamingLatency": 3,
+    "enableSsmlParsing": true
+  },
+  "firstMessage": "Bonjour! Ici Paul, agent expert de Drain Fortin. Comment puis-je vous aider aujourd'hui avec vos besoins en plomberie et drainage?",
+  "firstMessageMode": "assistant-speaks-first",
+  "hipaaEnabled": false,
+  "clientMessages": [
+    "assistant-hangs-up",
+    "function-call",
+    "speech-update",
+    "transcript"
+  ],
+  "serverMessages": [
+    "end-of-call-report",
+    "status-update",
+    "speech-update",
+    "transcript",
+    "tool-calls",
+    "user-interrupted",
+    "voice-input"
+  ],
+  "silenceTimeoutSeconds": 20,
+  "maxDurationSeconds": 600,
+  "backgroundSound": "off",
+  "backchannelingEnabled": true,
+  "backgroundDenoisingEnabled": true,
+  "modelOutputInMessagesEnabled": true,
+  "transportConfigurations": [
+    {
+      "provider": "twilio",
+      "record": true,
+      "recordingChannels": "dual"
+    }
+  ],
+  "endCallFunctionEnabled": true,
+  "endCallMessage": "Merci d'avoir appelé Drain Fortin. Nous vous contacterons très bientôt. Bonne journée!",
+  "endCallPhrases": [
+    "au revoir",
+    "bye",
+    "goodbye",
+    "merci beaucoup",
+    "c'est tout",
+    "bonne journée"
+  ],
+  "transcriber": {
+    "provider": "azure",
+    "language": "fr-CA"
+  },
+  "serverUrl": "{{SUPABASE_FUNCTION_URL}}/vapi-webhook-enhanced",
+  "serverUrlSecret": "{{VAPI_WEBHOOK_SECRET}}",
+  "analysisPlan": {
+    "summaryPrompt": "Résume l'appel en 2 phrases max. Inclus: service demandé, urgence, zone de service, et action prise.",
+    "structuredDataPrompt": "Extrais: service_type, priority_level, estimated_value, customer_city, customer_postal, scheduled, guarantee_mentioned",
+    "successEvaluationPrompt": "L'appel est réussi si: 1) Service validé avec knowledge base, 2) Zone vérifiée, 3) Prix avec garantie donnés, 4) Rendez-vous proposé ou SMS envoyé"
+  }
+}
