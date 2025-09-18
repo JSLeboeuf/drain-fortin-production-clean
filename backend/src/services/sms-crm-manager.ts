@@ -9,6 +9,15 @@ import twilio, { type Twilio } from 'twilio';
 const DEFAULT_TWILIO_FROM = '+14389004385';
 const DEFAULT_GUILLAUME_NUMBER = '+15141234567';
 const DEFAULT_BUSINESS_NUMBERS = ['+15145296037', '+14389004385'] as const;
+const DEFAULT_COUNTRY_CODE = '1';
+
+const E164_REGEX = /^\+[1-9]\d{6,14}$/;
+const NON_DIGIT_PLUS = /[^\d+]/g;
+
+interface NormalizePhoneOptions {
+  defaultCountryCode?: string;
+  onInvalid?: (input: string) => void;
+}
 
 const getRequiredEnv = (key: string): string => {
   const value = process.env[key];
@@ -26,7 +35,48 @@ const getRequiredEnv = (key: string): string => {
   return trimmed;
 };
 
-export const normalizePhoneNumbers = (numbers: Iterable<string | null | undefined>): string[] => {
+const sanitizeCountryCode = (value: string | undefined): string => {
+  const digits = (value ?? '').replace(/\D/g, '');
+  return digits || DEFAULT_COUNTRY_CODE;
+};
+
+const toE164 = (input: string, defaultCountryCode: string): string | null => {
+  const trimmed = input.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  let cleaned = trimmed.replace(NON_DIGIT_PLUS, '');
+
+  if (cleaned.startsWith('00')) {
+    cleaned = `+${cleaned.slice(2)}`;
+  }
+
+  const hasLeadingPlus = cleaned.startsWith('+');
+  const digits = cleaned.replace(/\D/g, '');
+
+  if (!digits) {
+    return null;
+  }
+
+  if (hasLeadingPlus) {
+    const candidate = `+${digits}`;
+    return E164_REGEX.test(candidate) ? candidate : null;
+  }
+
+  const alreadyPrefixed = digits.startsWith(defaultCountryCode) && digits.length > defaultCountryCode.length;
+  const candidateDigits = digits.length <= 10 && !alreadyPrefixed ? `${defaultCountryCode}${digits}` : digits;
+  const candidate = `+${candidateDigits}`;
+
+  return E164_REGEX.test(candidate) ? candidate : null;
+};
+
+export const normalizePhoneNumbers = (
+  numbers: Iterable<string | null | undefined>,
+  options: NormalizePhoneOptions = {}
+): string[] => {
+  const countryCode = sanitizeCountryCode(options.defaultCountryCode);
   const uniqueNumbers = new Set<string>();
 
   for (const number of numbers) {
@@ -34,18 +84,20 @@ export const normalizePhoneNumbers = (numbers: Iterable<string | null | undefine
       continue;
     }
 
-    const normalized = number.trim();
+    const normalized = toE164(number, countryCode);
 
-    if (normalized.length > 0) {
+    if (normalized) {
       uniqueNumbers.add(normalized);
+    } else if (number.trim().length > 0) {
+      options.onInvalid?.(number);
     }
   }
 
   return Array.from(uniqueNumbers);
 };
 
-const splitAndNormalizePhoneNumbers = (value: string | undefined): string[] =>
-  value ? normalizePhoneNumbers(value.split(',')) : [];
+const splitPhoneNumbers = (value: string | undefined): string[] =>
+  value ? value.split(',').map(entry => entry.trim()).filter(Boolean) : [];
 
 type UrgencyLevel = 'urgent' | 'normal';
 
@@ -87,6 +139,7 @@ interface SMSCRMManagerDependencies {
   phoneNumbers?: Partial<PhoneNumberConfig>;
   now?: () => Date;
   twilioFrom?: string;
+  defaultCountryCode?: string;
 }
 
 export class SMSCRMManager {
@@ -95,9 +148,10 @@ export class SMSCRMManager {
   private readonly phoneNumbers: PhoneNumberConfig;
   private readonly now: () => Date;
   private readonly twilioFrom: string;
+  private readonly defaultCountryCode: string;
 
   constructor(dependencies: SMSCRMManagerDependencies = {}) {
-    const { supabase, twilioClient, phoneNumbers, now, twilioFrom } = dependencies;
+    const { supabase, twilioClient, phoneNumbers, now, twilioFrom, defaultCountryCode } = dependencies;
 
     this.supabase =
       supabase ??
@@ -113,6 +167,7 @@ export class SMSCRMManager {
     this.twilioFrom =
       twilioFrom?.trim() || process.env.TWILIO_PHONE_NUMBER?.trim() || DEFAULT_TWILIO_FROM;
 
+    this.defaultCountryCode = sanitizeCountryCode(defaultCountryCode ?? process.env.DEFAULT_PHONE_COUNTRY_CODE);
     this.phoneNumbers = this.resolvePhoneNumbers(phoneNumbers);
     this.now = now ?? (() => new Date());
   }
@@ -125,7 +180,7 @@ export class SMSCRMManager {
       const message = this.buildCallNotificationMessage(callData);
       const recipients = this.getCallNotificationRecipients(callData.urgency);
 
-      await this.sendSMSBatch(recipients, message);
+      const deliveredRecipients = await this.sendSMSBatch(recipients, message);
 
       const timestamp = this.now().toISOString();
 
@@ -141,7 +196,7 @@ export class SMSCRMManager {
         timestamp
       });
 
-      return { success: true, message: 'SMS envoyé avec succès' };
+      return { success: true, message: 'SMS envoyé avec succès', recipients: deliveredRecipients };
     } catch (error: unknown) {
       console.error('Erreur envoi SMS:', error);
       return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -327,19 +382,78 @@ export class SMSCRMManager {
   }
 
   private resolvePhoneNumbers(overrides?: Partial<PhoneNumberConfig>): PhoneNumberConfig {
-    const baseConfig: PhoneNumberConfig = {
-      guillaume: process.env.GUILLAUME_PHONE?.trim() || DEFAULT_GUILLAUME_NUMBER,
-      business: normalizePhoneNumbers(DEFAULT_BUSINESS_NUMBERS),
-      alerts: splitAndNormalizePhoneNumbers(process.env.SMS_ALERT_NUMBERS)
-    };
+    const guillaume = this.resolvePrimaryNumber({
+      label: 'Guillaume',
+      override: overrides?.guillaume,
+      envValue: process.env.GUILLAUME_PHONE,
+      fallback: DEFAULT_GUILLAUME_NUMBER
+    });
+
+    const businessOverride = overrides?.business
+      ? normalizePhoneNumbers(overrides.business, {
+          defaultCountryCode: this.defaultCountryCode,
+          onInvalid: value => this.warnInvalidNumber('business override', value)
+        })
+      : [];
+
+    const businessDefault = normalizePhoneNumbers(DEFAULT_BUSINESS_NUMBERS, {
+      defaultCountryCode: this.defaultCountryCode
+    });
+
+    const business = businessOverride.length > 0 ? businessOverride : businessDefault;
+
+    const alertCandidates = [
+      ...(overrides?.alerts ?? []),
+      ...splitPhoneNumbers(process.env.SMS_ALERT_NUMBERS)
+    ];
+
+    const alerts = normalizePhoneNumbers(alertCandidates, {
+      defaultCountryCode: this.defaultCountryCode,
+      onInvalid: value => this.warnInvalidNumber('alert', value)
+    });
 
     return {
-      guillaume: overrides?.guillaume?.trim() || baseConfig.guillaume,
-      business: overrides?.business
-        ? normalizePhoneNumbers(overrides.business)
-        : baseConfig.business,
-      alerts: overrides?.alerts ? normalizePhoneNumbers(overrides.alerts) : baseConfig.alerts
+      guillaume,
+      business,
+      alerts
     };
+  }
+
+  private resolvePrimaryNumber(params: {
+    label: string;
+    override?: string;
+    envValue?: string;
+    fallback: string;
+  }): string {
+    const { label, override, envValue, fallback } = params;
+
+    const overrideNormalized = normalizePhoneNumbers([override], {
+      defaultCountryCode: this.defaultCountryCode,
+      onInvalid: value => this.warnInvalidNumber(`${label} override`, value)
+    });
+
+    if (overrideNormalized.length > 0) {
+      return overrideNormalized[0];
+    }
+
+    const envNormalized = normalizePhoneNumbers([envValue], {
+      defaultCountryCode: this.defaultCountryCode,
+      onInvalid: value => this.warnInvalidNumber(`${label} env`, value)
+    });
+
+    if (envNormalized.length > 0) {
+      return envNormalized[0];
+    }
+
+    const fallbackNormalized = normalizePhoneNumbers([fallback], {
+      defaultCountryCode: this.defaultCountryCode
+    });
+
+    if (fallbackNormalized.length > 0) {
+      return fallbackNormalized[0];
+    }
+
+    throw new Error(`A valid ${label} phone number is required`);
   }
 
   private buildCallNotificationMessage(callData: CallNotificationData): string {
@@ -387,13 +501,19 @@ export class SMSCRMManager {
       recipients.push(...this.phoneNumbers.alerts);
     }
 
-    return normalizePhoneNumbers(recipients);
+    return Array.from(new Set(recipients));
   }
 
   private async sendSMSBatch(recipients: string[], message: string) {
-    const uniqueRecipients = normalizePhoneNumbers(recipients);
+    const uniqueRecipients = Array.from(new Set(recipients));
+
+    if (uniqueRecipients.length === 0) {
+      throw new Error('At least one recipient is required to send an SMS batch');
+    }
 
     await Promise.all(uniqueRecipients.map(recipient => this.sendSMS(recipient, message)));
+
+    return uniqueRecipients;
   }
 
   private async fetchPhoneLineStatus(line: string) {
@@ -425,7 +545,9 @@ export class SMSCRMManager {
   }
 
   private async sendSMS(to: string, message: string) {
-    const normalizedTo = to.trim();
+    const [normalizedTo] = normalizePhoneNumbers([to], {
+      defaultCountryCode: this.defaultCountryCode
+    });
 
     if (!normalizedTo) {
       throw new Error('Recipient phone number is required');
@@ -466,6 +588,10 @@ export class SMSCRMManager {
     } catch (error) {
       console.error('Erreur log CRM:', error);
     }
+  }
+
+  private warnInvalidNumber(context: string, value: string) {
+    console.warn(`[SMSCRMManager] Invalid ${context} phone number skipped: ${value}`);
   }
 }
 
