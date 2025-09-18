@@ -3,12 +3,7 @@
  * Layout components for page structure and navigation
  */
 
-// Re-export layout components when they are created
-// export { Header } from './Header';
-// export { Sidebar } from './Sidebar';
-// export { Footer } from './Footer';
-// export { MainLayout } from './MainLayout';
-// export { DashboardLayout } from './DashboardLayout';
+export { default as Header } from './Header';
 
 // Placeholder for future layout components
 export const layoutComponents = {
