@@ -111,3 +111,86 @@ export interface WebSocketAuthToken {
   permissions: string[];
   userId?: string;
 }
+
+// Additional types for refactored components
+export interface VAPICall {
+  id: string;
+  created_at: string;
+  status: 'active' | 'completed' | 'failed' | 'queued';
+  duration?: number;
+  phone_number?: string;
+  transcript?: string;
+  recording_url?: string;
+  cost?: number;
+  metadata?: Record<string, unknown>;
+}
+
+export interface CallStats {
+  todayCalls: number;
+  successCalls: number;
+  failedCalls: number;
+  avgDuration: number;
+}
+
+export interface Alert {
+  id: string;
+  type: 'error' | 'warning' | 'info' | 'success';
+  message: string;
+  timestamp: string;
+  dismissed?: boolean;
+}
+
+export interface ConnectionStatus {
+  status: 'connected' | 'disconnected' | 'connecting';
+  lastConnected?: string;
+  reconnectAttempts?: number;
+}
+
+export interface ButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  icon?: React.ElementType;
+  variant?: 'primary' | 'secondary' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
+  className?: string;
+}
+
+export interface CardProps {
+  children: React.ReactNode;
+  title?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  actions?: React.ReactNode;
+}
+
+export interface StatusBadgeProps {
+  status: VAPICall['status'];
+  live?: boolean;
+  showIcon?: boolean;
+}
+
+export interface HeaderProps {
+  connectionStatus: ConnectionStatus['status'];
+  alertCount: number;
+  onMenuToggle?: () => void;
+}
+
+export interface QuickStatsProps {
+  stats: CallStats;
+}
+
+export interface LiveConversationsProps {
+  calls?: VAPICall[];
+}
+
+export interface CallHistoryTableProps {
+  calls?: VAPICall[];
+  onCallSelect?: (call: VAPICall) => void;
+}
+
+export interface AlertsPanelProps {
+  alerts: Alert[];
+  onDismissAlert?: (alertId: string) => void;
+}
