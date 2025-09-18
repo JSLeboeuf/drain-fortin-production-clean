@@ -1,9 +1,10 @@
 import { createRoot } from "react-dom/client";
 import React from "react";
 import { logger } from "@/lib/logger";
+import App from "./App";
 // Session Safety: no-outbound mocks (DEV only)
 import "./mocks/no-outbound";
-import App from "./App";
+// import TestApp from "./TestApp";
 import "./index.css";
 import "./styles/enhanced-ui.css";
 

@@ -5,8 +5,8 @@
 
 import React, { memo } from 'react';
 import { PhoneCall, CheckCircle, XCircle, Clock, LucideIcon } from 'lucide-react';
-import { DRAIN_FORTIN_COLORS } from '@/constants/colors';
-import { Card } from '@/components/ui/Card';
+import { DRAIN_FORTIN_COLORS } from '../../constants/colors';
+import { Card } from '../ui/Card';
 
 export interface StatsData {
   todayCalls: number;

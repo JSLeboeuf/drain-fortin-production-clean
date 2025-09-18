@@ -5,8 +5,8 @@
 
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
-import { DRAIN_FORTIN_COLORS } from '@/constants/colors';
-import { ButtonPrimary } from '@/components/ui';
+import { DRAIN_FORTIN_COLORS } from '../../constants/colors';
+import { ButtonPrimary } from '../ui/Button';
 
 interface SimpleErrorBoundaryState {
   hasError: boolean;
@@ -25,7 +25,7 @@ export class SimpleErrorBoundary extends React.Component<
     return { hasError: true };
   }
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       return (
         <div style={{

@@ -5,12 +5,12 @@
 
 import React, { memo, useState, useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { DRAIN_FORTIN_COLORS } from '@/constants/colors';
-import { Header } from '@/components/layout';
-import { ButtonPrimary } from '@/components/ui';
-import { QuickStats } from '@/components/dashboard';
-import { useVapiCalls } from '@/hooks/useVapiCalls';
-import { supabase } from '@/config/supabase';
+import { DRAIN_FORTIN_COLORS } from '../../constants/colors';
+import { Header } from '../layout/Header';
+import { ButtonPrimary } from '../ui/Button';
+import { QuickStats } from './QuickStats';
+import { useVapiCalls } from '../../hooks/useVapiCalls';
+import { supabase } from '../../config/supabase';
 
 export const Dashboard = memo(() => {
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected'>('connected');

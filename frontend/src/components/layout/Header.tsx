@@ -5,7 +5,7 @@
 
 import React, { memo } from 'react';
 import { Droplets, Wifi, WifiOff, Bell } from 'lucide-react';
-import { DRAIN_FORTIN_COLORS } from '@/constants/colors';
+import { DRAIN_FORTIN_COLORS } from '../../constants/colors';
 
 export interface HeaderProps {
   connectionStatus: 'connected' | 'disconnected';

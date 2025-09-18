@@ -5,9 +5,9 @@
 
 import React from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/config/query-client';
-import { Dashboard } from '@/components/dashboard/Dashboard';
-import { SimpleErrorBoundary } from '@/components/SimpleErrorBoundary';
+import { queryClient } from './config/query-client';
+import { Dashboard } from './components/dashboard/Dashboard';
+import { SimpleErrorBoundary } from './components/SimpleErrorBoundary';
 
 export default function App() {
   return (

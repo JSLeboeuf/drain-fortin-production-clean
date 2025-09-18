@@ -3,7 +3,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/config/supabase';
+import { supabase } from '../../config/supabase';
 
 export interface VapiCallLog {
   id: string;
